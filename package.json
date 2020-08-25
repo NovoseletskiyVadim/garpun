@@ -1,0 +1,21 @@
+{
+  "name": "cam_adapter",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js",
+    "script": "node ./scripts/watcher"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "chokidar": "^3.4.2",
+    "dotenv": "^8.2.0",
+    "file-type": "^14.7.1"
+  },
+  "devDependencies": {
+    "chai": "^4.2.0"
+  }
+}
