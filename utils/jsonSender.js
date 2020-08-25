@@ -5,7 +5,7 @@ module.exports = (eventMeta) => {
     let eventName = rest.join('_');
     if (eventName === `VEHICLE_DETECTION`) {
       console.log(time, plateNumber, eventName);
-      // logger.saveDetectEvent({ time, plateNumber, eventName });
+      logger.saveDetectEvent({ time, plateNumber, eventName });
     } else {
       logger.saveErrorEvent({ message: 'wrong event name' + ' ' + eventName });
       console.log('wrong event name');
