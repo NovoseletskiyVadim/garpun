@@ -23,6 +23,6 @@ const addFile = (camName) => {
   }, time);
 };
 
-for (let i = 0; i < 10; i++) {
+for (let i = 0; i < 1; i++) {
   addFile(i);
 }
