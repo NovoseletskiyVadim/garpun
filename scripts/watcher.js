@@ -19,8 +19,11 @@ watcher
   .on('add', async (pathFile) => {
     const fileData = await FileType.fromFile(pathFile);
     if (fileData && fileData.ext === 'jpg') {
-      const eventMeta = path.basename(pathFile, '.jpg');
-      jsonSender(eventMeta);
+      const parsedPath = path.parse(pathFile);
+      const splittedPath = parsedPath.dir.split(path.sep);
+      const cameraName = splittedPath[splittedPath.length - 1];
+      const fileName = parsedPath.name;
+      jsonSender({ cameraName, fileName });
     } else {
       logger.saveErrorEvent({ message: 'WRONG_FILE_TYPE' + ' ' + pathFile });
       console.log('WRONG_FILE_TYPE', pathFile);

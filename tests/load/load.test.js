@@ -1,23 +1,28 @@
 const fs = require('fs');
-const path = require('path');
-const { resolve } = require('path');
-const { rejects } = require('assert');
-require('dotenv').config();
 
 let calc = 0;
-const addFile = () => {
-  const data = new Date().getTime();
+const addFile = (camName) => {
+  const date = new Date().getTime();
+  const filePath = `c://Users//Alex//Documents//media_test//${camName}//${date}_CA5402AO_VEHICLE_DETECTION.jpg`;
+  if (!fs.existsSync(`c://Users//Alex//Documents//media_test//${camName}`)) {
+    fs.mkdirSync(`c://Users//Alex//Documents//media_test//${camName}`);
+  }
+  console.log(camName, calc, date);
   fs.copyFile(
     `c://Users//Alex//Documents//media_test//20200821153229331_CA5402AO_VEHICLE_DETECTION.jpg`,
-    `c://Users//Alex//Documents//media_test//${data}_CA5402AO_VEHICLE_DETECTION.jpg`,
-    () => {
-      calc++;
-      while (calc < 1000) {
-        return new Promise((resolve, rejects) => {
-          setTimeout(resolve(addFile()), 500);
-        });
-      }
-    }
+    filePath,
+    function () {}
   );
+  calc++;
+  const time = Math.floor(Math.random() * (180000 - 500)) + 500;
+  console.log(time);
+  setTimeout(() => {
+    if (calc < 1000) {
+      addFile(camName);
+    }
+  }, time);
 };
-addFile();
+
+for (let i = 0; i < 10; i++) {
+  addFile(i);
+}
