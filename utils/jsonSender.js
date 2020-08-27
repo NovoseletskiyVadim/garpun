@@ -23,8 +23,20 @@ module.exports = (eventData) => {
                 })
                 .then((doc) => {
                   const params = new url.URLSearchParams({ foo: 'bar' });
+
+                  const config = {
+                    headers: {
+                      'Content-type': ' application/json; charset=utf-8',
+                      Authentication: process.env.API_KEY,
+                    },
+                  };
                   axios
-                    .post(process.env.API_SERVER, params.toString())
+                    .post(
+                      process.env.API_SERVER +
+                        '/CollectMoveVehicles/ReceiveMovementHarpoon',
+                      JSON.stringify(params),
+                      config
+                    )
                     .then((res) => {
                       let update = {};
                       if (res.status === 200) {
@@ -45,7 +57,6 @@ module.exports = (eventData) => {
                               'No document matches the provided query.'
                             );
                           }
-                          clientClose(connect);
                         })
                         .catch((err) => {
                           console.log(err);
@@ -60,6 +71,8 @@ module.exports = (eventData) => {
                   //   eventName,
                   // });
                 });
+            } else {
+              clientClose(connect);
             }
           });
       });

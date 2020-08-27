@@ -6,7 +6,9 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node server.js",
-    "script": "node ./scripts/watcher"
+    "script": "node ./scripts/watcher",
+    "dev": "nodemon ./scripts/watcher",
+    "load": "node ./tests/load/load.test"
   },
   "author": "",
   "license": "ISC",
