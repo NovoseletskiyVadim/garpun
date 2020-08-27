@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node server.js",
     "script": "node ./scripts/watcher",
-    "dev": "nodemon ./scripts/watcher",
+    "dev": "nodemon app",
     "load": "node ./tests/load/load.test"
   },
   "author": "",
@@ -17,7 +17,11 @@
     "chokidar": "^3.4.2",
     "dotenv": "^8.2.0",
     "file-type": "^14.7.1",
-    "mongodb": "^3.6.0"
+    "moment": "^2.27.0",
+    "mongodb": "^3.6.0",
+    "sequelize": "^6.3.4",
+    "sqlite3": "^5.0.0",
+    "uuid": "^8.3.0"
   },
   "devDependencies": {
     "chai": "^4.2.0"

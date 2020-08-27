@@ -1,29 +1,21 @@
+'use strict';
 const chokidar = require('chokidar');
 const FileType = require('file-type');
 const path = require('path');
-const fs = require('fs');
 require('dotenv').config();
-const jsonSender = require('./../utils/jsonSender');
-const logger = require('./../utils/logger');
+require('./db/dbConnect');
+const eventHandler = require('./utils/eventHandler');
 
-if (!fs.existsSync(path.join(__dirname, './../logs'))) {
-  fs.mkdirSync(path.join(__dirname, './../logs'));
-}
-
-const watcher = chokidar.watch(process.env.MEDIA_PATH, {
+const evenWatcher = chokidar.watch(process.env.MEDIA_PATH, {
   ignored: /^\./,
   persistent: true,
 });
 
-watcher
+evenWatcher
   .on('add', async (pathFile) => {
     const fileData = await FileType.fromFile(pathFile);
     if (fileData && fileData.ext === 'jpg') {
-      const parsedPath = path.parse(pathFile);
-      const splittedPath = parsedPath.dir.split(path.sep);
-      const cameraName = splittedPath[splittedPath.length - 1];
-      const fileName = parsedPath.name;
-      jsonSender({ cameraName, fileName });
+      eventHandler(pathFile);
     } else {
       logger.saveErrorEvent({ message: 'WRONG_FILE_TYPE' + ' ' + pathFile });
       console.log('WRONG_FILE_TYPE', pathFile);
@@ -39,3 +31,5 @@ watcher
   .on('error', function (error) {
     console.error('Error happened', error);
   });
+
+module.exports = { evenWatcher };
