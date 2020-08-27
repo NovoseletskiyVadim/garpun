@@ -5,8 +5,7 @@
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js",
-    "script": "node ./scripts/watcher",
+    "start": "node app",
     "dev": "nodemon app",
     "load": "node ./tests/load/load.test"
   },

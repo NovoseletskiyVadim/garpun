@@ -13,14 +13,15 @@ npm v6.14.6
 1 npm update
 2 Create .env file
   MEDIA_PATH= path where stored photos
+  API_SERVER=
+  API_KEY=
+  SQL_DB=
 ```
 
 ##Start
 
 ```
-server
 npm start
-
-watch script
-npm run script
+or
+npm run dev
 ```
