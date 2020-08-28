@@ -1,84 +1,64 @@
 'use strict';
 const url = require('url');
 const axios = require('axios');
-var ObjectId = require('mongodb').ObjectId;
-const { clientConnect, clientClose } = require('../db/connect');
-const logger = require('./logger');
-module.exports = (eventData) => {
-  const { cameraName, fileName } = eventData;
-  if (fileName) {
-    const [time, plateNumber, ...rest] = fileName.split('_');
-    let eventName = rest.join('_');
-    if (eventName === `VEHICLE_DETECTION`) {
-      clientConnect().then((connect) => {
-        const db = connect.db('my-database');
-        db.collection('events')
-          .findOne({ name: fileName, device: cameraName })
-          .then((doc) => {
-            if (!doc) {
-              db.collection('events')
-                .insertOne({
-                  name: fileName,
-                  device: cameraName,
-                })
-                .then((doc) => {
-                  const params = new url.URLSearchParams({ foo: 'bar' });
+const { resolve } = require('path');
+const { rejects } = require('assert');
 
-                  const config = {
-                    headers: {
-                      'Content-type': ' application/json; charset=utf-8',
-                      Authentication: process.env.API_KEY,
-                    },
-                  };
-                  axios
-                    .post(
-                      process.env.API_SERVER +
-                        '/CollectMoveVehicles/ReceiveMovementHarpoon',
-                      JSON.stringify(params),
-                      config
-                    )
-                    .then((res) => {
-                      let update = {};
-                      if (res.status === 200) {
-                        update = { $set: { api_res: res.data } };
-                      } else {
-                        update = { $push: { api_res: { status: 'ERROR' } } };
-                      }
-                      db.collection('events')
-                        .findOneAndUpdate(
-                          { _id: ObjectId(doc.ops[0]._id) },
-                          update
-                        )
-                        .then((doc) => {
-                          if (doc) {
-                            console.log(doc.value);
-                          } else {
-                            console.log(
-                              'No document matches the provided query.'
-                            );
-                          }
-                        })
-                        .catch((err) => {
-                          console.log(err);
-                        });
-                    });
-                  // logger.saveDetectEvent({
-                  //   id: doc.ops[0]._id,
-                  //   cameraName,
-                  //   time,
-                  //   fileName,
-                  //   plateNumber,
-                  //   eventName,
-                  // });
-                });
-            } else {
-              clientClose(connect);
-            }
-          });
+module.exports = (eventData) => {
+  let jsonData = {
+    version: 1,
+    provider: process.env.PROVIDER || '', //Назва поставника послуги ?
+    data: {
+      device: {
+        id: '', //Унікальний ідентифікатор СРНЗ в ІПНП. Ідентифікатор видається при реєстрації
+        name: eventData.cameraName, //Назва СРНЗ
+        event: {
+          id: eventData.uuid,
+          datetime: eventData.formattedDate,
+          latitude: 0, //?
+          longitude: 0, //?
+          params: [],
+          vehicle: {
+            licensePlate: {
+              value: eventData.plateNumber,
+              country: null,
+              region: null,
+            },
+            params: [],
+          },
+          media: [
+            {
+              id: '', //?
+              data: '', //eventData.fileData, //Фотозображення ТЗ* Строка (base64)
+              url: null,
+              plate: {
+                data: null,
+                url: null,
+              },
+            },
+          ],
+        },
+      },
+    },
+  };
+  const config = {
+    headers: {
+      'Content-type': ' application/json; charset=utf-8',
+      Authentication: process.env.API_KEY, //
+    },
+  };
+  return new Promise((resolve, rejects) => {
+    axios
+      .post(
+        process.env.API_SERVER + '/CollectMoveVehicles/ReceiveMovementHarpoon',
+        JSON.stringify(jsonData),
+        config
+      )
+      .then((res) => {
+        resolve(true);
+      })
+      .catch((err) => {
+        rejects(err);
       });
-    } else {
-      logger.saveErrorEvent({ message: 'wrong event name' + ' ' + eventName });
-      console.log('wrong event name');
-    }
-  }
+  });
 };

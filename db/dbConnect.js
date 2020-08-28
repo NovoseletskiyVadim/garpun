@@ -9,7 +9,7 @@ const sequelize = new Sequelize({
 sequelize
   .authenticate()
   .then(() => {
-    console.log('DB connection has been established successfully.');
+    console.log('db connection OK.');
   })
   .catch((err) => {
     console.error('Unable to connect to the database:', err);
@@ -21,7 +21,6 @@ class CamEvent extends Model {}
 
 CamEvent.init(
   {
-    // attributes
     uuid: {
       type: Sequelize.STRING,
       defaultValue: Sequelize.UUIDV4,
@@ -45,6 +44,6 @@ CamEvent.init(
     modelName: 'camEvents',
   }
 );
-CamEvent.sync({ force: true });
+CamEvent.sync({ force: true }); //TEMP create new db all the timers
 
 module.exports.CamEvent = CamEvent;
