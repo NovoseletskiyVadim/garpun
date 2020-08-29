@@ -1,4 +1,5 @@
 const base64Convertor = require('./base64Convertor');
+
 module.exports = (eventData) => {
   return new Promise((resolve, reject) => {
     base64Convertor(eventData.pathFile)
@@ -27,7 +28,7 @@ module.exports = (eventData) => {
                 media: [
                   {
                     id: '', //?
-                    data: 'qqqqqqqq', //dataBase64, //Фотозображення ТЗ* Строка (base64)
+                    data: 'qqqqqqqq', //dataBase64,  //Фотозображення ТЗ* Строка (base64)
                     url: null,
                     plate: {
                       data: null,

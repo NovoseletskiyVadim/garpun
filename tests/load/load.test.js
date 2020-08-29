@@ -19,7 +19,7 @@ const addFile = (camName) => {
     }
   );
   calc++;
-  const time = Math.floor(Math.random() * (180000 - 50)) + 500;
+  const time = Math.floor(Math.random() * (10000 - 50)) + 50;
   console.log(time);
   setTimeout(() => {
     if (calc < 1000) {
@@ -28,6 +28,6 @@ const addFile = (camName) => {
   }, time);
 };
 
-for (let i = 0; i < 10; i++) {
+for (let i = 0; i < 1; i++) {
   addFile(i);
 }

@@ -1,9 +1,18 @@
 'use strict';
 const chokidar = require('chokidar');
 const FileType = require('file-type');
+const { fork } = require('child_process');
 require('dotenv').config();
 require('./db/dbConnect');
 const eventHandler = require('./utils/eventHandler');
+
+const forked = fork(`./utils/rejectApiHandler.js`);
+
+forked.on('message', (msg) => {
+  console.log(msg);
+});
+
+forked.send({ hello: 'world' });
 
 const evenWatcher = chokidar.watch(process.env.MEDIA_PATH, {
   ignored: /^\./,

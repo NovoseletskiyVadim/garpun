@@ -3,7 +3,7 @@ const path = require('path');
 const fs = require('fs');
 const moment = require('moment');
 const { v4: uuidv4 } = require('uuid');
-const { CamEvent } = require('./../db/dbConnect');
+const { CamEvent, PendingList } = require('./../db/dbConnect');
 const jsonSender = require('./jsonSender');
 const convertor = require('./base64Convertor');
 const jsonCreator = require('./jsonCreator');
@@ -39,6 +39,8 @@ module.exports = (pathFile) => {
           CamEvent.create(eventData);
         })
         .catch((err) => {
+          const status = 'REQUEST_REJECTED';
+          PendingList.create({ status, data: jsonToSend });
           console.log('REQUEST_REJECTED', err.message);
         });
     });

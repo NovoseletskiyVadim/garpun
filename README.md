@@ -1,6 +1,6 @@
 # garpun
 
-##Config
+## Config
 
 ```
 node v12.13.1

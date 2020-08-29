@@ -44,6 +44,25 @@ CamEvent.init(
     modelName: 'camEvents',
   }
 );
-CamEvent.sync({ force: true }); //TEMP create new db all the timers
+CamEvent.sync({ force: true }); //TEMP create a new db all the time
 
-module.exports.CamEvent = CamEvent;
+class PendingList extends Model {}
+
+PendingList.init(
+  {
+    status: {
+      type: Sequelize.STRING,
+    },
+    data: {
+      type: Sequelize.JSON,
+    },
+  },
+  {
+    sequelize,
+    modelName: 'pendingList',
+  }
+);
+
+PendingList.sync({ force: true });
+
+module.exports = { CamEvent, PendingList };
