@@ -10,7 +10,7 @@ const addFile = (camName) => {
   }
   console.log(camName, calc, date);
   fs.copyFile(
-    `C://Users//Alex//Downloads//GP//GP//media//zolotonosha1//20200821153249639_CA1759HX_VEHICLE_DETECTION.jpg`,
+    `C://Users//Alex//Downloads//GP//GP//media//zolotonosha1//20200821153229332_CA1440AT_VEHICLE_DETECTION.jpg`,
     filePath,
     function (e) {
       if (e) {
@@ -20,7 +20,7 @@ const addFile = (camName) => {
   );
   calc++;
   const time = Math.floor(Math.random() * (10000 - 50)) + 50;
-  console.log(time);
+
   setTimeout(() => {
     if (calc < 1000) {
       addFile(camName);
@@ -28,6 +28,6 @@ const addFile = (camName) => {
   }, time);
 };
 
-for (let i = 0; i < 1; i++) {
+for (let i = 0; i < 10; i++) {
   addFile(i);
 }

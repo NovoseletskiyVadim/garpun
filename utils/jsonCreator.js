@@ -28,7 +28,7 @@ module.exports = (eventData) => {
                 media: [
                   {
                     id: '', //?
-                    data: 'qqqqqqqq', //dataBase64,  //Фотозображення ТЗ* Строка (base64)
+                    data: dataBase64, //'qqqqqqqq', //dataBase64,  //Фотозображення ТЗ* Строка (base64)
                     url: null,
                     plate: {
                       data: null,
