@@ -13,11 +13,13 @@ const addFile = (camName) => {
     `C://Users//Alex//Downloads//GP//GP//media//zolotonosha1//20200821153249639_CA1759HX_VEHICLE_DETECTION.jpg`,
     filePath,
     function (e) {
-      console.log(e);
+      if (e) {
+        console.log(e);
+      }
     }
   );
   calc++;
-  const time = Math.floor(Math.random() * (180000 - 500)) + 500;
+  const time = Math.floor(Math.random() * (180000 - 50)) + 500;
   console.log(time);
   setTimeout(() => {
     if (calc < 1000) {

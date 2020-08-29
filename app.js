@@ -1,7 +1,6 @@
 'use strict';
 const chokidar = require('chokidar');
 const FileType = require('file-type');
-const path = require('path');
 require('dotenv').config();
 require('./db/dbConnect');
 const eventHandler = require('./utils/eventHandler');
@@ -21,13 +20,6 @@ evenWatcher
       console.log('WRONG_FILE_TYPE', pathFile);
     }
   })
-  // .on('change', function (path) {
-  //   console.log('File', path, 'has been changed');
-  // })
-  // .on('unlink', function (path) {
-  //   // logger.removeFileLog({ pathFile: path });
-  //   console.log('File', path, 'has been removed');
-  // })
   .on('error', function (error) {
     console.error('Error happened', error);
   });

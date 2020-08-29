@@ -10,8 +10,11 @@ module.exports = (filePath) => {
     });
 
     stream.on('close', () => {
-      console.log(buf.length, filePath);
-      resolve(buf);
+      fs.unlink(filePath, (err) => {
+        if (err) throw err;
+        resolve(buf);
+        console.log(`${buf.length}${filePath} was deleted`);
+      });
     });
 
     stream.on('error', (err) => {
