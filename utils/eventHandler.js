@@ -17,6 +17,12 @@ module.exports = (pathFile) => {
   const eventName = rest.join('_');
   const formattedDate = moment(date, 'YYYYMMDDhhmmss').format();
   const uuid = uuidv4();
+  const dataToLocalDB = {
+    uuid,
+    time: formattedDate,
+    license_plate_number: plateNumber,
+    camera: cameraName,
+  };
   if (eventName === `VEHICLE_DETECTION`) {
     jsonCreator({
       cameraName,
@@ -24,26 +30,29 @@ module.exports = (pathFile) => {
       formattedDate,
       uuid,
       pathFile,
-    }).then((jsonToSend) => {
-      jsonSender(jsonToSend)
-        .then((result) => {
-          let eventData = {
-            uuid,
-            time: formattedDate,
-            license_plate_number: plateNumber,
-            camera: cameraName,
-          };
-          if (result) {
-            eventData.uploaded = true;
-          }
-          CamEvent.create(eventData);
-        })
-        .catch((err) => {
-          const status = 'REQUEST_REJECTED';
-          PendingList.create({ status, data: jsonToSend });
-          console.log('REQUEST_REJECTED', err.message);
-        });
-    });
+    })
+      .then((jsonToSend) => {
+        jsonSender(jsonToSend)
+          .then((result) => {
+            if (result) {
+              dataToLocalDB.uploaded = true;
+            }
+            CamEvent.create(dataToLocalDB);
+          })
+          .catch((err) => {
+            const status = 'REQUEST_REJECTED';
+            PendingList.create({
+              status,
+              data: jsonToSend,
+              dbID: dataToLocalDB.uuid,
+            });
+            CamEvent.create(dataToLocalDB);
+            console.log('REQUEST_REJECTED', err.message);
+          });
+      })
+      .catch((err) => {
+        console.error('file', err);
+      });
   } else {
     console.error('ERROR_EVENT_NAME');
   }

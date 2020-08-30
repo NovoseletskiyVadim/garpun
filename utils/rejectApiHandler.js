@@ -4,49 +4,53 @@ const jsonSender = require('./jsonSender');
 process.send('rejectApiHandler ok');
 
 let interval = 5000;
+let limit = 10;
 
-let calc = 0;
 const resend = () => {
-  PendingList.findAll({ limit: 10 }).then((list) => {
-    calc += list.length;
+  PendingList.findAll({ limit: limit }).then((list) => {
     process.send('Pending events' + list.length);
     if (list.length === 0) {
       interval = 5000;
+      limit = 10;
     }
     const requests = list.map((item) => {
       return jsonSender(item.data).then((result) => {
-        calc--;
-        PendingList.destroy({
+        const destroy = PendingList.destroy({
           where: {
             id: item.id,
           },
         });
-        console.log('event sent ' + result);
-        // TODO save successfully sent event
-        // let eventData = {
-        //   uuid: item.data.device.event.id,
-        //   time: item.data.device.event.datetime,
-        //   license_plate_number: item.data.device.event.plateNumber,
-        //   camera: cameraName,
-        // };
-        // if (result) {
-        //   eventData.uploaded = true;
-        // }
-        // CamEvent.create(eventData);
+        const update = CamEvent.update(
+          { uploaded: true },
+          {
+            where: {
+              uuid: item.dbID,
+            },
+          }
+        );
+        Promise.all([destroy, update]).catch((err) => {
+          console.error('DB_ERR', err);
+        });
       });
     });
     if (requests.length > 0) {
       Promise.all(requests)
         .then((result) => {
+          if (limit < 10) {
+            limit++;
+          }
           interval = 5000;
         })
         .catch((e) => {
-          interval *= 2;
+          limit = 1;
+          if (limit === 1) {
+            interval *= 2;
+          }
         });
     }
   });
-  console.log(calc);
   process.send('Pending_interval' + interval);
+  process.send('List_limit' + limit);
   setTimeout(() => {
     if (interval < 100000) {
       resend();

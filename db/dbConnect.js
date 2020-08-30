@@ -56,6 +56,10 @@ PendingList.init(
     data: {
       type: Sequelize.JSON,
     },
+    dbID: {
+      type: Sequelize.STRING,
+      defaultValue: Sequelize.UUIDV4,
+    },
   },
   {
     sequelize,
