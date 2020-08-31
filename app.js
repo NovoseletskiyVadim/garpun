@@ -7,12 +7,11 @@ require('./db/dbConnect');
 const eventHandler = require('./utils/eventHandler');
 const rejectFileHandler = require('./utils/rejectFileHandler');
 const forked = fork(`./utils/rejectApiHandler.js`);
+const getFileMeta = require('./utils/getFileMeta');
 
 forked.on('message', (msg) => {
   console.log(msg);
 });
-
-forked.send({ hello: 'world' });
 
 const evenWatcher = chokidar.watch(process.env.MEDIA_PATH, {
   ignored: /^\./,
@@ -21,13 +20,14 @@ const evenWatcher = chokidar.watch(process.env.MEDIA_PATH, {
 
 evenWatcher
   .on('add', async (pathFile) => {
-    const fileData = await FileType.fromFile(pathFile);
-    if (fileData && fileData.ext === 'jpg') {
-      eventHandler(pathFile);
+    const fileType = await FileType.fromFile(pathFile);
+    const fileMeta = getFileMeta(pathFile);
+    if (fileType && fileType.ext === 'jpg' && typeof fileMeta === 'object') {
+      eventHandler(fileMeta);
     } else {
       //logger.saveErrorEvent({ message: 'WRONG_FILE_TYPE' + ' ' + pathFile });
       rejectFileHandler(pathFile);
-      console.log('WRONG_FILE_TYPE', pathFile);
+      console.error('WRONG_FILE_TYPE', pathFile);
     }
   })
   .on('error', function (error) {
