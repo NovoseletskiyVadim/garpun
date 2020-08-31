@@ -5,7 +5,7 @@ const { fork } = require('child_process');
 require('dotenv').config();
 require('./db/dbConnect');
 const eventHandler = require('./utils/eventHandler');
-
+const rejectFileHandler = require('./utils/rejectFileHandler');
 const forked = fork(`./utils/rejectApiHandler.js`);
 
 forked.on('message', (msg) => {
@@ -25,7 +25,8 @@ evenWatcher
     if (fileData && fileData.ext === 'jpg') {
       eventHandler(pathFile);
     } else {
-      logger.saveErrorEvent({ message: 'WRONG_FILE_TYPE' + ' ' + pathFile });
+      //logger.saveErrorEvent({ message: 'WRONG_FILE_TYPE' + ' ' + pathFile });
+      rejectFileHandler(pathFile);
       console.log('WRONG_FILE_TYPE', pathFile);
     }
   })

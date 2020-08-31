@@ -1,12 +1,13 @@
 'use strict';
 const path = require('path');
-const fs = require('fs');
+
 const moment = require('moment');
 const { v4: uuidv4 } = require('uuid');
 const { CamEvent, PendingList } = require('./../db/dbConnect');
 const jsonSender = require('./jsonSender');
 const convertor = require('./base64Convertor');
 const jsonCreator = require('./jsonCreator');
+const rejectFileHandler = require('./rejectFileHandler');
 
 module.exports = (pathFile) => {
   const parsedPath = path.parse(pathFile);
@@ -54,6 +55,7 @@ module.exports = (pathFile) => {
         console.error('file', err);
       });
   } else {
+    rejectFileHandler(pathFile);
     console.error('ERROR_EVENT_NAME');
   }
 };
