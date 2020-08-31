@@ -1,3 +1,4 @@
+'use strict';
 const { CamEvent, PendingList } = require('./../db/dbConnect');
 const jsonSender = require('./jsonSender');
 

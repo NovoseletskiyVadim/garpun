@@ -1,3 +1,4 @@
+'use strict';
 const base64Convertor = require('./base64Convertor');
 
 module.exports = (eventData) => {

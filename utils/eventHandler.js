@@ -1,13 +1,8 @@
 'use strict';
-const path = require('path');
 
-const moment = require('moment');
-const { v4: uuidv4 } = require('uuid');
 const { CamEvent, PendingList } = require('./../db/dbConnect');
 const jsonSender = require('./jsonSender');
 const jsonCreator = require('./jsonCreator');
-
-const rejectFileHandler = require('./rejectFileHandler');
 
 module.exports = (fileMeta) => {
   const { uuid, eventDate, cameraName, plateNumber, file } = fileMeta;
