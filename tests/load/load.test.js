@@ -3,7 +3,7 @@ const moment = require('moment');
 
 let calc = 0;
 const addFile = (camName) => {
-  const date = moment().format('YYYYMMDHHmmssSSS');
+  const date = moment().format('YYYYMMDDHHmmssSSS');
   const filePath = `c://Users//Alex//Documents//media_test//${camName}//${date}_CA5402AO_VEHICLE_DETECTION.jpg`;
   if (!fs.existsSync(`c://Users//Alex//Documents//media_test//${camName}`)) {
     fs.mkdirSync(`c://Users//Alex//Documents//media_test//${camName}`);
@@ -19,7 +19,7 @@ const addFile = (camName) => {
     }
   );
   calc++;
-  const time = Math.floor(Math.random() * (10000 - 50)) + 50;
+  const time = Math.floor(Math.random() * (30000 - 500)) + 500;
 
   setTimeout(() => {
     if (calc < 1000) {

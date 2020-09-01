@@ -32,19 +32,20 @@ const saveErrorEvent = (eventData) => {
   stream.end();
 };
 
-const removeFileLog = (eventData) => {
+const rejectFileLog = (eventData) => {
   const { pathFile } = eventData;
   const stream = fs.createWriteStream(
-    path.join(__dirname, '../logs/removed.log'),
+    path.join(__dirname, '../logs/reject.log'),
     { flags: 'a' }
   );
   stream.write(
     `${JSON.stringify({
       time: new Date(),
-      path: pathFile,
+      message: eventData.message,
+      file: eventData.file,
     })}\n`
   );
   stream.end();
 };
 
-module.exports = { saveDetectEvent, saveErrorEvent, removeFileLog };
+module.exports = { saveDetectEvent, saveErrorEvent, rejectFileLog };

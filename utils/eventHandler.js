@@ -15,7 +15,7 @@ module.exports = (fileMeta) => {
   jsonCreator({
     cameraName,
     plateNumber,
-    eventDate,
+    datetime: eventDate,
     uuid,
     pathFile: file.fullPath,
   })

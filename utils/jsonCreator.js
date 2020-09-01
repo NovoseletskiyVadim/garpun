@@ -14,7 +14,7 @@ module.exports = (eventData) => {
               name: eventData.cameraName, //Назва СРНЗ
               event: {
                 id: eventData.uuid,
-                datetime: eventData.formattedDate,
+                datetime: eventData.datetime,
                 latitude: 0, //?
                 longitude: 0, //?
                 params: [],
@@ -29,7 +29,7 @@ module.exports = (eventData) => {
                 media: [
                   {
                     id: '', //?
-                    data: dataBase64, //'qqqqqqqq', //dataBase64,  //Фотозображення ТЗ* Строка (base64)
+                    data: 'qqqqqqqq', //'qqqqqqqq', //dataBase64,  //Фотозображення ТЗ* Строка (base64)
                     url: null,
                     plate: {
                       data: null,

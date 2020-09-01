@@ -9,7 +9,6 @@ let limit = 10;
 
 const resend = () => {
   models.pendingList.findAll({ limit: limit }).then((list) => {
-    process.send('Pending events' + list.length);
     if (list.length === 0) {
       interval = 5000;
       limit = 10;
@@ -49,9 +48,13 @@ const resend = () => {
           }
         });
     }
+    process.send({
+      Pending_interval: interval,
+      List_limit: limit,
+      'Pending events': list.length,
+    });
   });
-  process.send('Pending_interval' + interval);
-  process.send('List_limit' + limit);
+
   setTimeout(() => {
     if (interval < 100000) {
       resend();

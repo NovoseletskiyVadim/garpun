@@ -11,24 +11,11 @@ module.exports = (pathFile) => {
   const fileName = name;
   const [date, plateNumber, ...rest] = fileName.split('_');
   const eventName = rest.join('_');
-  if (eventName !== `VEHICLE_DETECTION`) {
-    return false;
-  }
-  if (plateNumber.length < 4) {
-    return false;
-  }
-  const dateInFormat = moment(date, 'YYYYMMDDHHmmssSSS', true);
-  const isValidData = dateInFormat.isValid();
-  if (!isValidData) {
-    return false;
-  }
-  const eventDate = dateInFormat.format('YYYY-MM-DDTHH:mm:ss.SSSZ');
-
-  return {
+  let fileMeta = {
     uuid,
-    eventDate,
+    isValid: true,
+    notPassed: [],
     cameraName,
-    plateNumber,
     file: {
       fullPath: pathFile,
       dir,
@@ -36,4 +23,25 @@ module.exports = (pathFile) => {
       ext,
     },
   };
+  if (eventName !== `VEHICLE_DETECTION`) {
+    fileMeta.isValid = false;
+    fileMeta.notPassed.push('EVENT_NAME');
+  }
+  if (!plateNumber || plateNumber.length < 4) {
+    fileMeta.isValid = false;
+    fileMeta.notPassed.push('PLATE_NUMBER');
+  } else {
+    fileMeta.plateNumber = plateNumber;
+  }
+
+  const dateInFormat = moment(date, 'YYYYMMDDHHmmssSSS', true);
+  const isValidData = dateInFormat.isValid();
+  if (!isValidData) {
+    fileMeta.isValid = false;
+    fileMeta.notPassed.push('TIME_STAMP');
+  } else {
+    fileMeta.eventDate = dateInFormat.format('YYYY-MM-DDTHH:mm:ss.SSSZ');
+  }
+
+  return fileMeta;
 };
