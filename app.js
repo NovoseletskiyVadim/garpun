@@ -24,7 +24,7 @@ eventWatcher
   .on('add', (pathFile) => {
     const fileMeta = getFileMeta(pathFile);
     FileType.fromFile(pathFile).then((type) => {
-      if (type && type.ext !== 'jpg') {
+      if (!type || type.ext !== 'jpg') {
         fileMeta.isValid = false;
         fileMeta.notPassed.push('FILE_TYPE');
       }
