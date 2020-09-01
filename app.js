@@ -11,9 +11,10 @@ const eventWatcher = chokidar.watch(process.env.MEDIA_PATH, {
 
 eventWatcher
   .on('add', (pathFile) => {
-    const fileMeta = getFileMeta(pathFile);
+
     FileType.fromFile(pathFile).then((type) => {
-      if (type && type.ext === 'jpg' && typeof fileMeta === 'object') {
+
+      if (type && type.ext === 'jpg') {
 
         console.log('It\'s OK!!!'+pathFile);
 
