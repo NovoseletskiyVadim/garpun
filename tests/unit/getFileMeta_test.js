@@ -16,7 +16,7 @@ describe('getFileMeta test', function () {
         'file'
       );
     expect(result).to.include({
-      eventDate: '2020-08-21T15:32:29+03:00',
+      eventDate: '2020-08-21T15:32:29.331+03:00',
       cameraName: 'media_test',
       plateNumber: 'CA5402AO',
     });

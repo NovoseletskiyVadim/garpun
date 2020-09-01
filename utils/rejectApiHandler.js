@@ -1,5 +1,5 @@
 'use strict';
-const { CamEvent, PendingList } = require('./../db/dbConnect');
+const { models } = require('./../db/dbConnect');
 const jsonSender = require('./jsonSender');
 
 process.send('rejectApiHandler ok');
@@ -8,7 +8,7 @@ let interval = 5000;
 let limit = 10;
 
 const resend = () => {
-  PendingList.findAll({ limit: limit }).then((list) => {
+  models.pendingList.findAll({ limit: limit }).then((list) => {
     process.send('Pending events' + list.length);
     if (list.length === 0) {
       interval = 5000;
@@ -16,12 +16,12 @@ const resend = () => {
     }
     const requests = list.map((item) => {
       return jsonSender(item.data).then((result) => {
-        const destroy = PendingList.destroy({
+        const destroy = models.pendingList.destroy({
           where: {
             id: item.id,
           },
         });
-        const update = CamEvent.update(
+        const update = models.camEvents.update(
           { uploaded: true },
           {
             where: {

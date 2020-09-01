@@ -1,9 +1,10 @@
 'use strict';
+
 const chokidar = require('chokidar');
 const FileType = require('file-type');
-const { fork } = require('child_process');
 require('dotenv').config();
 require('./db/dbConnect');
+const { fork } = require('child_process');
 const eventHandler = require('./utils/eventHandler');
 const rejectFileHandler = require('./utils/rejectFileHandler');
 const forked = fork(`./utils/rejectApiHandler.js`);

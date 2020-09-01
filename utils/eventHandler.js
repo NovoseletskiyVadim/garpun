@@ -1,6 +1,5 @@
 'use strict';
-
-const { CamEvent, PendingList } = require('./../db/dbConnect');
+const { models } = require('./../db/dbConnect');
 const jsonSender = require('./jsonSender');
 const jsonCreator = require('./jsonCreator');
 
@@ -26,16 +25,16 @@ module.exports = (fileMeta) => {
           if (result) {
             dataToLocalDB.uploaded = true;
           }
-          CamEvent.create(dataToLocalDB);
+          models.camEvents.create(dataToLocalDB);
         })
         .catch((err) => {
           const status = 'REQUEST_REJECTED';
-          PendingList.create({
+          models.pendingList.create({
             status,
             data: jsonToSend,
             dbID: dataToLocalDB.uuid,
           });
-          CamEvent.create(dataToLocalDB);
+          models.camEvents.create(dataToLocalDB);
           console.log('REQUEST_REJECTED', err.message);
         });
     })

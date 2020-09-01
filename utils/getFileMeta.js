@@ -17,12 +17,12 @@ module.exports = (pathFile) => {
   if (plateNumber.length < 4) {
     return false;
   }
-  const dateInFormat = moment(date, 'YYYYMMDDhhmmss');
+  const dateInFormat = moment(date, 'YYYYMMDDHHmmssSSS', true);
   const isValidData = dateInFormat.isValid();
   if (!isValidData) {
     return false;
   }
-  const eventDate = dateInFormat.format();
+  const eventDate = dateInFormat.format('YYYY-MM-DDTHH:mm:ss.SSSZ');
 
   return {
     uuid,
