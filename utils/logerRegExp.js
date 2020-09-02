@@ -7,7 +7,8 @@ const path = require('path');
 
 
 const saveDetectEvent = (RegExpArray) => {
-  const [ time, plateNumber, eventName ] = RegExpArray;
+  const [ full_inform, time, plateNumber, eventName ] = RegExpArray;
+
   const stream = fs.createWriteStream(
     path.join(__dirname, '../logs/VEHICLE_DETECTION.log'),
     { flags: 'a' }
@@ -22,35 +23,24 @@ const saveDetectEvent = (RegExpArray) => {
   stream.end();
 };
 
-// const saveErrorEvent = (eventData) => {
-//   const { message } = eventData;
-//   const stream = fs.createWriteStream(
-//     path.join(__dirname, '../logs/error.log'),
-//     { flags: 'a' }
-//   );
-//   stream.write(
-//     `${JSON.stringify({
-//       time: new Date(),
-//       message,
-//     })}\n`
-//   );
-//   stream.end();
-// };
+const saveErrorEvent = (RegExpArray,err) => {
+  const error=err;  
+  const [ full_inform, time, plateNumber, eventName ] = RegExpArray;
+  const stream = fs.createWriteStream(
+    path.join(__dirname, '../logs/error.log'),
+    { flags: 'a' }
+  );
+  stream.write(
+    `${JSON.stringify({
+        time,
+        plateNumber,
+        eventName,
+        error
+    })}\n`
+  );
+  stream.end();
+};
 
-// const removeFileLog = (eventData) => {
-//   const { pathFile } = eventData;
-//   const stream = fs.createWriteStream(
-//     path.join(__dirname, '../logs/removed.log'),
-//     { flags: 'a' }
-//   );
-//   stream.write(
-//     `${JSON.stringify({
-//       time: new Date(),
-//       path: pathFile,
-//     })}\n`
-//   );
-//   stream.end();
-// };
 
-module.exports = { saveDetectEvent};
-// module.exports = { saveDetectEvent, saveErrorEvent, removeFileLog };
+
+module.exports = { saveDetectEvent, saveErrorEvent};

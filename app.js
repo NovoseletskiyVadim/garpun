@@ -16,26 +16,19 @@ eventWatcher
 
     FileType.fromFile(pathFile).then((type) => {
 
+      const patternCheckNameFile=/(\d{17})_([a-zA-Z0-9А-Яа-я]{4,8})_(VEHICLE_DETECTION)/;
+      const RegExpArray=pathFile.match(patternCheckNameFile);
+
       if (type && type.ext === 'jpg') {
         
-        // console.log('It\'s OK!!!'+pathFile);
-        // const nameFile=pathFile.split("\\").pop();
-        // console.log('nameFile='+nameFile+' typeoF= '+typeof nameFile);
-
-        const patternCheckNameFile=/(\d{17})_([a-zA-Z0-9А-Яа-я]{4,8})_(VEHICLE_DETECTION)/;
-
-
-        const RegExpArray=pathFile.match(patternCheckNameFile);
-
-        console.log(RegExpArray);
-        
-
-
-
+        LogRegExp.saveDetectEvent(RegExpArray);
 
       } else {
 
-        console.error('WRONG_FILE_TYPE', pathFile);
+        const err='WRONG_FILE_TYPE'     
+
+        LogRegExp.saveErrorEvent(RegExpArray,err);
+      
       }
     });
   })
