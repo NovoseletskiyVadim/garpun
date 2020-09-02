@@ -35,7 +35,7 @@ describe('getFileMeta test', function () {
 
   it('should not work - wrong date', function () {
     const result = getFileMeta(
-      'c:\\media_test\\QQQQQQ_CA5402AO_VEHICLE_DETECTION.jpg'
+      'c:\\media_test\\QQQQQQ_a1200xrg_VEHICLE_DETECTION.jpg'
     );
     expect(result)
       .to.be.an('object')
@@ -49,7 +49,7 @@ describe('getFileMeta test', function () {
       )
       .to.include({
         cameraName: 'media_test',
-        plateNumber: 'CA5402AO',
+        plateNumber: 'a1200xrg',
         isValid: false,
       });
     expect(result.notPassed)
@@ -57,9 +57,9 @@ describe('getFileMeta test', function () {
       .deep.equal(['TIME_STAMP']);
     expect(result.file).to.include({
       dir: 'c:\\media_test',
-      name: 'QQQQQQ_CA5402AO_VEHICLE_DETECTION',
+      name: 'QQQQQQ_a1200xrg_VEHICLE_DETECTION',
       ext: '.jpg',
-      fullPath: 'c:\\media_test\\QQQQQQ_CA5402AO_VEHICLE_DETECTION.jpg',
+      fullPath: 'c:\\media_test\\QQQQQQ_a1200xrg_VEHICLE_DETECTION.jpg',
     });
   });
   it('should not work - wrong plateNumber <4', function () {

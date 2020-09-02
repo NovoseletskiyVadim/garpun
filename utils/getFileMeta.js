@@ -11,6 +11,7 @@ module.exports = (pathFile) => {
   const fileName = name;
   const [date, plateNumber, ...rest] = fileName.split('_');
   const eventName = rest.join('_');
+  const plateNumberRegX = /^[a-zA-ZА-Я0-9]{4,8}$/;
   let fileMeta = {
     uuid,
     isValid: true,
@@ -27,7 +28,7 @@ module.exports = (pathFile) => {
     fileMeta.isValid = false;
     fileMeta.notPassed.push('EVENT_NAME');
   }
-  if (!plateNumber || plateNumber.length < 4) {
+  if (!plateNumber || !plateNumberRegX.test(plateNumber)) {
     fileMeta.isValid = false;
     fileMeta.notPassed.push('PLATE_NUMBER');
   } else {
