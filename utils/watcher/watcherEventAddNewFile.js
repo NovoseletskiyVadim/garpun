@@ -2,8 +2,8 @@ const getFileMeta = require('./getFileMeta');
 const FileType = require('file-type');
 const eventHandler = require('../handlers/eventHandler');
 const appLogger = require('../logger/logger');
+const rejectFileHandler = require('./utils/rejectFileHandler');
 // TODO: change path file
-// const rejectFileHandler = require('./utils/rejectFileHandler');
 // require('./db/dbConnect');
 
 
@@ -21,7 +21,6 @@ const watcherEventAddNewFile=function(){
         if (fileMeta.isValid) {
             eventHandler(fileMeta);
         } else {
-            // TODO:
             appLogger.rejectFileLog({
                 message: fileMeta.notPassed.join(),
                 file: fileMeta.file,
