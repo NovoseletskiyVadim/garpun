@@ -2,11 +2,7 @@
 
 const chokidar = require('chokidar');
 require('dotenv').config();
-
 const watcherEventAdd =require('./events/watcherEventAdd');
-
-
-
 
 
 
@@ -17,8 +13,11 @@ const eventWatcher = chokidar.watch(process.env.MEDIA_PATH, {
 
 eventWatcher
   .on('add', (pathFile) => {
+    // variant 1
+    // watcherEventAdd.eventWatchAddNewFile(pathFile);
 
-    watcherEventAdd.eventWatchAddNewFile(pathFile);
+    // variant 2
+    
     
   })
   .on('error', function (error) {
