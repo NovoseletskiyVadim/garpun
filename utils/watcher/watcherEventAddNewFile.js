@@ -18,6 +18,7 @@ const watcherEventAddNewFile=function(){
             fileMeta.notPassed.push('FILE_TYPE');
         }
         if (fileMeta.isValid) {
+            // TODO:
             eventHandler(fileMeta);
         } else {
             appLogger.rejectFileLog({
