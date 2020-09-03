@@ -7,7 +7,8 @@ const inputFilePath = path.join(
   `../test_media/watch_folder/input.jpg`
 );
 const etalonFilePath = path.join(__dirname, `../test_media/etalon.jpg`);
-const resultFilePath = path.join(__dirname, `../test_media/result.jpg`);
+// const resultFilePath = path.join(__dirname, `../test_media/result1.jpg`);
+const resultFilePath = 'h:\\result1.jpg';
 
 describe('picture to base64 test', function () {
   before(() => {

@@ -41,6 +41,11 @@ eventWatcher
     });
   })
   .on('error', function (error) {
+    console.log(error.code);
+    if (error.code === 'UNKNOWN') {
+      rejectFileHandler(error.path);
+    }
+
     console.error('Error happened', error);
   });
 

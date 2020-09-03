@@ -14,11 +14,8 @@ module.exports = (pathFile) => {
     pathFile,
     trashPath + path.sep + fileName + parsedPath.ext,
     (err) => {
-      if (err) {
-        console.log('trash_err');
-      } else {
-        fs.unlink(pathFile, (err) => {});
-      }
+      fs.unlink(pathFile, (err) => {});
+      console.log('trash_err');
     }
   );
 };
