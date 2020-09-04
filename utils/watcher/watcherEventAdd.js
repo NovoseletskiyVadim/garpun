@@ -2,7 +2,7 @@
 // на основе рег выражений
 
 const FileType = require('file-type');
-const LogRegExp = require('../utils/logger/logerRegExp');
+const LogRegExp = require('../logger/logerRegExp');
 
 
 
