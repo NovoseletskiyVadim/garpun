@@ -1,6 +1,5 @@
 'use strict';
-// TODO: change path
-// const base64Convertor = require('./base64Convertor');
+const base64Convertor = require('../binaryConvertor/base64Convertor');
 
 module.exports = (eventData) => {
   return new Promise((resolve, reject) => {
