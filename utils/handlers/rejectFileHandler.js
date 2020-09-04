@@ -15,8 +15,11 @@ module.exports = (pathFile) => {
     trashPath + path.sep + fileName + parsedPath.ext,
     (err) => {
       if (err) {
+        // TODO: Add logger
         console.log('trash_err');
       } else {
+        // TODO: Add logger
+
         fs.unlink(pathFile, (err) => {});
       }
     }
