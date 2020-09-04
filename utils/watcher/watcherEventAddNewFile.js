@@ -32,7 +32,7 @@ const watcherEventAddNewFile=function(pathFile){
                 message: fileMeta.notPassed.join(),
                 // FIXME:fileMeta.file>fileMeta.file.fullPath
                 file: fileMeta.file.fullPath,
-                
+
             });
 
             rejectFileHandler(pathFile);
