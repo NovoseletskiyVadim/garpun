@@ -16,7 +16,7 @@ sequelize
     console.error('Unable to connect to the database:', err);
   });
 
-require('../models/camEvent')(sequelize);
-require('../models/pendingList')(sequelize);
+require('./models/camEvent')(sequelize);
+require('./models/pendingList')(sequelize);
 
 module.exports = sequelize;
