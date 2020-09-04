@@ -1,8 +1,8 @@
 'use strict';
+const jsonSender = require('../json/jsonSender');
+const jsonCreator = require('../json/jsonCreator');
 // TODO: Change pass
 // const { models } = require('./../db/dbConnect');
-// const jsonSender = require('./jsonSender');
-// const jsonCreator = require('./jsonCreator');
 
 module.exports = (fileMeta) => {
   const { uuid, eventDate, cameraName, plateNumber, file } = fileMeta;
