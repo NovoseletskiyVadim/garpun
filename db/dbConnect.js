@@ -1,9 +1,10 @@
 'use strict';
+const path = require('path');
 const Sequelize = require('sequelize');
 
 const sequelize = new Sequelize({
   dialect: 'sqlite',
-  storage: __dirname + process.env.SQL_DB,
+  storage: path.join(__dirname, process.env.SQL_DB),
   logging: false, // Disables logging
 });
 
