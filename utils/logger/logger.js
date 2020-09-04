@@ -32,4 +32,36 @@ const rejectFileLog = (eventData) => {
   stream.end();
 };
 
-module.exports = { rejectFileLog, saveAppError };
+
+const transferTrashFileLog = (eventData) => {
+  const stream = fs.createWriteStream(
+    path.join(__dirname, '../../logs/transfer.log'),
+    { flags: 'a' }
+  );
+  stream.write(
+    `${JSON.stringify({
+      time: new Date(),
+      message: eventData.message,
+      file: eventData.file,
+    })}\n`
+  );
+  stream.end();
+};
+
+const delTransferTrashFileLog = (eventData) => {
+  const stream = fs.createWriteStream(
+    path.join(__dirname, '../../logs/delTransferFile.log'),
+    { flags: 'a' }
+  );
+  stream.write(
+    `${JSON.stringify({
+      time: new Date(),
+      message: eventData.message,
+      file: eventData.file,
+    })}\n`
+  );
+  stream.end();
+};
+
+
+module.exports = { rejectFileLog, saveAppError, transferTrashFileLog, delTransferTrashFileLog };
