@@ -1,7 +1,7 @@
 'use strict';
-const { models } = require('./../db/dbConnect');
+const { models } = require('./../db/dbConnect').sequelize;
 const jsonSender = require('./jsonSender');
-
+console.log(models);
 process.send('rejectApiHandler ok');
 
 let interval = 5000;
@@ -23,49 +23,55 @@ const resend = () => {
     }, interval);
   };
 
-  models.pendingList.findAll({ limit: limit }).then((list) => {
-    if (list.length === 0) {
-      interval = 5000;
-      limit = 10;
-      restart();
-    } else {
-      const requests = list.map((item) => {
-        return jsonSender(item.data).then((result) => {
-          const destroy = models.pendingList.destroy({
-            where: {
-              id: item.id,
-            },
-          });
-          const update = models.camEvents.update(
-            { uploaded: true },
-            {
+  models.pendingList
+    .findAll({ limit: limit })
+    .then((list) => {
+      console.log(list.length);
+      if (list.length === 0) {
+        interval = 5000;
+        limit = 10;
+        restart();
+      } else {
+        const requests = list.map((item) => {
+          return jsonSender(item.data).then((result) => {
+            const destroy = models.pendingList.destroy({
               where: {
-                uuid: item.dbID,
+                id: item.id,
               },
-            }
-          );
-          Promise.all([destroy, update]).catch((err) => {
-            console.error('DB_ERR', err);
+            });
+            const update = models.camEvents.update(
+              { uploaded: true },
+              {
+                where: {
+                  uuid: item.dbID,
+                },
+              }
+            );
+            Promise.all([destroy, update]).catch((err) => {
+              console.error('DB_ERR', err);
+            });
           });
         });
-      });
-      Promise.all(requests)
-        .then((result) => {
-          if (limit < 10) {
-            limit++;
-          }
-          interval = 5000;
-          restart();
-        })
-        .catch((e) => {
-          limit = 1;
-          if (limit === 1) {
-            interval *= 2;
-          }
-          restart();
-        });
-    }
-  });
+        Promise.all(requests)
+          .then((result) => {
+            if (limit < 10) {
+              limit++;
+            }
+            interval = 5000;
+            restart();
+          })
+          .catch((e) => {
+            limit = 1;
+            if (limit === 1) {
+              interval *= 2;
+            }
+            restart();
+          });
+      }
+    })
+    .catch((err) => {
+      console.log(err);
+    });
 };
 
 setTimeout(() => {

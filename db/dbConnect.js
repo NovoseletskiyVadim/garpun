@@ -7,16 +7,26 @@ const sequelize = new Sequelize({
   logging: false, // Disables logging
 });
 
-sequelize
-  .authenticate()
-  .then(() => {
-    console.log('db connection OK.');
-  })
-  .catch((err) => {
-    console.error('Unable to connect to the database:', err);
-  });
-
 require('../models/camEvent')(sequelize);
 require('../models/pendingList')(sequelize);
+// sequelize.sync({ force: true });
+// sequelize
+//   .authenticate()
+//   .then(() => {
+//     console.log('db connection OK.');
+//   })
+//   .catch((err) => {
+//     console.error('Unable to connect to the database:', err);
+//   });//   .catch((err) => {
+//     console.error('Unable to connect to the database:', err);
+//   });
 
-module.exports = sequelize;
+module.exports = {
+  start: () => {
+    return sequelize.authenticate();
+  },
+  dbCreate: () => {
+    return sequelize.sync({ force: true });
+  },
+  sequelize,
+};

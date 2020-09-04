@@ -8,13 +8,12 @@ module.exports = (jsonData) => {
       Authentication: process.env.API_KEY, //
     },
   };
+  const url =
+    process.env.API_SERVER + '/CollectMoveVehicles/ReceiveMovementHarpoon';
+
   return new Promise((resolve, rejects) => {
     axios
-      .post(
-        process.env.API_SERVER + '/CollectMoveVehicles/ReceiveMovementHarpoon',
-        jsonData,
-        config
-      )
+      .post(url, jsonData, config)
       .then((res) => {
         resolve(true);
       })

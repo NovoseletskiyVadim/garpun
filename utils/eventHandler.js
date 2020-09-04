@@ -1,5 +1,5 @@
 'use strict';
-const { models } = require('./../db/dbConnect');
+const { models } = require('./../db/dbConnect').sequelize;
 const jsonSender = require('./jsonSender');
 const jsonCreator = require('./jsonCreator');
 
@@ -25,7 +25,9 @@ module.exports = (fileMeta) => {
           if (result) {
             dataToLocalDB.uploaded = true;
           }
-          models.camEvents.create(dataToLocalDB);
+          models.camEvents.create(dataToLocalDB).catch((err) => {
+            console.error(err);
+          });
         })
         .catch((err) => {
           const status = 'REQUEST_REJECTED';
