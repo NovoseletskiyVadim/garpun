@@ -5,7 +5,7 @@ const path = require('path');
 const saveAppError = (eventData) => {
   const { message } = eventData;
   const stream = fs.createWriteStream(
-    path.join(__dirname, '../logs/error.log'),
+    path.join(__dirname, '../../logs/error.log'),
     { flags: 'a' }
   );
   stream.write(
@@ -19,7 +19,7 @@ const saveAppError = (eventData) => {
 
 const rejectFileLog = (eventData) => {
   const stream = fs.createWriteStream(
-    path.join(__dirname, '../logs/reject.log'),
+    path.join(__dirname, '../../logs/reject.log'),
     { flags: 'a' }
   );
   stream.write(
