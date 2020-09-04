@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const moment = require('moment');
-require('dotenv').config('../');
+require('dotenv').config('./../.env');
 
 let calc = 0;
 let calcByFold = {};
@@ -13,7 +13,8 @@ const addFile = (camName) => {
   }
 
   const date = moment().format('YYYYMMDDHHmmssSSS');
-  const sourceFile = process.env.SOURCE_FILE;
+
+  const sourceFile = process.env.TEST_SOURCE_FILE;
   const inputFolder = path.join(process.env.MEDIA_PATH, camName.toString());
   const filePath = path.join(
     process.env.MEDIA_PATH,
@@ -39,7 +40,7 @@ const addFile = (camName) => {
   }, time);
 };
 
-const workingCams = process.env.CAMS || 1;
+const workingCams = process.env.TEST_LOAD_CAMS || 1;
 
 for (let i = 0; i < workingCams; i++) {
   addFile(i);
