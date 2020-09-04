@@ -2,7 +2,7 @@
 
 const chokidar = require('chokidar');
 require('dotenv').config();
-const watcherEventAdd = require('./events/watcherEventAdd');
+const watcherEventAdd = require('./utils/watcher/watcherEventAdd');
 const watcherEventAddNewFile = require('./utils/watcher/watcherEventAddNewFile.js');
 
 
