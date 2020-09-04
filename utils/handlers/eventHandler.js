@@ -4,7 +4,9 @@ const jsonSender = require('../json/jsonSender');
 const jsonCreator = require('../json/jsonCreator');
 
 module.exports = (fileMeta) => {
+
   const { uuid, eventDate, cameraName, plateNumber, file } = fileMeta;
+
   const dataToLocalDB = {
     uuid: uuid,
     time: eventDate,
@@ -35,7 +37,7 @@ module.exports = (fileMeta) => {
             dbID: dataToLocalDB.uuid,
           });
           models.camEvents.create(dataToLocalDB);
-          console.log('REQUEST_REJECTED', err.message);
+          // console.log('REQUEST_REJECTED', err.message);
         });
     })
     .catch((err) => {
