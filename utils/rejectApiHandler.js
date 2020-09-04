@@ -1,17 +1,13 @@
 'use strict';
 const { models } = require('./../db/dbConnect').sequelize;
 const jsonSender = require('./jsonSender');
-process.send('rejectApiHandler ok');
+process.send(`rejectApiHandler started with PID ${process.pid}`);
 
 let interval = 5000;
 let limit = 10;
 
 const resend = () => {
   const restart = () => {
-    process.send({
-      Pending_interval: interval,
-      List_limit: limit,
-    });
     setTimeout(() => {
       if (interval < 100000) {
         resend();
@@ -25,12 +21,16 @@ const resend = () => {
   models.pendingList
     .findAll({ limit: limit })
     .then((list) => {
-      console.log(list.length);
       if (list.length === 0) {
         interval = 5000;
         limit = 10;
         restart();
       } else {
+        process.send({
+          pendingEvents: list.length,
+          Pending_interval: interval,
+          List_limit: limit,
+        });
         const requests = list.map((item) => {
           return jsonSender(item.data).then((result) => {
             const destroy = models.pendingList.destroy({
@@ -73,6 +73,4 @@ const resend = () => {
     });
 };
 
-setTimeout(() => {
-  resend();
-}, interval);
+resend();

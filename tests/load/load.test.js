@@ -3,9 +3,31 @@ const path = require('path');
 const moment = require('moment');
 require('dotenv').config('./../.env');
 
+const cameraNames = [
+  'q',
+  'w',
+  'e',
+  'r',
+  't',
+  'y',
+  'u',
+  'i',
+  'o',
+  'p',
+  'a',
+  's',
+  'd',
+  'f',
+  'g',
+  'h',
+  'j',
+  'k',
+  'l',
+];
 let calc = 0;
 let calcByFold = {};
 const addFile = (camName) => {
+  
   if (calcByFold[camName] === undefined) {
     calcByFold[camName] = 1;
   } else {
@@ -15,19 +37,21 @@ const addFile = (camName) => {
   const date = moment().format('YYYYMMDDHHmmssSSS');
 
   const sourceFile = process.env.TEST_SOURCE_FILE;
-  const inputFolder = path.join(process.env.MEDIA_PATH, camName.toString());
-  const filePath = path.join(
-    process.env.MEDIA_PATH,
-    camName.toString(),
-    `${date}_CA5402AO_VEHICLE_DETECTION.jpg`
-  );
+  const inputFolder = path.join(process.env.MEDIA_PATH, camName);
   if (!fs.existsSync(inputFolder)) {
     fs.mkdirSync(inputFolder);
   }
-  console.log(camName, calc, date, calcByFold);
+
+  const filePath = path.join(
+    process.env.MEDIA_PATH,
+    camName,
+    `${date}_CA5402AO_VEHICLE_DETECTION.jpg`
+  );
+  console.log(filePath);
+  console.log(calc, { camName: camName }, date, calcByFold);
   fs.copyFile(sourceFile, filePath, function (e) {
     if (e) {
-      console.log(e);
+      console.log('copy', e);
     }
   });
   calc++;
@@ -43,5 +67,5 @@ const addFile = (camName) => {
 const workingCams = process.env.TEST_LOAD_CAMS || 1;
 
 for (let i = 0; i < workingCams; i++) {
-  addFile(i);
+  addFile(cameraNames[i]);
 }

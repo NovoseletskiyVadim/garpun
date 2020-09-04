@@ -4,17 +4,17 @@ const eventHandler = require('./eventHandler');
 const rejectFileHandler = require('./rejectFileHandler');
 const getFileMeta = require('./getFileMeta');
 const appLogger = require('./logger');
-const eventWatcher = chokidar.watch(process.env.MEDIA_PATH, {
-  ignored: /^\./,
-  persistent: true,
-});
 
 module.exports = {
   startWatch: () => {
-    console.log('sdfs');
-    return eventWatcher
+    const eventWatcher = chokidar.watch(process.env.MEDIA_PATH, {
+      ignored: /^\./,
+      persistent: true,
+    });
+    console.log('Under watch: ' + process.env.MEDIA_PATH);
+    eventWatcher
       .on('add', (pathFile) => {
-        console.log(pathFile);
+        console.log('new file');
         const fileMeta = getFileMeta(pathFile);
         FileType.fromFile(pathFile).then((type) => {
           if (!type || type.ext !== 'jpg') {

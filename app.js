@@ -5,9 +5,7 @@ require('dotenv').config();
 const dbConnect = require('./db/dbConnect');
 const { fork } = require('child_process');
 const eventWatcher = require('./utils/eventWatcher');
-
-console.log(process.env.MEDIA_PATH);
-
+console.log(`APPs PID ${process.pid}`);
 if (!fs.existsSync(process.env.MEDIA_PATH)) {
   fs.mkdirSync(process.env.MEDIA_PATH);
   console.log('watch dir created');
@@ -26,10 +24,10 @@ dbConnect
     });
   })
   .then(() => {
-    // const forked = fork(`./utils/rejectApiHandler.js`);
-    // forked.on('message', (msg) => {
-    //   console.log(msg);
-    // });
+    const forked = fork(`./utils/rejectApiHandler.js`);
+    forked.on('message', (msg) => {
+      console.log(msg);
+    });
     eventWatcher.startWatch();
   })
   .catch((err) => {

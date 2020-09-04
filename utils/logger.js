@@ -2,6 +2,10 @@
 const fs = require('fs');
 const path = require('path');
 
+if (!fs.existsSync(path.join(__dirname, '../logs/'))) {
+  fs.mkdirSync(path.join(__dirname, '../logs/'));
+}
+
 const saveAppError = (eventData) => {
   const { message } = eventData;
   const stream = fs.createWriteStream(
