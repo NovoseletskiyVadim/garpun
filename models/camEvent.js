@@ -19,5 +19,11 @@ module.exports = (sequelize) => {
     camera: {
       type: DataTypes.STRING,
     },
+    apiResponse: {
+      type: DataTypes.JSON,
+    },
+    fileName: {
+      type: DataTypes.STRING,
+    },
   });
 };

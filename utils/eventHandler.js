@@ -10,6 +10,7 @@ module.exports = (fileMeta) => {
     time: eventDate,
     license_plate_number: plateNumber,
     camera: cameraName,
+    fileName: file.name,
   };
 
   jsonCreator({
@@ -22,14 +23,20 @@ module.exports = (fileMeta) => {
     .then((jsonToSend) => {
       jsonSender(jsonToSend)
         .then((result) => {
-          if (result) {
+          const { status } = result.data;
+          dataToLocalDB.apiResponse = result.data;
+          if (status && status === 'OK') {
             dataToLocalDB.uploaded = true;
+          } else {
+            // TODO
+            console.log('JSON_NOT_WALID');
           }
           models.camEvents.create(dataToLocalDB).catch((err) => {
             console.error(err);
           });
         })
         .catch((err) => {
+          console.log(err.response.status);
           const status = 'REQUEST_REJECTED';
           models.pendingList.create({
             status,

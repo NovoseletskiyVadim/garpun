@@ -24,10 +24,9 @@ const cameraNames = [
   'k',
   'l',
 ];
-let calc = 0;
+let calc = 1;
 let calcByFold = {};
 const addFile = (camName) => {
-  
   if (calcByFold[camName] === undefined) {
     calcByFold[camName] = 1;
   } else {
@@ -47,7 +46,6 @@ const addFile = (camName) => {
     camName,
     `${date}_CA5402AO_VEHICLE_DETECTION.jpg`
   );
-  console.log(filePath);
   console.log(calc, { camName: camName }, date, calcByFold);
   fs.copyFile(sourceFile, filePath, function (e) {
     if (e) {

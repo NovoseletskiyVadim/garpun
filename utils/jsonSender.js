@@ -15,7 +15,7 @@ module.exports = (jsonData) => {
     axios
       .post(url, jsonData, config)
       .then((res) => {
-        resolve(true);
+        resolve(res);
       })
       .catch((err) => {
         rejects(err);

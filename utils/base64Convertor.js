@@ -17,7 +17,6 @@ module.exports = (filePath) => {
         } else {
           resolve(Buffer.concat(buf).toString('base64'));
         }
-        // console.log(`${buf.length}${filePath} was deleted`);
       });
     });
 
