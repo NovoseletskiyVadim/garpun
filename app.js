@@ -7,8 +7,12 @@ const { fork } = require('child_process');
 const eventWatcher = require('./utils/eventWatcher');
 console.log(`APPs PID ${process.pid}`);
 if (!fs.existsSync(process.env.MEDIA_PATH)) {
-  fs.mkdirSync(process.env.MEDIA_PATH);
-  console.log('watch dir created');
+  try {
+    fs.mkdirSync(process.env.MEDIA_PATH);
+  } catch (error) {
+    console.error(error.message);
+    process.exit();
+  }
 }
 
 dbConnect

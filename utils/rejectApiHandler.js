@@ -32,7 +32,7 @@ const resend = () => {
           List_limit: limit,
         });
         const requests = list.map((item) => {
-          return jsonSender(item.data).then((result) => {
+          return jsonSender(item.data, item.fileMeta).then((result) => {
             const destroy = models.pendingList.destroy({
               where: {
                 id: item.id,

@@ -1,4 +1,4 @@
-const base64Convertor = require('./../../utils/base64Convertor');
+const base64Convertor = require('../../utils/base64Convertor');
 const path = require('path');
 const fs = require('fs');
 const should = require('chai').should();

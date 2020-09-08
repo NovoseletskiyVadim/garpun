@@ -4,7 +4,7 @@ const eventHandler = require('./eventHandler');
 const rejectFileHandler = require('./rejectFileHandler');
 const getFileMeta = require('./getFileMeta');
 const appLogger = require('./logger');
-
+let calcFile = 0;
 module.exports = {
   startWatch: () => {
     const eventWatcher = chokidar.watch(process.env.MEDIA_PATH, {
@@ -14,7 +14,8 @@ module.exports = {
     console.log('Under watch: ' + process.env.MEDIA_PATH);
     eventWatcher
       .on('add', (pathFile) => {
-        console.log('new file');
+        calcFile++;
+        console.log('get new file' + calcFile);
         const fileMeta = getFileMeta(pathFile);
         FileType.fromFile(pathFile).then((type) => {
           if (!type || type.ext !== 'jpg') {
@@ -28,7 +29,7 @@ module.exports = {
               message: fileMeta.notPassed.join(),
               file: fileMeta.file,
             });
-            rejectFileHandler(pathFile);
+            rejectFileHandler(fileMeta);
             console.error('WRONG_FILE', pathFile);
           }
         });

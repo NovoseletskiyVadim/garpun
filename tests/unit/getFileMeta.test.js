@@ -1,4 +1,4 @@
-const getFileMeta = require('./../../utils/getFileMeta');
+const getFileMeta = require('../../utils/getFileMeta');
 var expect = require('chai').expect;
 
 describe('getFileMeta test', function () {

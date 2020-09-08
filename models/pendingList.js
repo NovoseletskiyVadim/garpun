@@ -12,5 +12,8 @@ module.exports = (sequelize) => {
       type: DataTypes.STRING,
       defaultValue: DataTypes.UUIDV4,
     },
+    fileMeta: {
+      type: DataTypes.JSON,
+    },
   });
 };

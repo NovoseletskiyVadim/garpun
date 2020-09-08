@@ -21,30 +21,24 @@ module.exports = (fileMeta) => {
     pathFile: file.fullPath,
   })
     .then((jsonToSend) => {
-      jsonSender(jsonToSend)
+      jsonSender(jsonToSend, fileMeta)
         .then((result) => {
-          const { status } = result.data;
-          dataToLocalDB.apiResponse = result.data;
-          if (status && status === 'OK') {
-            dataToLocalDB.uploaded = true;
-          } else {
-            // TODO
-            console.log('JSON_NOT_WALID');
-          }
+          dataToLocalDB.apiResponse = result.apiResponse;
+          dataToLocalDB.uploaded = result.uploaded;
           models.camEvents.create(dataToLocalDB).catch((err) => {
             console.error(err);
           });
         })
-        .catch((err) => {
-          console.log(err.response.status);
+        .catch((error) => {
           const status = 'REQUEST_REJECTED';
           models.pendingList.create({
             status,
             data: jsonToSend,
             dbID: dataToLocalDB.uuid,
+            fileMeta,
           });
           models.camEvents.create(dataToLocalDB);
-          console.log('REQUEST_REJECTED', err.message);
+          console.log('REQUEST_REJECTED', error.message);
         });
     })
     .catch((err) => {

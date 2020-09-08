@@ -11,13 +11,7 @@ module.exports = (filePath) => {
     });
 
     stream.on('close', () => {
-      fs.unlink(filePath, (err) => {
-        if (err) {
-          rejects(err);
-        } else {
-          resolve(Buffer.concat(buf).toString('base64'));
-        }
-      });
+      resolve(Buffer.concat(buf).toString('base64'));
     });
 
     stream.on('error', (err) => {

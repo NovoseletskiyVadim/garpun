@@ -1,21 +1,40 @@
 'use strict';
-const path = require('path');
 const fs = require('fs');
-module.exports = (pathFile) => {
-  const parsedPath = path.parse(pathFile);
-  const splittedPath = parsedPath.dir.split(path.sep);
-  const cameraName = splittedPath[splittedPath.length - 1];
-  const fileName = parsedPath.name;
-  const trashPath = process.env.TRESH_PATH + cameraName;
+const path = require('path');
+
+module.exports = (fileMeta) => {
+  const pathFile = fileMeta.file.fullPath;
+  const cameraName = fileMeta.cameraName;
+  const fileName = fileMeta.file.name;
+  const trashPath = process.env.TRASH_PATH + cameraName;
+
+  if (!fs.existsSync(process.env.TRASH_PATH)) {
+    try {
+      fs.mkdirSync(process.env.TRASH_PATH);
+    } catch (error) {
+      console.error('TRASH_FOLDER_ERROR', error);
+    }
+  }
   if (!fs.existsSync(trashPath)) {
-    fs.mkdirSync(trashPath);
+    try {
+      fs.mkdirSync(trashPath);
+    } catch (error) {
+      console.error('TRASH_FOLDER_ERROR', error);
+    }
   }
   fs.copyFile(
     pathFile,
-    trashPath + path.sep + fileName + parsedPath.ext,
-    (err) => {
-      fs.unlink(pathFile, (err) => {});
-      console.log('trash_err');
+    trashPath + path.sep + fileName + fileMeta.file.ext,
+    (error) => {
+      if (error) {
+        console.error('TRASH_COPY_ERROR', error);
+      }
+
+      fs.unlink(pathFile, (error) => {
+        if (error) {
+          console.error('TRASH_DELETE_ERROR', error);
+        }
+      });
     }
   );
 };
