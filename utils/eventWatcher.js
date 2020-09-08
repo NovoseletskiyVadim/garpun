@@ -3,7 +3,8 @@ const FileType = require('file-type');
 const eventHandler = require('./eventHandler');
 const rejectFileHandler = require('./rejectFileHandler');
 const getFileMeta = require('./getFileMeta');
-const appLogger = require('./logger');
+const { appErrorLog, rejectFileLog } = require('./logger');
+
 let calcFile = 0;
 module.exports = {
   startWatch: () => {
@@ -15,7 +16,7 @@ module.exports = {
     eventWatcher
       .on('add', (pathFile) => {
         calcFile++;
-        console.log('get new file' + calcFile);
+        console.log('get new file ' + calcFile);
         const fileMeta = getFileMeta(pathFile);
         FileType.fromFile(pathFile).then((type) => {
           if (!type || type.ext !== 'jpg') {
@@ -25,7 +26,7 @@ module.exports = {
           if (fileMeta.isValid) {
             eventHandler(fileMeta);
           } else {
-            appLogger.rejectFileLog({
+            rejectFileLog({
               message: fileMeta.notPassed.join(),
               file: fileMeta.file,
             });
@@ -35,12 +36,10 @@ module.exports = {
         });
       })
       .on('error', function (error) {
-        console.log(error.code);
         if (error.code === 'UNKNOWN') {
           rejectFileHandler(error.path);
         }
-
-        console.error('Error happened', error);
+        appErrorLog({ message: { text: 'WATCHER_ERROR', error: error } });
       });
   },
 };

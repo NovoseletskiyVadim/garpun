@@ -43,6 +43,5 @@ module.exports = (pathFile) => {
   } else {
     fileMeta.eventDate = dateInFormat.format('YYYY-MM-DDTHH:mm:ss.SSSZ');
   }
-
   return fileMeta;
 };

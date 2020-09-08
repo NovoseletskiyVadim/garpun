@@ -1,5 +1,6 @@
 'use strict';
 const fs = require('fs');
+const { appErrorLog } = require('./logger');
 
 module.exports = (filePath) => {
   return new Promise((resolve, rejects) => {
@@ -14,8 +15,8 @@ module.exports = (filePath) => {
       resolve(Buffer.concat(buf).toString('base64'));
     });
 
-    stream.on('error', (err) => {
-      console.log(err);
+    stream.on('error', (error) => {
+      appErrorLog({ message: { text: 'BASE64_ERROR', error: error } });
       rejects(err);
     });
   });

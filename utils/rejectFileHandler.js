@@ -7,19 +7,20 @@ module.exports = (fileMeta) => {
   const cameraName = fileMeta.cameraName;
   const fileName = fileMeta.file.name;
   const trashPath = process.env.TRASH_PATH + cameraName;
+  const { appErrorLog } = require('./logger');
 
   if (!fs.existsSync(process.env.TRASH_PATH)) {
     try {
       fs.mkdirSync(process.env.TRASH_PATH);
     } catch (error) {
-      console.error('TRASH_FOLDER_ERROR', error);
+      appErrorLog({ message: { text: 'TRASH_FOLDER_ERROR', error: error } });
     }
   }
   if (!fs.existsSync(trashPath)) {
     try {
       fs.mkdirSync(trashPath);
     } catch (error) {
-      console.error('TRASH_FOLDER_ERROR', error);
+      appErrorLog({ message: { text: 'TRASH_FOLDER_ERROR', error: error } });
     }
   }
   fs.copyFile(
@@ -27,12 +28,14 @@ module.exports = (fileMeta) => {
     trashPath + path.sep + fileName + fileMeta.file.ext,
     (error) => {
       if (error) {
-        console.error('TRASH_COPY_ERROR', error);
+        appErrorLog({ message: { text: 'TRASH_COPY_ERROR', error: error } });
       }
 
       fs.unlink(pathFile, (error) => {
         if (error) {
-          console.error('TRASH_DELETE_ERROR', error);
+          appErrorLog({
+            message: { text: 'TRASH_DELETE_ERROR', error: error },
+          });
         }
       });
     }

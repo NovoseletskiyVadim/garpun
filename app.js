@@ -1,17 +1,17 @@
 'use strict';
-
+console.log(process);
 const fs = require('fs');
 require('dotenv').config();
 const dbConnect = require('./db/dbConnect');
 const { fork } = require('child_process');
 const eventWatcher = require('./utils/eventWatcher');
+const appErrorLog = require('./utils/logger');
 console.log(`APPs PID ${process.pid}`);
 if (!fs.existsSync(process.env.MEDIA_PATH)) {
   try {
     fs.mkdirSync(process.env.MEDIA_PATH);
   } catch (error) {
-    console.error(error.message);
-    process.exit();
+    appErrorLog({ message: { text: error.message, error } });
   }
 }
 
@@ -35,7 +35,7 @@ dbConnect
     eventWatcher.startWatch();
   })
   .catch((err) => {
-    console.error('Unable to connect to the database:', err);
+    appErrorLog({ message: { text: 'db error', error: err } });
   });
 
 module.exports = { eventWatcher };

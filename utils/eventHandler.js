@@ -2,6 +2,7 @@
 const { models } = require('./../db/dbConnect').sequelize;
 const jsonSender = require('./jsonSender');
 const jsonCreator = require('./jsonCreator');
+const { appErrorLog } = require('./logger');
 
 module.exports = (fileMeta) => {
   const { uuid, eventDate, cameraName, plateNumber, file } = fileMeta;
@@ -37,11 +38,11 @@ module.exports = (fileMeta) => {
             dbID: dataToLocalDB.uuid,
             fileMeta,
           });
+          appErrorLog({ message: { text: 'API_ERROR', error: error.message } });
           models.camEvents.create(dataToLocalDB);
-          console.log('REQUEST_REJECTED', error.message);
         });
     })
-    .catch((err) => {
-      console.error('file', err);
+    .catch((error) => {
+      appErrorLog({ message: { text: 'EVENTHANDLER_ERROR', error: error } });
     });
 };

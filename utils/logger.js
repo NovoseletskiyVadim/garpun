@@ -6,7 +6,7 @@ if (!fs.existsSync(path.join(__dirname, '../logs/'))) {
   fs.mkdirSync(path.join(__dirname, '../logs/'));
 }
 
-const saveAppError = (eventData) => {
+const appErrorLog = (eventData) => {
   const { message } = eventData;
   const stream = fs.createWriteStream(
     path.join(__dirname, '../logs/error.log'),
@@ -36,4 +36,4 @@ const rejectFileLog = (eventData) => {
   stream.end();
 };
 
-module.exports = { rejectFileLog, saveAppError };
+module.exports = { rejectFileLog, appErrorLog };
