@@ -10,13 +10,23 @@ const sequelize = new Sequelize({
 
 require('../models/camEvent')(sequelize);
 require('../models/pendingList')(sequelize);
+require('../models/cameras')(sequelize);
 
 module.exports = {
   start: () => {
     return sequelize.authenticate();
   },
   dbCreate: () => {
-    return sequelize.sync({ force: true });
+    const { cameras, camEvents, pendingList } = sequelize.models;
+    const tableCreate = [
+      cameras.sync(),
+      camEvents.sync({ force: true }),
+      pendingList.sync({ force: true }),
+    ];
+    return Promise.all(tableCreate);
+  },
+  stop: () => {
+    return sequelize.close();
   },
   sequelize,
 };
