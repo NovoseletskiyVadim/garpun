@@ -1,22 +1,28 @@
 'use strict';
 const base64Convertor = require('./base64Convertor');
+const { models } = require('./../db/dbConnect').sequelize;
 
 module.exports = (eventData) => {
   return new Promise((resolve, reject) => {
-    base64Convertor(eventData.pathFile)
-      .then((dataBase64) => {
+    const dataBase64 = base64Convertor(eventData.pathFile);
+    const cameraInfo = models.cameras.findOne({
+      where: { ftpHomeDir: eventData.cameraName },
+    });
+    Promise.all([dataBase64, cameraInfo])
+      .then((result) => {
+        const [dataBase64, cameraInfo] = result;
         const eventObject = {
           version: 1,
           provider: process.env.PROVIDER || '', //Назва поставника послуги ?
           data: {
             device: {
-              id: '', //Унікальний ідентифікатор СРНЗ в ІПНП. Ідентифікатор видається при реєстрації
-              name: eventData.cameraName, //Назва СРНЗ
+              id: cameraInfo.uuid, //Унікальний ідентифікатор СРНЗ в ІПНП. Ідентифікатор видається при реєстрації
+              name: cameraInfo.name, //Назва СРНЗ
               event: {
                 id: eventData.uuid,
                 datetime: eventData.datetime,
-                latitude: 0, //?
-                longitude: 0, //?
+                latitude: cameraInfo.position.split(',')[0], //?
+                longitude: cameraInfo.position.split(',')[1], //?
                 params: [],
                 vehicle: {
                   licensePlate: {
