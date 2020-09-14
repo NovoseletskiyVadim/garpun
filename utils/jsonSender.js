@@ -11,7 +11,7 @@ module.exports = (jsonData, fileMeta) => {
     },
   };
   const url =
-    process.env.API_SERVER + '/CollectMoveVehicles/ReceiveMovementHarpoon';
+    process.env.API_SERVER + '/api/CollectMoveVehicles/ReceiveMovementHarpoon';
 
   return new Promise((resolve, rejects) => {
     axios
@@ -22,16 +22,22 @@ module.exports = (jsonData, fileMeta) => {
         let uploaded = false;
         if (status && status === 'OK') {
           uploaded = true;
-          fs.unlinkSync(fileMeta.file.fullPath);
+          fs.unlink(fileMeta.file.fullPath, (err) => {
+            if (err) throw err;
+            resolve({ apiResponse, uploaded });
+            // console.log('path/file.txt was deleted');
+          });
+          // fs.unlink(fileMeta.file.fullPath);
         } else {
           // status 200 with error
           // TODO  All type API ERROR response?
-          console.log('JSON_NOT_VALID');
-          rejectFileHandler(fileMeta);
+          rejectFileHandler(fileMeta).then(() => {
+            resolve({ apiResponse, uploaded });
+          });
         }
-        resolve({ apiResponse, uploaded });
       })
       .catch((err) => {
+        process.env.NODE_ENV === 'DEV' && console.log(err.message);
         rejects(err);
       });
   });

@@ -26,11 +26,12 @@ const resend = () => {
         limit = 10;
         restart();
       } else {
-        process.send({
-          pendingEvents: list.length,
-          Pending_interval: interval,
-          List_limit: limit,
-        });
+        process.env.NODE_ENV === 'DEV' &&
+          process.send({
+            pendingEvents: list.length,
+            Pending_interval: interval,
+            List_limit: limit,
+          });
         const requests = list.map((item) => {
           return jsonSender(item.data, item.fileMeta).then((result) => {
             const destroy = models.pendingList.destroy({

@@ -49,6 +49,8 @@ module.exports = (eventData) => {
         };
         resolve(JSON.stringify(eventObject));
       })
-      .catch(reject);
+      .catch((err) => {
+        reject(err);
+      });
   });
 };

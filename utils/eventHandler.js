@@ -43,6 +43,12 @@ module.exports = (fileMeta) => {
         });
     })
     .catch((error) => {
-      appErrorLog({ message: { text: 'EVENTHANDLER_ERROR', error: error } });
+      appErrorLog({
+        message: {
+          text: 'EVENTHANDLER_ERROR',
+          error: error.message,
+          stack: error.stack,
+        },
+      });
     });
 };

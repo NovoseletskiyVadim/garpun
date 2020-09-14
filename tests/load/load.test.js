@@ -62,7 +62,11 @@ const addFile = (camName) => {
   }, time);
 };
 
-const workingCams = process.env.TEST_LOAD_CAMS || 1;
+let workingCams = process.env.TEST_LOAD_CAMS || 1;
+if (workingCams > cameraNames.length) {
+  console.log('set max cams to ' + cameraNames.length);
+  workingCams = cameraNames.length;
+}
 
 for (let i = 0; i < workingCams; i++) {
   addFile(cameraNames[i]);
