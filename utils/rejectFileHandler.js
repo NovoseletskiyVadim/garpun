@@ -13,14 +13,14 @@ module.exports = (fileMeta) => {
       try {
         fs.mkdirSync(process.env.TRASH_PATH);
       } catch (error) {
-        appErrorLog({ message: { text: 'TRASH_FOLDER_ERROR', error: error } });
+        appErrorLog({ message: { text: 'TRASH_FOLDER_ERROR', error } });
       }
     }
     if (!fs.existsSync(trashPath)) {
       try {
         fs.mkdirSync(trashPath);
       } catch (error) {
-        appErrorLog({ message: { text: 'TRASH_FOLDER_ERROR', error: error } });
+        appErrorLog({ message: { text: 'TRASH_FOLDER_ERROR', error } });
       }
     }
     fs.copyFile(
@@ -28,13 +28,13 @@ module.exports = (fileMeta) => {
       trashPath + path.sep + fileName + fileMeta.file.ext,
       (error) => {
         if (error) {
-          appErrorLog({ message: { text: 'TRASH_COPY_ERROR', error: error } });
+          appErrorLog({ message: { text: 'TRASH_COPY_ERROR', error } });
         }
 
         fs.unlink(pathFile, (error) => {
           if (error) {
             appErrorLog({
-              message: { text: 'TRASH_DELETE_ERROR', error: error },
+              message: { text: 'TRASH_DELETE_ERROR', error },
             });
           }
           resolve(true);

@@ -14,6 +14,7 @@ module.exports = () => {
       eventWatcher = chokidar.watch(process.env.MEDIA_PATH, {
         ignored: /^\./,
         persistent: true,
+        awaitWriteFinish: true,
       });
       console.log('Under watch: ' + process.env.MEDIA_PATH);
       eventWatcher
@@ -44,7 +45,7 @@ module.exports = () => {
           if (error.code === 'UNKNOWN') {
             rejectFileHandler(error.path);
           }
-          appErrorLog({ message: { text: 'WATCHER_ERROR', error: error } });
+          appErrorLog({ message: { text: 'WATCHER_ERROR', error } });
         });
     },
     stopWatcher: () => {
