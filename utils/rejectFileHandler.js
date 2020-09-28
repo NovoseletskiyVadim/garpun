@@ -7,7 +7,7 @@ module.exports = (fileMeta) => {
   const pathFile = fileMeta.file.fullPath;
   const cameraName = fileMeta.cameraName;
   const fileName = fileMeta.file.name;
-  const trashPath = process.env.TRASH_PATH + cameraName;
+  const trashPath = path.join(process.env.TRASH_PATH, cameraName);
   return new Promise((resolve, reject) => {
     if (!fs.existsSync(process.env.TRASH_PATH)) {
       try {
