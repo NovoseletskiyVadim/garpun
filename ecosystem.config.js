@@ -7,7 +7,7 @@ module.exports = {
       ignore_watch: ['[/\\]./', 'node_modules', 'logs', 'db'],
       max_memory_restart: '150M',
       env: {
-        NODE_ENV: 'development',
+        NODE_ENV: 'DEV',
       },
       env_production: {
         NODE_ENV: 'production',
