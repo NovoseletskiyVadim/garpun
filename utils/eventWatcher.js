@@ -21,7 +21,7 @@ module.exports = () => {
         .on('add', (pathFile) => {
           calcFile++;
           process.env.NODE_ENV === 'DEV' &&
-            console.log('get new file ' + calcFile);
+            console.log(calcFile + ' get ' + pathFile);
           const fileMeta = getFileMeta(pathFile);
           FileType.fromFile(pathFile).then((type) => {
             if (!type || type.ext !== 'jpg') {
@@ -45,6 +45,7 @@ module.exports = () => {
           if (error.code === 'UNKNOWN') {
             rejectFileHandler(error.path);
           }
+          console.error('WATCHER_ERROR', error);
           appErrorLog({ message: { text: 'WATCHER_ERROR', error } });
         });
     },

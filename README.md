@@ -5,6 +5,12 @@
 ```
 node v12.13.1
 npm v6.14.6
+apt install vsftpd
+apt install db_util
+apt install sqlite3
+npm install pm2 -g
+
+
 ```
 
 ## Instalation

@@ -38,11 +38,17 @@ module.exports = (fileMeta) => {
             dbID: dataToLocalDB.uuid,
             fileMeta,
           });
+          console.error({ text: 'API_ERROR', error });
           appErrorLog({ message: { text: 'API_ERROR', error: error.message } });
           models.camEvents.create(dataToLocalDB);
         });
     })
     .catch((error) => {
+      console.error({
+        text: 'EVENTHANDLER_ERROR',
+        error: error.message,
+        stack: error.stack,
+      });
       appErrorLog({
         message: {
           text: 'EVENTHANDLER_ERROR',

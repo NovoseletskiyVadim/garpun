@@ -37,7 +37,7 @@ module.exports = (jsonData, fileMeta) => {
         }
       })
       .catch((err) => {
-        process.env.NODE_ENV === 'DEV' && console.log(err.message);
+        process.env.NODE_ENV === 'DEV' && console.error(err.message);
         rejects(err);
       });
   });

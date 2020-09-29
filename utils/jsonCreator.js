@@ -50,6 +50,7 @@ module.exports = (eventData) => {
         resolve(JSON.stringify(eventObject));
       })
       .catch((err) => {
+        console.error('JSON_CREATOR_ERROR', err);
         reject(err);
       });
   });
