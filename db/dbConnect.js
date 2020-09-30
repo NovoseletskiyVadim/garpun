@@ -18,11 +18,7 @@ module.exports = {
   },
   dbCreate: () => {
     const { cameras, camEvents, pendingList } = sequelize.models;
-    const tableCreate = [
-      cameras.sync(),
-      camEvents.sync({ force: true }),
-      pendingList.sync({ force: true }),
-    ];
+    const tableCreate = [cameras.sync(), camEvents.sync(), pendingList.sync()];
     return Promise.all(tableCreate);
   },
   stop: () => {
