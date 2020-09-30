@@ -23,8 +23,8 @@ module.exports = (eventData) => {
             event: {
               id: eventData.uuid,
               datetime: eventData.datetime,
-              latitude: cameraInfo.position.split(',')[0], //?
-              longitude: cameraInfo.position.split(',')[1], //?
+              latitude: parseFloat(cameraInfo.position.split(',')[0]), //?
+              longitude: parseFloat(cameraInfo.position.split(',')[1]), //?
               params: [],
               vehicle: {
                 licensePlate: {
