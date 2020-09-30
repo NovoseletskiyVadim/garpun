@@ -1,6 +1,7 @@
 'use strict';
 const base64Convertor = require('./base64Convertor');
 const { models } = require('./../db/dbConnect').sequelize;
+const { v4: uuidv4 } = require('uuid');
 
 module.exports = (eventData) => {
   return new Promise((resolve, reject) => {
@@ -35,7 +36,7 @@ module.exports = (eventData) => {
               },
               media: [
                 {
-                  id: '', //?
+                  id: uuidv4(), //?
                   data: dataBase64, //Фотозображення ТЗ* Строка (base64)
                   url: null,
                   plate: {
