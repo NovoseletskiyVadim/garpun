@@ -18,32 +18,32 @@ module.exports = (eventData) => {
             device: {
               id: cameraInfo.uuid, //Унікальний ідентифікатор СРНЗ в ІПНП. Ідентифікатор видається при реєстрації
               name: cameraInfo.name, //Назва СРНЗ
-              event: {
-                id: eventData.uuid,
-                datetime: eventData.datetime,
-                latitude: cameraInfo.position.split(',')[0], //?
-                longitude: cameraInfo.position.split(',')[1], //?
-                params: [],
-                vehicle: {
-                  licensePlate: {
-                    value: eventData.plateNumber,
-                    country: null,
-                    region: null,
-                  },
-                  params: [],
+            },
+            event: {
+              id: eventData.uuid,
+              datetime: eventData.datetime,
+              latitude: cameraInfo.position.split(',')[0], //?
+              longitude: cameraInfo.position.split(',')[1], //?
+              params: [],
+              vehicle: {
+                licensePlate: {
+                  value: eventData.plateNumber,
+                  country: null,
+                  region: null,
                 },
-                media: [
-                  {
-                    id: '', //?
-                    data: dataBase64, //Фотозображення ТЗ* Строка (base64)
-                    url: null,
-                    plate: {
-                      data: null,
-                      url: null,
-                    },
-                  },
-                ],
+                params: [],
               },
+              media: [
+                {
+                  id: '', //?
+                  data: dataBase64, //Фотозображення ТЗ* Строка (base64)
+                  url: null,
+                  plate: {
+                    data: null,
+                    url: null,
+                  },
+                },
+              ],
             },
           },
         };
