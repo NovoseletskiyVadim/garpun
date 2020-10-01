@@ -14,6 +14,7 @@ require('../models/cameras')(sequelize);
 
 module.exports = {
   start: () => {
+    console.log('DB_NAME', process.env.SQL_DB);
     return sequelize.authenticate();
   },
   dbCreate: () => {

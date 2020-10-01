@@ -9,7 +9,7 @@ pm2 4.5.0
 
 -for linux host machine
 apt install vsftpd
-apt install db_util
+apt install db-util
 apt install sqlite3
 
 ```
@@ -48,7 +48,10 @@ $ pm2 start ecosystem.config.js  - like a daemon process
 
 ```
     If process is not started yet:
-      $pm2 start ecosystem.config.js
+      for production
+        $pm2 start ecosystem.config.js --env production
+      for dev
+        $pm2 start ecosystem.config.js
     # Generate Startup Script
       $ pm2 startup
     # Freeze your process list across server restart
