@@ -63,12 +63,12 @@ module.exports = (fileMeta) => {
           }
           console.error(errorMsg);
           const status = 'API_ERROR';
-          models.pendingList.create({
-            status,
-            data: jsonToSend,
-            dbID: dataToLocalDB.uuid,
-            fileMeta,
-          });
+          // models.pendingList.create({
+          //   status,
+          //   data: jsonToSend,
+          //   dbID: dataToLocalDB.uuid,
+          //   fileMeta,
+          // });
           appErrorLog({
             message: errorMsg,
           });
