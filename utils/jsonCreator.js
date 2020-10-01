@@ -14,17 +14,17 @@ module.exports = (eventData) => {
         const [dataBase64, cameraInfo] = result;
         const eventObject = {
           version: 1,
-          provider: process.env.PROVIDER || '', //Назва поставника послуги ?
+          provider: process.env.PROVIDER || '',
           data: {
             device: {
-              id: cameraInfo.uuid, //Унікальний ідентифікатор СРНЗ в ІПНП. Ідентифікатор видається при реєстрації
-              name: cameraInfo.name, //Назва СРНЗ
+              id: cameraInfo.uuid,
+              name: cameraInfo.name,
             },
             event: {
               id: eventData.uuid,
               datetime: eventData.datetime,
-              latitude: parseFloat(cameraInfo.position.split(',')[0]), //?
-              longitude: parseFloat(cameraInfo.position.split(',')[1]), //?
+              latitude: parseFloat(cameraInfo.position.split(',')[0]),
+              longitude: parseFloat(cameraInfo.position.split(',')[1]),
               params: [],
               vehicle: {
                 licensePlate: {
@@ -36,8 +36,8 @@ module.exports = (eventData) => {
               },
               media: [
                 {
-                  id: uuidv4(), //?
-                  data: dataBase64, //Фотозображення ТЗ* Строка (base64)
+                  id: uuidv4(),
+                  data: dataBase64,
                   url: null,
                   plate: {
                     data: null,

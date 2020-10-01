@@ -1,4 +1,5 @@
 'use strict';
+const moment = require('moment');
 const { models } = require('./../db/dbConnect').sequelize;
 const jsonSender = require('./jsonSender');
 const jsonCreator = require('./jsonCreator');
@@ -26,20 +27,51 @@ module.exports = (fileMeta) => {
         .then((result) => {
           dataToLocalDB.apiResponse = result.apiResponse;
           dataToLocalDB.uploaded = result.uploaded;
-          models.camEvents.create(dataToLocalDB).catch((err) => {
-            console.error(err);
-          });
+          models.camEvents
+            .create(dataToLocalDB)
+            .then((res) => {
+              if (result.uploaded) {
+                console.log(
+                  `camera:${dataToLocalDB.camera} photo:${dataToLocalDB.fileName} API_RES:${dataToLocalDB.apiResponse.status}`
+                );
+              } else {
+                console.error(
+                  `camera:${dataToLocalDB.camera} photo:${
+                    dataToLocalDB.fileName
+                  } API_RES:${JSON.stringify(dataToLocalDB.apiResponse.error)}`
+                );
+              }
+            })
+            .catch((error) => {
+              const errorMsg = {
+                text: 'DB_ERROR',
+                error: error.message,
+                stack: error.stack,
+              };
+              appErrorLog({
+                message: errorMsg,
+              });
+              console.error(errorMsg);
+            });
         })
         .catch((error) => {
-          const status = 'REQUEST_REJECTED';
+          let errorMsg;
+          if (error.response) {
+            errorMsg = `API_ERROR-${error.response.status} ${error.message} UPL:${error.config.url} camera:${dataToLocalDB.camera}, photo:${dataToLocalDB.fileName}`;
+          } else {
+            errorMsg = `API_ERROR ${error.message}`;
+          }
+          console.error(errorMsg);
+          const status = 'API_ERROR';
           models.pendingList.create({
             status,
             data: jsonToSend,
             dbID: dataToLocalDB.uuid,
             fileMeta,
           });
-          console.error({ text: 'API_ERROR', error });
-          appErrorLog({ message: { text: 'API_ERROR', error: error.message } });
+          appErrorLog({
+            message: errorMsg,
+          });
           models.camEvents.create(dataToLocalDB);
         });
     })

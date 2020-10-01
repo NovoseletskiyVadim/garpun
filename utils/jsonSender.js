@@ -11,7 +11,7 @@ module.exports = (jsonData, fileMeta) => {
     },
   };
   const url =
-    process.env.API_SERVER + '/api/CollectMoveVehicles/ReceiveMovementHarpoon';
+    process.env.API_SERVER + '/CollectMoveVehicles/ReceiveMovementHarpoon';
 
   return new Promise((resolve, rejects) => {
     axios
@@ -25,9 +25,7 @@ module.exports = (jsonData, fileMeta) => {
           fs.unlink(fileMeta.file.fullPath, (err) => {
             if (err) throw err;
             resolve({ apiResponse, uploaded });
-            // console.log('path/file.txt was deleted');
           });
-          // fs.unlink(fileMeta.file.fullPath);
         } else {
           // status 200 with error
           // TODO  All type API ERROR response?
@@ -37,7 +35,6 @@ module.exports = (jsonData, fileMeta) => {
         }
       })
       .catch((err) => {
-        process.env.NODE_ENV === 'DEV' && console.error(err.message);
         rejects(err);
       });
   });

@@ -4,9 +4,9 @@ const eventHandler = require('./eventHandler');
 const rejectFileHandler = require('./rejectFileHandler');
 const getFileMeta = require('./getFileMeta');
 const { appErrorLog, rejectFileLog } = require('./logger');
+const fs = require('fs');
 
 module.exports = () => {
-  let calcFile = 0;
   let eventWatcher;
 
   return {
@@ -19,9 +19,6 @@ module.exports = () => {
       console.log('Under watch: ' + process.env.MEDIA_PATH);
       eventWatcher
         .on('add', (pathFile) => {
-          calcFile++;
-          process.env.NODE_ENV === 'DEV' &&
-            console.log(calcFile + ' get ' + pathFile);
           const fileMeta = getFileMeta(pathFile);
           FileType.fromFile(pathFile).then((type) => {
             if (!type || type.ext !== 'jpg') {
