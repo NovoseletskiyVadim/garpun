@@ -53,7 +53,7 @@ const addFile = (camName) => {
     }
   });
   calc++;
-  const time = Math.floor(Math.random() * (30000 - 100)) + 100;
+  const time = Math.floor(Math.random() * (5000 - 100)) + 100;
 
   setTimeout(() => {
     if (calc < 1000) {

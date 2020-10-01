@@ -34,7 +34,11 @@ module.exports = () => {
               });
               rejectFileHandler(fileMeta);
               process.env.NODE_ENV === 'DEV' &&
-                console.error('WRONG_FILE', pathFile);
+                console.error(
+                  `WRONG_FILE WHY: ${fileMeta.notPassed.join(' ')} camera:${
+                    fileMeta.cameraName
+                  } photo:${fileMeta.file.name}${fileMeta.file.ext}`
+                );
             }
           });
         })
