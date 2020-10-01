@@ -4,7 +4,7 @@ const jsonSender = require('./jsonSender');
 process.send(`rejectApiHandler started`);
 
 let interval = 5000;
-let limit = 10;
+let limit = 100;
 
 const resend = () => {
   const restart = () => {
@@ -23,7 +23,7 @@ const resend = () => {
     .then((list) => {
       if (list.length === 0) {
         interval = 5000;
-        limit = 10;
+        limit = 100;
         restart();
       } else {
         process.env.NODE_ENV === 'DEV' &&
@@ -54,7 +54,7 @@ const resend = () => {
         });
         Promise.all(requests)
           .then((result) => {
-            if (limit < 10) {
+            if (limit < 100) {
               limit++;
             }
             interval = 5000;

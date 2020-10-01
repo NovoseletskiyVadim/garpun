@@ -14,13 +14,23 @@ require('../models/cameras')(sequelize);
 
 module.exports = {
   start: () => {
-    console.log('DB_NAME', process.env.SQL_DB);
     return sequelize.authenticate();
   },
   dbCreate: () => {
+    console.log('DB_NAME', process.env.SQL_DB);
     const { cameras, camEvents, pendingList } = sequelize.models;
-    const tableCreate = [cameras.sync(), camEvents.sync(), pendingList.sync()];
-    return Promise.all(tableCreate);
+    let tablesList = [];
+    if (process.env.NODE_ENV === 'DEV') {
+      tablesList = [
+        cameras.sync(),
+        camEvents.sync({ force: true }),
+        pendingList.sync({ force: true }),
+      ];
+    } else {
+      tablesList = [cameras.sync(), camEvents.sync(), pendingList.sync()];
+    }
+
+    return Promise.all(tablesList);
   },
   stop: () => {
     return sequelize.close();
