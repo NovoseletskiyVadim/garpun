@@ -14,10 +14,10 @@ require('../models/cameras')(sequelize);
 
 module.exports = {
   start: () => {
-    console.log('DB_NAME', process.env.SQL_DB);
     return sequelize.authenticate();
   },
   dbCreate: () => {
+    console.log('DB_NAME', process.env.SQL_DB);
     const { cameras, camEvents, pendingList } = sequelize.models;
     let tablesList = [];
     if (process.env.NODE_ENV === 'DEV') {

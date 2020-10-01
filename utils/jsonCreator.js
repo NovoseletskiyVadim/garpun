@@ -40,7 +40,7 @@ module.exports = (eventData) => {
                 media: [
                   {
                     id: uuidv4(),
-                    data: dataBase64.length < 250000 ? dataBase64 : ' ',
+                    data: dataBase64,
                     url: null,
                     plate: {
                       data: null,

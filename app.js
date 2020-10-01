@@ -5,6 +5,7 @@ const dbConnect = require('./db/dbConnect');
 const { fork } = require('child_process');
 const eventWatcher = require('./utils/eventWatcher')();
 const { appErrorLog } = require('./utils/logger');
+console.log('APP_STARTED_MODE: ' + process.env.NODE_ENV);
 
 if (!fs.existsSync(process.env.MEDIA_PATH)) {
   try {
