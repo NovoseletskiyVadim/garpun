@@ -54,9 +54,6 @@ module.exports = () => {
           }
         })
         .on('error', function (error) {
-          if (error.code === 'UNKNOWN') {
-            rejectFileHandler(error.path);
-          }
           console.error('WATCHER_ERROR', error);
           appErrorLog({ message: { text: 'WATCHER_ERROR', error } });
         });

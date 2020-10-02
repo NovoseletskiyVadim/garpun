@@ -1,7 +1,7 @@
 {
   "name": "cam_adapter",
-  "version": "1.0.0",
-  "description": "",
+  "version": "1.1.0",
+  "description": "This is a app for adapting hikvision cameras to prepare and sending data to the API.",
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -16,7 +16,7 @@
     "chokidar": "^3.4.2",
     "dotenv": "^8.2.0",
     "file-type": "^14.7.1",
-    "moment": "^2.27.0",
+    "moment": "^2.29.0",
     "sequelize": "^6.3.4",
     "sqlite3": "^5.0.0",
     "uuid": "^8.3.0"

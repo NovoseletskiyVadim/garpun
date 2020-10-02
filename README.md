@@ -1,4 +1,6 @@
-# garpun
+# The garpun
+
+This is a app for adapting hikvision cameras to prepare and sending data to the API.
 
 ## Config
 
