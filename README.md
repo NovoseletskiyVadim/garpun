@@ -19,7 +19,7 @@ apt install sqlite3
 ## Instalation
 
 ```
-1 $ npm update
+1 $ npm install
 2 Create .env file
   MEDIA_PATH= path to FTP dir
   TRESH_PATH= path where will be stored files with wrong data type and file name
