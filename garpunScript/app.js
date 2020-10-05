@@ -7,15 +7,12 @@ const eventWatcher = require('./utils/eventWatcher')();
 const { appErrorLog } = require('./utils/logger');
 console.log('APP_STARTED_MODE: ' + process.env.NODE_ENV);
 
-if (!fs.existsSync(process.env.MEDIA_PATH)) {
-  try {
-    fs.mkdirSync(process.env.MEDIA_PATH);
-  } catch (error) {
-    console.error('CREATE_MEDIA_DIR_ERROR');
-    appErrorLog({ message: { text: 'CREATE_MEDIA_DIR_ERROR', error } });
-  }
-}
 let forked;
+if (parseInt(process.env.ARCHIVE_DAYS) > 0) {
+  console.log('FILE_ARCHIVE: ' + process.env.ARCHIVE_DAYS);
+} else {
+  console.log('FILE_ARCHIVE: OFF');
+}
 
 dbConnect
   .dbCreate()

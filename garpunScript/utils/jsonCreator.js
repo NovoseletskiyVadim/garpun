@@ -5,7 +5,7 @@ const { v4: uuidv4 } = require('uuid');
 
 module.exports = (eventData) => {
   return new Promise((resolve, reject) => {
-    const dataBase64 = base64Convertor(eventData.pathFile);
+    const dataBase64 = base64Convertor(eventData);
     const cameraInfo = models.cameras.findOne({
       where: { ftpHomeDir: eventData.cameraName },
     });

@@ -20,7 +20,7 @@ module.exports = (fileMeta) => {
     plateNumber,
     datetime: eventDate,
     uuid,
-    pathFile: file.fullPath,
+    file,
   })
     .then((jsonToSend) => {
       jsonSender(jsonToSend, fileMeta)
@@ -57,7 +57,11 @@ module.exports = (fileMeta) => {
         .catch((error) => {
           let errorMsg;
           if (error.response) {
-            errorMsg = `API_ERROR-${error.response.status} ${error.message} UPL:${error.config.url} camera:${dataToLocalDB.camera}, photo:${dataToLocalDB.fileName}`;
+            errorMsg = `API_ERROR-${error.response.status} ${error.message} ${
+              error.response.statusText || error.message
+            } UPL:${error.config.url} camera:${dataToLocalDB.camera}, photo:${
+              dataToLocalDB.fileName
+            }`;
           } else {
             errorMsg = `API_ERROR ${error.message}`;
           }

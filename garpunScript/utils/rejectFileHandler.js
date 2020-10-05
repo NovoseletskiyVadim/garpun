@@ -1,13 +1,16 @@
 'use strict';
 const fs = require('fs');
 const path = require('path');
+const fileExplorer = require('./fileExplorer');
 const { appErrorLog } = require('./logger');
 
 module.exports = (fileMeta) => {
   const pathFile = fileMeta.file.fullPath;
   const cameraName = fileMeta.cameraName;
   const fileName = fileMeta.file.name;
-  const trashPath = path.join(process.env.TRASH_PATH, cameraName);
+  // const trashPath = path.join(process.env.TRASH_PATH, cameraName);
+  const trashPath = fileExplorer.setFileDirPath(cameraName, 'TRASH_PATH');
+
   return new Promise((resolve, reject) => {
     if (!fs.existsSync(process.env.TRASH_PATH)) {
       try {
@@ -18,7 +21,7 @@ module.exports = (fileMeta) => {
     }
     if (!fs.existsSync(trashPath)) {
       try {
-        fs.mkdirSync(trashPath);
+        fs.mkdirSync(trashPath, { recursive: true });
       } catch (error) {
         appErrorLog({ message: { text: 'TRASH_FOLDER_ERROR', error } });
       }

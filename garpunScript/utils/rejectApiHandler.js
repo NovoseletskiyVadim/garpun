@@ -4,7 +4,7 @@ const jsonSender = require('./jsonSender');
 process.send(`rejectApiHandler started`);
 
 let interval = 5000;
-let limit = 100;
+let limit = 10;
 
 const resend = () => {
   const restart = () => {
@@ -12,49 +12,66 @@ const resend = () => {
       if (interval < 100000) {
         resend();
       } else {
-        interval = 5000;
+        interval = 100000;
         resend();
       }
     }, interval);
   };
 
   models.pendingList
-    .findAll({ limit: limit })
-    .then((list) => {
-      if (list.length === 0) {
+    .findAndCountAll({ limit: limit })
+    .then((result) => {
+      const { count, rows } = result;
+      if (rows.length === 0) {
         interval = 5000;
-        limit = 100;
+        limit = 10;
         restart();
       } else {
         process.env.NODE_ENV === 'DEV' &&
           process.send({
-            pendingEvents: list.length,
+            pendingEvents: count,
             Pending_interval: interval,
-            List_limit: limit,
+            rows_limit: limit,
           });
-        const requests = list.map((item) => {
+        const requests = rows.map((item) => {
           return jsonSender(item.data, item.fileMeta).then((result) => {
             const destroy = models.pendingList.destroy({
               where: {
                 id: item.id,
               },
             });
-            const update = models.camEvents.update(
-              { uploaded: true },
-              {
+            const update = models.camEvents
+              .findOne({
                 where: {
                   uuid: item.dbID,
                 },
-              }
-            );
-            Promise.all([destroy, update]).catch((err) => {
-              console.error('DB_ERR', err);
-            });
+              })
+              .then((item) => {
+                return item.update({
+                  uploaded: true,
+                  apiResponse: result.apiResponse,
+                });
+              });
+            Promise.all([destroy, update])
+              .then((result) => {
+                const eventData = result[1].dataValues;
+                console.log(
+                  `RESEND camera:${eventData.camera} photo:${
+                    eventData.fileName
+                  } API_RES:${
+                    eventData.apiResponse.status ||
+                    JSON.stringify(eventData.apiResponse.error)
+                  }`
+                );
+              })
+              .catch((err) => {
+                console.error('DB_ERR', err);
+              });
           });
         });
         Promise.all(requests)
           .then((result) => {
-            if (limit < 100) {
+            if (limit < 10) {
               limit++;
             }
             interval = 5000;
