@@ -1,4 +1,6 @@
-# garpun
+# The garpun
+
+This is a app for adapting hikvision cameras to prepare and sending data to the API.
 
 ## Config
 
@@ -17,7 +19,7 @@ apt install sqlite3
 ## Instalation
 
 ```
-1 $ npm update
+1 $ npm install
 2 Create .env file
   MEDIA_PATH= path to FTP dir
   TRESH_PATH= path where will be stored files with wrong data type and file name
@@ -25,6 +27,10 @@ apt install sqlite3
   API_KEY=
   SQL_DB=
   PROVIDER=
+  TIME_TO_CHECK_CAMERAS=
+  ARCHIVE_DAYS=
+  ARCHIVE_PATH=
+  BOT_TOKEN=
  - add for run tests:
   TEST_SOURCE_FILE=
   TEST_LOAD_CAMS=

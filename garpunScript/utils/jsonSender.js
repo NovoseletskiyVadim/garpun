@@ -22,13 +22,8 @@ module.exports = (jsonData, fileMeta) => {
         let uploaded = false;
         if (status && status === 'OK') {
           uploaded = true;
-          fs.unlink(fileMeta.file.fullPath, (err) => {
-            if (err) throw err;
-            resolve({ apiResponse, uploaded });
-          });
+          resolve({ apiResponse, uploaded });
         } else {
-          // status 200 with error
-          // TODO  All type API ERROR response?
           rejectFileHandler(fileMeta).then(() => {
             resolve({ apiResponse, uploaded });
           });

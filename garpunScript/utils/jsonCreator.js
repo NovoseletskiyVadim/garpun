@@ -5,7 +5,7 @@ const { v4: uuidv4 } = require('uuid');
 
 module.exports = (eventData) => {
   return new Promise((resolve, reject) => {
-    const dataBase64 = base64Convertor(eventData.pathFile);
+    const dataBase64 = base64Convertor(eventData);
     const cameraInfo = models.cameras.findOne({
       where: { ftpHomeDir: eventData.cameraName },
     });
@@ -13,7 +13,7 @@ module.exports = (eventData) => {
       .then((result) => {
         const [dataBase64, cameraInfo] = result;
         if (!Boolean(cameraInfo)) {
-          reject(new Error(`CAMERA ${eventData.cameraName} NOT_EXIT`));
+          reject(new Error(`CAMERA ${eventData.cameraName} NOT_EXIST`));
         } else {
           const eventObject = {
             version: 1,

@@ -1,10 +1,16 @@
 const chokidar = require('chokidar');
 const FileType = require('file-type');
+const { fork } = require('child_process');
 const eventHandler = require('./eventHandler');
 const rejectFileHandler = require('./rejectFileHandler');
 const getFileMeta = require('./getFileMeta');
 const { appErrorLog, rejectFileLog } = require('./logger');
 const fs = require('fs');
+const forkedPing = fork(`./utils/pingCam.js`);
+
+forkedPing.on('message', (msg) => {
+  console.log(msg);
+});
 
 module.exports = () => {
   let eventWatcher;
@@ -21,6 +27,7 @@ module.exports = () => {
         .on('add', (pathFile) => {
           const fileSize = fs.statSync(pathFile).size;
           const fileMeta = getFileMeta(pathFile);
+          forkedPing.send(fileMeta.cameraName);
           if (fileSize < 250000) {
             FileType.fromFile(pathFile).then((type) => {
               if (!type || type.ext !== 'jpg') {
@@ -36,7 +43,7 @@ module.exports = () => {
                 });
                 rejectFileHandler(fileMeta);
                 console.error(
-                  `WRONG_FILE WHY: ${fileMeta.notPassed.join(' ')} camera:${
+                  `WRONG ${fileMeta.notPassed.join(' ')} camera:${
                     fileMeta.cameraName
                   } photo:${fileMeta.file.name}${fileMeta.file.ext}`
                 );
@@ -45,18 +52,13 @@ module.exports = () => {
           } else {
             rejectFileHandler(fileMeta);
             console.error(
-              `WRONG_FILE WHY: FILE_SIZE>200Kb ${fileMeta.notPassed.join(
-                ' '
-              )} camera:${fileMeta.cameraName} photo:${fileMeta.file.name}${
-                fileMeta.file.ext
-              }`
+              `WRONG FILE_SIZE ${fileMeta.notPassed.join(' ')} camera:${
+                fileMeta.cameraName
+              } photo:${fileMeta.file.name}${fileMeta.file.ext}`
             );
           }
         })
         .on('error', function (error) {
-          if (error.code === 'UNKNOWN') {
-            rejectFileHandler(error.path);
-          }
           console.error('WATCHER_ERROR', error);
           appErrorLog({ message: { text: 'WATCHER_ERROR', error } });
         });
