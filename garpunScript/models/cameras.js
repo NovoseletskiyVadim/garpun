@@ -21,5 +21,11 @@ module.exports = (sequelize) => {
     position: {
       type: DataTypes.STRING,
     },
+    cameraIP: {
+      type: DataTypes.STRING,
+    },
+    isOnLine: {
+      type: DataTypes.BOOLEAN,
+    },
   });
 };

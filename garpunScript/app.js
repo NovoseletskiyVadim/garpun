@@ -1,6 +1,6 @@
 'use strict';
-const fs = require('fs');
 require('dotenv').config();
+// require('./utils/garpunBot');
 const dbConnect = require('./db/dbConnect');
 const { fork } = require('child_process');
 const eventWatcher = require('./utils/eventWatcher')();
@@ -8,6 +8,7 @@ const { appErrorLog } = require('./utils/logger');
 console.log('APP_STARTED_MODE: ' + process.env.NODE_ENV);
 
 let forked;
+
 if (parseInt(process.env.ARCHIVE_DAYS) > 0) {
   console.log('FILE_ARCHIVE: ' + process.env.ARCHIVE_DAYS);
 } else {
@@ -28,9 +29,11 @@ dbConnect
   })
   .then(() => {
     forked = fork(`./utils/rejectApiHandler.js`);
+
     forked.on('message', (msg) => {
       console.log(msg);
     });
+
     eventWatcher.startWatch();
   })
   .catch((err) => {

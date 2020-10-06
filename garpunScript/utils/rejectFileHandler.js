@@ -8,17 +8,9 @@ module.exports = (fileMeta) => {
   const pathFile = fileMeta.file.fullPath;
   const cameraName = fileMeta.cameraName;
   const fileName = fileMeta.file.name;
-  // const trashPath = path.join(process.env.TRASH_PATH, cameraName);
   const trashPath = fileExplorer.setFileDirPath(cameraName, 'TRASH_PATH');
 
   return new Promise((resolve, reject) => {
-    if (!fs.existsSync(process.env.TRASH_PATH)) {
-      try {
-        fs.mkdirSync(process.env.TRASH_PATH);
-      } catch (error) {
-        appErrorLog({ message: { text: 'TRASH_FOLDER_ERROR', error } });
-      }
-    }
     if (!fs.existsSync(trashPath)) {
       try {
         fs.mkdirSync(trashPath, { recursive: true });

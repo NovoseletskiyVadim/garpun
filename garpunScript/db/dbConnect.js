@@ -20,14 +20,19 @@ module.exports = {
     console.log('DB_NAME', process.env.SQL_DB);
     const { cameras, camEvents, pendingList } = sequelize.models;
     let tablesList = [];
-    if (process.env.NODE_ENV === 'DEVI') {
+    //if NODE_ENV === 'DEV' clean test DB
+    if (process.env.NODE_ENV === 'DEV') {
       tablesList = [
-        cameras.sync(),
+        cameras.sync({ alter: true }),
         camEvents.sync({ force: true }),
         pendingList.sync({ force: true }),
       ];
     } else {
-      tablesList = [cameras.sync(), camEvents.sync(), pendingList.sync()];
+      tablesList = [
+        cameras.sync({ alter: true }),
+        camEvents.sync({ alter: true }),
+        pendingList.sync({ alter: true }),
+      ];
     }
 
     return Promise.all(tablesList);

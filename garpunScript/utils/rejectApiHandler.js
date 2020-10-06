@@ -1,7 +1,7 @@
 'use strict';
 const { models } = require('./../db/dbConnect').sequelize;
 const jsonSender = require('./jsonSender');
-process.send(`rejectApiHandler started`);
+process.send(`RejectApiHandler started ID:${process.pid}`);
 
 let interval = 5000;
 let limit = 10;

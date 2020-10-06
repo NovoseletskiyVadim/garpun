@@ -23,10 +23,6 @@ module.exports = (jsonData, fileMeta) => {
         if (status && status === 'OK') {
           uploaded = true;
           resolve({ apiResponse, uploaded });
-          // fs.unlink(fileMeta.file.fullPath, (err) => {
-          //   if (err) throw err;
-          //
-          // });
         } else {
           // status 200 with error
           // TODO  All type API ERROR response?

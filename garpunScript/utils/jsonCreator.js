@@ -13,7 +13,7 @@ module.exports = (eventData) => {
       .then((result) => {
         const [dataBase64, cameraInfo] = result;
         if (!Boolean(cameraInfo)) {
-          reject(new Error(`CAMERA ${eventData.cameraName} NOT_EXIT`));
+          reject(new Error(`CAMERA ${eventData.cameraName} NOT_EXIST`));
         } else {
           const eventObject = {
             version: 1,

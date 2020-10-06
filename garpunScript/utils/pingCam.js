@@ -1,37 +1,49 @@
+'use strict';
 const ping = require('ping');
+const { models } = require('./../db/dbConnect').sequelize;
+// const { alarmSignal } = require('./garpunBot');
 
-const hosts = ['192.168.1.1', 'google.com', 'yahoo.com'];
-const cameras = {
-  test_cam: { address: '10.15.40.18' },
-  google: { address: 'google' },
+process.send(`PingCam started ID:${process.pid}`);
+const timeOut = process.env.TIME_TO_CHECK_CAMERAS;
+const pingCam = (camera, timeOut, recursive) => {
+  camera.ping = setTimeout(function () {
+    ping.sys.probe(camera.cameraIP, (isAlive) => {
+      if (!isAlive) {
+        // alarmSignal(`Camera ${camera.ftpHomeDir} is dead`);
+        console.log(`Camera ${camera.ftpHomeDir} is dead`);
+      }
+    });
+    if (recursive) {
+      pingCam(camera, timeOut, true);
+    }
+  }, timeOut);
 };
-Object.keys(cameras).forEach((cam) => {
-  cameras[cam].ping = setTimeout(function () {
-    console.log('Hello ' + cam);
-  }, 3000);
-});
 
-const CameraAlive = (camera) => {
-  clearTimeout(cameras[camera].ping);
-  cameras[camera].ping = setTimeout(function () {
-    console.log('Hello ' + camera);
-  }, 3000);
+let cameras = [];
+
+models.cameras
+  .findAll({ where: { isOnLine: true }, raw: true })
+  .then((camerasList) => {
+    let workingCam = '';
+    cameras = camerasList.map((cam) => {
+      workingCam += ` ${cam.ftpHomeDir}`;
+      pingCam(cam, timeOut, true);
+      return cam;
+    });
+    console.log(`WORKING_CAMERAS: ${workingCam}`);
+    process.on('message', (camName) => {
+      cameraAlive(camName);
+    });
+  });
+
+const cameraAlive = (camera) => {
+  const cameraIndex = cameras.findIndex((cam) => {
+    if (cam.ftpHomeDir === camera) {
+      return true;
+    }
+  });
+  clearTimeout(cameras[cameraIndex].ping);
+  pingCam(cameras[cameraIndex], timeOut, true);
 };
 
-CameraAlive('test_cam');
-CameraAlive('test_cam');
-
-// var cfg = {
-//   timeout: 20000,
-//   // WARNING: -i 2 may not work in other platform like window
-//   // extra: ['-i', '2'],
-// };
-
-// hosts.forEach(function (host) {
-//   ping.sys.probe(host, function (isAlive) {
-//     var msg = isAlive
-//       ? 'host ' + host + ' is alive'
-//       : 'host ' + host + ' is dead';
-//     console.log(msg);
-//   });
-// }, cfg);
+module.exports = { pingCam };

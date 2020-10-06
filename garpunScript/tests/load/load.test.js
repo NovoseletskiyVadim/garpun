@@ -4,6 +4,7 @@ const moment = require('moment');
 require('dotenv').config('./../.env');
 
 const cameraNames = [
+  'Cherk_park_50',
   'zolotonosha1',
   'zhashkiv1',
   'uman1',
