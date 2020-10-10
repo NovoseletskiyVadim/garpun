@@ -1,5 +1,12 @@
 extends layout
 
 block content
-  h1= title
-  p Welcome to #{title}
+  h3 Harpoon online monitoring
+  ul(id="events-monitor")
+    li(class='event-wrap event-monitor-header')
+      div(class="event-time") Event time
+      div(class="event-camera") Camera name
+      div(class="event-fileName") Plate number
+      div(class='event-msg') API\Files Errors 
+      div(class='event-img') Image
+    

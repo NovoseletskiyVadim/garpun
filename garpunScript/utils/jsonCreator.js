@@ -1,5 +1,5 @@
 'use strict';
-const base64Convertor = require('./base64Convertor');
+const { base64Convertor } = require('./fileExplorer');
 const { models } = require('./../db/dbConnect').sequelize;
 const { v4: uuidv4 } = require('uuid');
 

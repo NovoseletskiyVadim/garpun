@@ -1,12 +1,15 @@
 const chokidar = require('chokidar');
+const moment = require('moment');
 const FileType = require('file-type');
 const { fork } = require('child_process');
+const fs = require('fs');
+
 const eventHandler = require('./eventHandler');
-const rejectFileHandler = require('./rejectFileHandler');
+const { rejectFileHandler } = require('./fileExplorer');
 const getFileMeta = require('./getFileMeta');
 const { appErrorLog, rejectFileLog } = require('./logger');
-const fs = require('fs');
 const forkedPing = fork(`./utils/pingCam.js`);
+const socketMsgSender = require('../socketIO');
 
 forkedPing.on('message', (msg) => {
   console.log(msg);
@@ -28,35 +31,47 @@ module.exports = () => {
           const fileSize = fs.statSync(pathFile).size;
           const fileMeta = getFileMeta(pathFile);
           forkedPing.send(fileMeta.cameraName);
-          if (fileSize < 250000) {
-            FileType.fromFile(pathFile).then((type) => {
-              if (!type || type.ext !== 'jpg') {
-                fileMeta.isValid = false;
-                fileMeta.notPassed.push('FILE_TYPE');
-              }
-              if (fileMeta.isValid) {
-                eventHandler(fileMeta);
-              } else {
-                rejectFileLog({
-                  message: fileMeta.notPassed.join(),
-                  file: fileMeta.file,
+          FileType.fromFile(pathFile).then((type) => {
+            if (!type || type.ext !== 'jpg') {
+              fileMeta.isValid = false;
+              fileMeta.notPassed.push('FILE_TYPE');
+            }
+            if (fileSize > parseInt(process.env.MAX_FILE_SIZE, 10)) {
+              fileMeta.isValid = false;
+              fileMeta.notPassed.push('FILE_SIZE');
+            }
+            if (fileMeta.isValid) {
+              eventHandler(fileMeta);
+            } else {
+              rejectFileLog({
+                message: fileMeta.notPassed.join(),
+                file: fileMeta.file,
+              });
+              rejectFileHandler(fileMeta).then(() => {
+                socketMsgSender.newEvent({
+                  eventTime: moment(fileMeta.eventDate).format(
+                    'YYYY-MM-DD hh:mm:ss'
+                  ),
+                  cameraName: fileMeta.cameraName,
+                  plateNumber: fileMeta.plateNumber || ' ',
+                  isErrors: fileMeta.notPassed,
+                  filePath: fileMeta.notPassed.includes('FILE_TYPE')
+                    ? false
+                    : `/images/trash_files/${
+                        fileMeta.cameraName
+                      }/${moment().format('YYYYMMDD')}/${
+                        fileMeta.file.name + fileMeta.file.ext
+                      }`,
                 });
-                rejectFileHandler(fileMeta);
-                console.error(
-                  `WRONG ${fileMeta.notPassed.join(' ')} camera:${
-                    fileMeta.cameraName
-                  } photo:${fileMeta.file.name}${fileMeta.file.ext}`
-                );
-              }
-            });
-          } else {
-            rejectFileHandler(fileMeta);
-            console.error(
-              `WRONG FILE_SIZE ${fileMeta.notPassed.join(' ')} camera:${
-                fileMeta.cameraName
-              } photo:${fileMeta.file.name}${fileMeta.file.ext}`
-            );
-          }
+              });
+              console.log(
+                '\x1b[31m%s\x1b[0m',
+                `WRONG ${fileMeta.notPassed.join(' ')} camera:${
+                  fileMeta.cameraName
+                } photo:${fileMeta.file.name}${fileMeta.file.ext}`
+              );
+            }
+          });
         })
         .on('error', function (error) {
           console.error('WATCHER_ERROR', error);

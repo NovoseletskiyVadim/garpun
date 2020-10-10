@@ -1,13 +1,11 @@
 'use strict';
 const axios = require('axios');
-const fs = require('fs');
-const rejectFileHandler = require('./rejectFileHandler');
 
-module.exports = (jsonData, fileMeta) => {
+module.exports = (jsonData) => {
   const config = {
     headers: {
       'Content-type': ' application/json; charset=utf-8',
-      Authentication: process.env.API_KEY, //
+      Authentication: process.env.API_KEY,
     },
   };
   const url =
@@ -19,20 +17,25 @@ module.exports = (jsonData, fileMeta) => {
       .then((result) => {
         const { status } = result.data;
         const apiResponse = result.data;
-        let uploaded = false;
+        let isSent = false;
         if (status && status === 'OK') {
-          uploaded = true;
-          resolve({ apiResponse, uploaded });
-        } else {
-          // status 200 with error
-          // TODO  All type API ERROR response?
-          rejectFileHandler(fileMeta).then(() => {
-            resolve({ apiResponse, uploaded });
-          });
+          isSent = true;
         }
+        resolve({ isSent, apiResponse });
       })
-      .catch((err) => {
-        rejects(err);
+      .catch((error) => {
+        let errorMsg = {
+          errorText: '',
+          statusCode: 0,
+          apiURL: url,
+        };
+        if (error.response) {
+          errorMsg.errorText = error.response.statusText || error.message;
+          errorMsg.statusCode = error.response.status;
+        } else {
+          errorMsg.errorText = error.message;
+        }
+        rejects(errorMsg);
       });
   });
 };

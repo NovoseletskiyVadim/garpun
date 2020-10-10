@@ -1,7 +1,6 @@
 'use strict';
 const ping = require('ping');
 const { models } = require('./../db/dbConnect').sequelize;
-// const { alarmSignal } = require('./garpunBot');
 
 process.send(`PingCam started ID:${process.pid}`);
 const timeOut = process.env.TIME_TO_CHECK_CAMERAS;
@@ -9,8 +8,7 @@ const pingCam = (camera, timeOut, recursive) => {
   camera.ping = setTimeout(function () {
     ping.sys.probe(camera.cameraIP, (isAlive) => {
       if (!isAlive) {
-        // alarmSignal(`Camera ${camera.ftpHomeDir} is dead`);
-        console.log(`Camera ${camera.ftpHomeDir} is dead`);
+        console.log('\x1b[31m%s\x1b[0m', `DEAD_CAMERA ${camera.ftpHomeDir}`);
       }
     });
     if (recursive) {
@@ -42,8 +40,10 @@ const cameraAlive = (camera) => {
       return true;
     }
   });
-  clearTimeout(cameras[cameraIndex].ping);
-  pingCam(cameras[cameraIndex], timeOut, true);
+  if (cameraIndex >= 0) {
+    clearTimeout(cameras[cameraIndex].ping);
+    pingCam(cameras[cameraIndex], timeOut, true);
+  }
 };
 
 module.exports = { pingCam };

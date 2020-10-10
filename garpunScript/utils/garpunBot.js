@@ -1,10 +1,6 @@
 const TelegramBot = require('node-telegram-bot-api');
 const { models } = require('./../db/dbConnect').sequelize;
-const bot = new TelegramBot(
-  process.env.TELEGRAM_BOT_TOKEN ||
-    '1339697180:AAEpHNCWt-YNJ4SL_gNGXA40RTxXNPo9_SM',
-  { polling: true }
-);
+const bot = new TelegramBot(process.env.BOT_TOKEN, { polling: true });
 
 bot.onText(/\/stat (.+)/, function (msg, match) {
   var fromId = msg.from.id; // Получаем ID отправителя
@@ -24,11 +20,11 @@ let userList = [];
 
 bot.onText(/\/reg (.+)/, function (msg, match) {
   var fromId = msg.from.id; // Получаем ID отправителя
-  console.log(fromId);
-  var resp = match[1]; // Получаем текст после /echo
-  if (resp === 'save') {
-    userList.push(fromId);
-  }
+  console.log(msg);
+  // var resp = match[1]; // Получаем текст после /echo
+  // if (resp === 'save') {
+  //   userList.push(fromId);
+  // }
   bot.sendMessage(fromId, 'Reg ok');
 });
 
