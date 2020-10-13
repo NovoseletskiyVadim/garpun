@@ -5,11 +5,26 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var favicon = require('serve-favicon');
 var path = require('path');
-
+const nocache = require('nocache');
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
+const helmet = require('helmet');
 
 var app = express();
+app.use(nocache());
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        'default-src': ["'self'"],
+        'script-src': ["'self'", 'cdnjs.cloudflare.com'],
+        'object-src': ["'none'"],
+        'connect-src': ["'self'", '10.15.1.235:*'],
+      },
+    },
+  })
+);
+
 app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));

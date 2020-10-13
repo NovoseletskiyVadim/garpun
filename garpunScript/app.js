@@ -1,6 +1,6 @@
 'use strict';
 require('dotenv').config();
-
+require('./utils/garpunBot');
 const dbConnect = require('./db/dbConnect');
 const { fork } = require('child_process');
 const eventWatcher = require('./utils/eventWatcher')();

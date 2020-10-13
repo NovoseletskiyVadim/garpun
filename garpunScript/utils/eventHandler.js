@@ -26,7 +26,7 @@ module.exports = (fileMeta) => {
     .then((jsonToSend) => {
       socketMsgSender.newEvent({
         uuid,
-        eventTime: moment(fileMeta.eventDate).format('YYYY-MM-DD hh:mm:ss'),
+        eventTime: moment(fileMeta.eventDate).format('YYYY-MM-DD HH:mm:ss'),
         cameraName: fileMeta.cameraName,
         plateNumber: fileMeta.plateNumber,
         isErrors: [],

@@ -50,7 +50,7 @@ module.exports = () => {
               rejectFileHandler(fileMeta).then(() => {
                 socketMsgSender.newEvent({
                   eventTime: moment(fileMeta.eventDate).format(
-                    'YYYY-MM-DD hh:mm:ss'
+                    'YYYY-MM-DD HH:mm:ss'
                   ),
                   cameraName: fileMeta.cameraName,
                   plateNumber: fileMeta.plateNumber || ' ',
