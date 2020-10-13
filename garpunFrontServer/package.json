@@ -7,12 +7,15 @@
     "dev": "nodemon ./bin/www"
   },
   "dependencies": {
+    "compression": "^1.7.4",
     "cookie-parser": "~1.4.4",
     "debug": "~2.6.9",
     "dotenv": "^8.2.0",
     "express": "~4.16.1",
+    "helmet": "^4.1.1",
     "http-errors": "~1.6.3",
     "morgan": "~1.9.1",
+    "nocache": "^2.1.0",
     "pug": "^3.0.0",
     "serve-favicon": "^2.5.0"
   }

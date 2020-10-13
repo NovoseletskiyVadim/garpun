@@ -14,15 +14,18 @@ var usersRouter = require('./routes/users');
 var app = express();
 app.use(compression());
 app.use(helmet({
+    hsts: false,
+contentSecurityPolicy: {
+      directives: {	
+  },
  contentSecurityPolicy: {
       directives: {
         defaultSrc: ["'self'"],
         scriptSrc: ["'self'", 'cdnjs.cloudflare.com'],
         objectSrc: ["'none'"],
-	connectSrc: ["'self'", '10.15.1.235:*'],
+        upgradeInsecureRequests: [],
       },
     },
-  },
 )
 );
 app.use(nocache());
