@@ -5,6 +5,7 @@ const { models } = require('./../db/dbConnect').sequelize;
 const jsonSender = require('./jsonSender');
 const jsonCreator = require('./jsonCreator');
 const { appErrorLog } = require('./logger');
+const { apiErrorAlarm } = require('./harpoonBot');
 
 module.exports = (fileMeta) => {
   const { uuid, eventDate, cameraName, plateNumber, file } = fileMeta;
@@ -26,7 +27,7 @@ module.exports = (fileMeta) => {
     .then((jsonToSend) => {
       socketMsgSender.newEvent({
         uuid,
-        eventTime: moment(fileMeta.eventDate).format('YYYY-MM-DD hh:mm:ss'),
+        eventTime: moment(fileMeta.eventDate).format('YYYY-MM-DD HH:mm:ss'),
         cameraName: fileMeta.cameraName,
         plateNumber: fileMeta.plateNumber,
         isErrors: [],
@@ -38,6 +39,7 @@ module.exports = (fileMeta) => {
       });
       jsonSender(jsonToSend, fileMeta)
         .then((result) => {
+          apiErrorAlarm(200);
           const { isSent, apiResponse } = result;
           dataToLocalDB.apiResponse = apiResponse;
           dataToLocalDB.uploaded = isSent;
@@ -86,6 +88,7 @@ module.exports = (fileMeta) => {
           } ${error.errorText} UPL:${error.apiURL} camera:${
             dataToLocalDB.camera
           }, photo:${dataToLocalDB.fileName}`;
+          apiErrorAlarm(error.statusCode);
           console.log('\x1b[31m%s\x1b[0m', errorMsg);
           socketMsgSender.apiResp({
             uuid,

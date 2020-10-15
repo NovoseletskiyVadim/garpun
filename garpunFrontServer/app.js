@@ -6,26 +6,30 @@ var logger = require('morgan');
 var favicon = require('serve-favicon');
 const compression = require('compression');
 var path = require('path');
-const helmet = require("helmet");
 const nocache = require('nocache');
+const compression = require('compression');
+
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
+const helmet = require('helmet');
 
 var app = express();
+app.use(nocache());
 app.use(compression());
-app.use(helmet({
- contentSecurityPolicy: {
+app.use(
+  helmet({
+    contentSecurityPolicy: {
       directives: {
-        defaultSrc: ["'self'"],
-        scriptSrc: ["'self'", 'cdnjs.cloudflare.com'],
-        objectSrc: ["'none'"],
-	connectSrc: ["'self'", '10.15.1.235:*'],
+        'default-src': ["'self'"],
+        'script-src': ["'self'"],
+        'object-src': ["'none'"],
+        'connect-src': ["'self'", '10.15.1.235:*', 'ws://10.15.1.235:8888'],
       },
     },
-  },
-)
+  })
 );
-app.use(nocache());
+
+
 app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
