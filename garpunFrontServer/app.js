@@ -19,9 +19,9 @@ app.use(
     contentSecurityPolicy: {
       directives: {
         'default-src': ["'self'"],
-        'script-src': ["'self'", 'cdnjs.cloudflare.com'],
+        'script-src': ["'self'"],
         'object-src': ["'none'"],
-        'connect-src': ["'self'", '10.15.1.235:*'],
+        'connect-src': ["'self'", '10.15.1.235:*', 'ws://10.15.1.235:8888'],
       },
     },
   })
