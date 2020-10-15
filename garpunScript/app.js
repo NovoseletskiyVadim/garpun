@@ -1,12 +1,14 @@
 'use strict';
 require('dotenv').config();
-require('./utils/garpunBot');
+// require('./utils/harpoonBot');
 const dbConnect = require('./db/dbConnect');
-const { fork } = require('child_process');
 const eventWatcher = require('./utils/eventWatcher')();
 const { appErrorLog } = require('./utils/logger');
-console.log('APP_STARTED_MODE: ' + process.env.NODE_ENV);
 const { socketStart, apiResp } = require('./socketIO');
+const { camerasWatcher, rejectApiHandler } = require('./utils/childProcesses');
+
+console.log('APP_STARTED_MODE: ' + process.env.NODE_ENV);
+
 let forked;
 
 socketStart();
@@ -30,9 +32,9 @@ dbConnect
     });
   })
   .then(() => {
-    forked = fork(`./utils/rejectApiHandler.js`);
-
-    forked.on('message', (msg) => {
+    camerasWatcher.send({ type: 'START' });
+    rejectApiHandler.send({ type: 'START' });
+    rejectApiHandler.on('message', (msg) => {
       switch (msg.type) {
         case 'REQ_SENT':
           apiResp({
@@ -57,6 +59,7 @@ dbConnect
 
 const stopAPP = () => {
   forked.kill();
+  rejectApiHandler.kill();
   watch.stopWatcher();
 };
 

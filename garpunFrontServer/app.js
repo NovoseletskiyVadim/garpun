@@ -6,12 +6,14 @@ var logger = require('morgan');
 var favicon = require('serve-favicon');
 var path = require('path');
 const nocache = require('nocache');
+const compression = require('compression');
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 const helmet = require('helmet');
 
 var app = express();
 app.use(nocache());
+app.use(compression());
 app.use(
   helmet({
     contentSecurityPolicy: {

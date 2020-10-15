@@ -3,17 +3,12 @@ const moment = require('moment');
 const FileType = require('file-type');
 const { fork } = require('child_process');
 const fs = require('fs');
-
+const { camerasWatcher } = require('./childProcesses');
 const eventHandler = require('./eventHandler');
 const { rejectFileHandler } = require('./fileExplorer');
 const getFileMeta = require('./getFileMeta');
 const { appErrorLog, rejectFileLog } = require('./logger');
-const forkedPing = fork(`./utils/pingCam.js`);
 const socketMsgSender = require('../socketIO');
-
-forkedPing.on('message', (msg) => {
-  console.log(msg);
-});
 
 module.exports = () => {
   let eventWatcher;
@@ -30,7 +25,7 @@ module.exports = () => {
         .on('add', (pathFile) => {
           const fileSize = fs.statSync(pathFile).size;
           const fileMeta = getFileMeta(pathFile);
-          forkedPing.send(fileMeta.cameraName);
+          camerasWatcher.send({ type: 'EVENT', data: fileMeta.cameraName });
           FileType.fromFile(pathFile).then((type) => {
             if (!type || type.ext !== 'jpg') {
               fileMeta.isValid = false;
