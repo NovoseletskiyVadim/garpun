@@ -1,6 +1,6 @@
 'use strict';
 require('dotenv').config();
-// require('./utils/harpoonBot');
+require('./utils/harpoonBot');
 const dbConnect = require('./db/dbConnect');
 const eventWatcher = require('./utils/eventWatcher')();
 const { appErrorLog } = require('./utils/logger');

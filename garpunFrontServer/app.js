@@ -4,7 +4,6 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var favicon = require('serve-favicon');
-const compression = require('compression');
 var path = require('path');
 const nocache = require('nocache');
 const compression = require('compression');
@@ -28,7 +27,6 @@ app.use(
     },
   })
 );
-
 
 app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 // view engine setup

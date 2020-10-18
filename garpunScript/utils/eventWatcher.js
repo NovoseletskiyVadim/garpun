@@ -1,7 +1,6 @@
 const chokidar = require('chokidar');
 const moment = require('moment');
 const FileType = require('file-type');
-const { fork } = require('child_process');
 const fs = require('fs');
 const { camerasWatcher } = require('./childProcesses');
 const eventHandler = require('./eventHandler');
