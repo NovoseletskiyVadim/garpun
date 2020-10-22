@@ -1,6 +1,6 @@
 'use strict';
-// const socket = io('ws://10.15.1.235:8888');
-const socket = io('ws://localhost:8888');
+const socket = io('ws://10.15.1.235:8888');
+//const socket = io('ws://localhost:8888');
 const eventListWrapper = document.getElementById('events-monitor');
 
 const showBigImg = (target) => {

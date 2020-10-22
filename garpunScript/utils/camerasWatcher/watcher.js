@@ -59,7 +59,7 @@ module.exports = () => {
               camera.statusNow = 'ON';
               camera.startTimeInOffLine = 0;
               alarmSignal(msg);
-              process.send(msg);
+              process.send({ [camera.ftpHomeDir]: 'ONLINE' });
               camera.timeOutBotAlert = BOT_TIME_OUT_MSG;
             }
           }
