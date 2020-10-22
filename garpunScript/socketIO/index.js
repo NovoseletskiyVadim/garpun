@@ -35,6 +35,7 @@ module.exports = {
 
   newEvent: (msgData) => {
     if (Object.keys(activeUsers).length) {
+      console.log(activeUsers);
       Object.keys(activeUsers).forEach((user) => {
         if (
           activeUsers[user].camerasFilter &&
