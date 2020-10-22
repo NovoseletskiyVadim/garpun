@@ -35,12 +35,9 @@ module.exports = {
 
   newEvent: (msgData) => {
     if (Object.keys(activeUsers).length) {
-      console.log(activeUsers);
       Object.keys(activeUsers).forEach((user) => {
-        if (
-          activeUsers[user].camerasFilter &&
-          activeUsers[user].camerasFilter.indexOf(msgData.cameraName) >= 0
-        ) {
+        const filter = [...activeUsers[user].camerasFilter];
+        if (filter.indexOf(msgData.cameraName) >= 0) {
           io.to(user).emit('get-event', msgData);
         }
       });
@@ -50,10 +47,8 @@ module.exports = {
   apiResp: (msgData) => {
     if (Object.keys(activeUsers).length) {
       Object.keys(activeUsers).forEach((user) => {
-        if (
-          activeUsers[user].camerasFilter &&
-          user.camerasFilter.indexOf(msgData.cameraName) >= 0
-        ) {
+        const filter = [...activeUsers[user].camerasFilter];
+        if (filter.indexOf(msgData.cameraName) >= 0) {
           io.to(user).emit('api-res', msgData);
         }
       });
