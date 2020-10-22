@@ -1,6 +1,6 @@
 'use strict';
-// const socket = io('10.15.1.235:8888');
-const socket = io('localhost:8888');
+const socket = io('ws://10.15.1.235:8888');
+// const socket = io('ws://localhost:8888');
 const eventListWrapper = document.getElementById('events-monitor');
 
 const showBigImg = (target) => {
@@ -39,6 +39,14 @@ const hoverMsg = (message, TYPE) => {
   });
   return hoverBox;
 };
+
+socket.on('connect', () => {
+  socket.emit('setCamerasFilter', ['Cherk_park_50']);
+});
+
+socket.on('cam-status', (msg) => {
+  console.log(msg);
+});
 
 socket.on('get-event', (msg) => {
   const eventWrapper = document.createElement('li');
@@ -124,3 +132,12 @@ socket.on('api-res', (msg) => {
   const eventMsg = event.querySelector('.event-msg');
   eventMsg.textContent = apiMsg;
 });
+
+const camFiler = document.querySelector('.cam-filter');
+const camsSelectors = camFiler.getElementsByTagName('input');
+Array.from(camsSelectors).forEach(function (item) {
+  item.addEventListener('change', (e) => {
+    console.log(e.target.name, e.target.checked);
+  });
+});
+console.log(camsSelectors);

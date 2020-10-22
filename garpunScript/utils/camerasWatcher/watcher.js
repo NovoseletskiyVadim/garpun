@@ -45,7 +45,7 @@ module.exports = () => {
             }
             msg = createMsg(camera, 'OFFLINE');
             console.log('\x1b[31m%s\x1b[0m', msg);
-
+            process.send({ [camera.ftpHomeDir]: 'OFFLINE' });
             if (
               camera.timeOutBotAlert !== BOT_TIME_OUT_MSG &&
               camera.timeOutBotAlert % BOT_TIME_OUT_MSG === 0
@@ -59,6 +59,7 @@ module.exports = () => {
               camera.statusNow = 'ON';
               camera.startTimeInOffLine = 0;
               alarmSignal(msg);
+              process.send(msg);
               camera.timeOutBotAlert = BOT_TIME_OUT_MSG;
             }
           }
@@ -98,6 +99,7 @@ module.exports = () => {
           console.log('\x1b[32m%s\x1b[0m', msg);
           workingCamList[cameraIndex].statusNow = 'ON';
           alarmSignal(msg);
+          process.send(msg);
           workingCamList[cameraIndex].timeOutBotAlert = BOT_TIME_OUT_MSG;
         }
         clearTimeout(workingCamList[cameraIndex].ping);

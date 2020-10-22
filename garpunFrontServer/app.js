@@ -22,7 +22,13 @@ app.use(
         'default-src': ["'self'"],
         'script-src': ["'self'"],
         'object-src': ["'none'"],
-        'connect-src': ["'self'", '10.15.1.235:*', 'ws://10.15.1.235:8888'],
+        'connect-src': [
+          "'self'",
+          '10.15.1.235:*',
+          'ws://10.15.1.235:8888',
+          'ws://localhost:8888',
+          'localhost:*',
+        ],
       },
     },
   })

@@ -2,6 +2,14 @@ extends layout
 
 block content
   h3 Harpoon online monitoring
+  div(class="cam-filter")
+    h3 Cameras filter:
+    div   
+      input( type="checkbox" id="Cherk_park_50" name="Cherk_park_50")
+      label( for="Cherk_park_50") Cherk_park_50
+    div   
+      input( type="checkbox" id="Kosari001" name="Kosari001")
+      label( for="Kosari001") Kosari001
   ul(id="events-monitor")
     li(class='event-wrap event-monitor-header')
       div(class="event-time") Event time

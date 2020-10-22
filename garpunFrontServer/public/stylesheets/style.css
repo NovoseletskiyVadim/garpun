@@ -140,3 +140,6 @@ ul {
   width: 80vw;
   height: auto;
 }
+.cam-filter {
+  display: flex;
+}
