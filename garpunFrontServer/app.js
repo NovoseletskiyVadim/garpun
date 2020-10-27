@@ -7,13 +7,15 @@ var favicon = require('serve-favicon');
 var path = require('path');
 const nocache = require('nocache');
 const compression = require('compression');
+require('dotenv').config();
 
-var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
+const indexRouter = require('./routes/index');
+const usersRouter = require('./routes/users');
+const camerasRouter = require('./routes/cameras');
 const helmet = require('helmet');
 
 var app = express();
-app.use(nocache());
+// app.use(nocache());
 app.use(compression());
 app.use(
   helmet({
@@ -47,6 +49,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
+app.use('/cameras', camerasRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

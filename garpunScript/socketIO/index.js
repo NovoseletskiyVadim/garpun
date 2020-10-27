@@ -16,9 +16,9 @@ module.exports = {
       const address = socket.handshake.headers.host;
       activeUsers[socket.id] = {};
       console.log('WEB_USER_CONNECTED_FROM: ' + address);
-      socket.on('setCamerasFilter', (cameraName) => {
-        if (Array.isArray(cameraName)) {
-          activeUsers[socket.id].camerasFilter = [...cameraName];
+      socket.on('setCamerasFilter', (cameras) => {
+        if (Array.isArray(cameras)) {
+          activeUsers[socket.id].camerasFilter = [...cameras];
         }
       });
       socket.on('disconnect', (reason) => {
@@ -34,24 +34,19 @@ module.exports = {
   },
 
   newEvent: (msgData) => {
-    if (Object.keys(activeUsers).length) {
-      Object.keys(activeUsers).forEach((user) => {
-        const filter = [...activeUsers[user].camerasFilter];
-        if (filter.indexOf(msgData.cameraName) >= 0) {
-          io.to(user).emit('get-event', msgData);
-        }
-      });
+    for (let user in activeUsers) {
+      if (
+        activeUsers[user].camerasFilter &&
+        activeUsers[user].camerasFilter.indexOf(msgData.cameraName) >= 0
+      ) {
+        io.to(user).emit('get-event', msgData);
+      }
     }
   },
 
   apiResp: (msgData) => {
-    if (Object.keys(activeUsers).length) {
-      Object.keys(activeUsers).forEach((user) => {
-        const filter = [...activeUsers[user].camerasFilter];
-        if (filter.indexOf(msgData.cameraName) >= 0) {
-          io.to(user).emit('api-res', msgData);
-        }
-      });
+    for (let user in activeUsers) {
+      io.to(user).emit('api-res', msgData);
     }
   },
 };

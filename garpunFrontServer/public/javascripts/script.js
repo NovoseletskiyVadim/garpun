@@ -41,7 +41,7 @@ const hoverMsg = (message, TYPE) => {
 };
 
 socket.on('connect', () => {
-  socket.emit('setCamerasFilter', ['Cherk_park_50']);
+  socket.emit('setCamerasFilter', ['Kosari001']);
 });
 
 socket.on('cam-status', (msg) => {
