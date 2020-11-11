@@ -1,13 +1,12 @@
 var express = require('express');
 var router = express.Router();
-const { models } = require('./../../garpunScript/db/dbConnect').sequelize;
+const Cameras = require('./../db').models.cameras;
+const accessCheck = require('./../middleWare/checkUserAccess');
 
-router.get('/', function (req, res, next) {
-  models.cameras
-    .findAll({ where: { isOnLine: true }, raw: true })
-    .then((result) => {
-      res.send(result);
-    });
+router.get('/', accessCheck.onlyAuthenticated, (req, res, next) => {
+  Cameras.findAll({ raw: true }).then((result) => {
+    res.send(result);
+  });
 });
 
 module.exports = router;

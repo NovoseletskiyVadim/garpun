@@ -30,6 +30,7 @@ module.exports = (fileMeta) => {
         eventTime: moment(fileMeta.eventDate).format('YYYY-MM-DD HH:mm:ss'),
         cameraName: fileMeta.cameraName,
         plateNumber: fileMeta.plateNumber,
+        fileName: fileMeta.file.name,
         isErrors: [],
         filePath: `/images/files_archive/${
           fileMeta.cameraName

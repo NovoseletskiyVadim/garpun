@@ -49,6 +49,7 @@ module.exports = () => {
                   cameraName: fileMeta.cameraName,
                   plateNumber: fileMeta.plateNumber || ' ',
                   isErrors: fileMeta.notPassed,
+                  fileName: fileMeta.file.name,
                   filePath: fileMeta.notPassed.includes('FILE_TYPE')
                     ? false
                     : `/images/trash_files/${

@@ -13,6 +13,7 @@
   "license": "ISC",
   "dependencies": {
     "axios": "^0.20.0",
+    "bcrypt": "^5.0.0",
     "chokidar": "^3.4.2",
     "dotenv": "^8.2.0",
     "file-type": "^14.7.1",

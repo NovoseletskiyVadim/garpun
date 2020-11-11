@@ -11,6 +11,7 @@ const sequelize = new Sequelize({
 require('../models/camEvent')(sequelize);
 require('../models/pendingList')(sequelize);
 require('../models/cameras')(sequelize);
+require('../models/users')(sequelize);
 
 module.exports = {
   start: () => {
@@ -18,7 +19,7 @@ module.exports = {
   },
   dbCreate: () => {
     console.log('DB_NAME', process.env.SQL_DB);
-    const { cameras, camEvents, pendingList } = sequelize.models;
+    const { cameras, camEvents, pendingList, userList } = sequelize.models;
     let tablesList = [];
     //if NODE_ENV === 'DEV' clean test DB
     if (process.env.NODE_ENV === 'DEV') {
@@ -26,12 +27,14 @@ module.exports = {
         cameras.sync({ alter: true }),
         camEvents.sync({ force: true }),
         pendingList.sync({ force: true }),
+        userList.sync({ alter: true }),
       ];
     } else {
       tablesList = [
         cameras.sync({ alter: true }),
         camEvents.sync({ alter: true }),
         pendingList.sync({ alter: true }),
+        userList.sync({ alter: true }),
       ];
     }
 
