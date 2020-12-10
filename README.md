@@ -47,7 +47,7 @@ for linux host machine
   usermod -aG ftp user  - add user to ftp group
 
   $ sudo bash /migrations/addFTPuser.sh   - create user for FTP
-  $ sudo service vsftpd restart
+  $ sudo systemctl vsftpd restart
 ```
 
 ##Start
