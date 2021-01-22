@@ -2,11 +2,10 @@ const ping = require('ping');
 const moment = require('moment');
 
 const Cameras = require('../../models/cameras');
-const Logger = require('../logger/appLog');
+const appLogger = require('../logger/appLogger');
 const logTypes = require('../logger/logTypes');
 
 module.exports = () => {
-  const logger = Logger();
   let workingCamList = [];
   const TIMEOUT_TO_CHECK = process.env.TIME_TO_CHECK_CAMERAS;
 
@@ -20,7 +19,7 @@ module.exports = () => {
           } else {
             timeInOffline = 0;
           }
-          logger(logTypes.CAMERA_ONLINE, {
+          appLogger.printLog(logTypes.CAMERA_ONLINE, {
             name: camera.ftpHomeDir,
             timeInOffline,
           });
@@ -34,7 +33,7 @@ module.exports = () => {
         ) {
           camera.startTimeInOffLine = moment() - TIMEOUT_TO_CHECK;
           camera.statusNow = 'OFF';
-          logger('CAMERA_IS_DEAD', camera.ftpHomeDir);
+          appLogger.printLog(logTypes.CAMERA_OFFLINE, camera.ftpHomeDir);
         }
       });
       setPingTimeOut(camera, timeOut);
@@ -52,7 +51,10 @@ module.exports = () => {
             cam.startTimeInOffLine = 0;
             return cam;
           });
-          logger('APP_START_INFO', `WORKING_CAMERAS: ${workingCam}`);
+          appLogger.printLog(
+            logTypes.APP_INFO,
+            `WORKING_CAMERAS: ${workingCam}`
+          );
         }
       );
     },
@@ -68,7 +70,10 @@ module.exports = () => {
           const timeInOffline = moment(
             workingCamList[cameraIndex].startTimeInOffLine
           ).fromNow(true);
-          logger(logTypes.CAMERA_ONLINE, { name: cameraName, timeInOffline });
+          appLogger.printLog(logTypes.CAMERA_ONLINE, {
+            name: cameraName,
+            timeInOffline,
+          });
           workingCamList[cameraIndex].statusNow = 'ON';
           workingCamList[cameraIndex].startTimeInOffLine = 0;
         }

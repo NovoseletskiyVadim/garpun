@@ -1,8 +1,10 @@
 const {
   apiErrorAlarm,
   jsonReSenderCalcAlert,
+  telegramIcons,
+  alarmSignal,
 } = require('../telegBot/harpoonBot');
-const { appErrorLog } = require('./appLoggerToFile');
+const { appErrorLog } = require('./logToFile');
 const logTypes = require('./logTypes');
 
 module.exports = {
@@ -15,8 +17,10 @@ module.exports = {
   setApiState: function (apiRes) {
     if (this.apiState.statusCode !== apiRes.statusCode) {
       this.apiState = apiRes;
-      // apiErrorAlarm(this.apiState);
+      apiErrorAlarm(this.apiState);
+      return true;
     }
+    return false;
   },
 
   printLog: function (type, loggerData) {
@@ -39,18 +43,16 @@ module.exports = {
         textMsg = `WAITING_REQUESTS_COUNT: ${count} WAIT_TIMEOUT: ${interval}`;
         if (alertsHistory.lastCount !== count) {
           console.log(colorTypes.warning, textMsg);
-          jsonReSenderCalcAlert(textMsg, count, alertsHistory);
-          // const isShouldSend = alertScheduler(
-          //   count,
-          //   alertsHistory.INFO_RESENDER
-          // );
-          // if (isShouldSend) {
-          //   alarmSignal(`${textMsg} \xE2\x8F\xB3`);
-          // }
+          const newAlertsHistory = jsonReSenderCalcAlert(
+            textMsg,
+            count,
+            alertsHistory
+          );
+          this.resenderAlertsHistory.deliveredAlerts = newAlertsHistory;
         }
         this.resenderAlertsHistory.lastCount = count;
         break;
-      case 'WRONG_FILE':
+      case logTypes.WRONG_FILE:
         console.log(colorTypes.error, loggerData);
         break;
       case logTypes.JSON_SENT:
@@ -83,8 +85,9 @@ module.exports = {
           message: { errorType, error: errorData },
         });
         break;
-      case 'CAMERA_IS_DEAD':
-        textMsg = `CAMERA_IS_DEAD ${loggerData}`;
+      case logTypes.CAMERA_OFFLINE:
+        textMsg = `CAMERA ${loggerData} OFFLINE`;
+        alarmSignal(`${textMsg} ${telegramIcons.CAMERA_OFFLINE}`);
         console.log(colorTypes.errorSecond, textMsg);
         break;
       case logTypes.CAMERA_ONLINE:
@@ -92,6 +95,7 @@ module.exports = {
         textMsg = `CAMERA ${loggerData.name} ONLINE${
           loggerData.timeInOffline !== 0 ? timeOff : ''
         }`;
+        alarmSignal(`${textMsg} ${telegramIcons.CAMERA_ONLINE}`);
         console.log(colorTypes.successful, textMsg);
         break;
       default:

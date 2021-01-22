@@ -12,9 +12,6 @@ module.exports = sequelize.define('cameras', {
   ftpPassword: {
     type: DataTypes.STRING,
   },
-  ftpUsername: {
-    type: DataTypes.STRING,
-  },
   name: {
     type: DataTypes.STRING,
   },

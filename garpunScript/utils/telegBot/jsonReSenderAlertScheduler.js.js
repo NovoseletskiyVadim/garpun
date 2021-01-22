@@ -1,24 +1,23 @@
 const alertScheduler = (eventCalc, alertsHistory) => {
-  const isGrown =
-    (alertsHistory.lastCount < eventCalc || !alertsHistory.lastCount) && true;
+  const { lastCount, deliveredAlerts } = alertsHistory;
+  const isGrown = lastCount < eventCalc && true;
   const rangeTen = Math.floor(eventCalc / 10);
   const rangeOneHundred = Math.floor(eventCalc / 100);
   const rangeThousand = Math.floor(eventCalc / 1000);
 
   const checkIsDelivered = (num) => {
-    const index = alertsHistory.deliveredAlerts.indexOf(num);
+    const index = deliveredAlerts.indexOf(num);
     if (index < 0) {
-      alertsHistory.deliveredAlerts.push(num);
+      deliveredAlerts.push(num);
       return true;
     } else {
       return false;
     }
   };
 
-  const lastDelivered =
-    alertsHistory.deliveredAlerts[alertsHistory.deliveredAlerts.length - 1];
+  const lastDelivered = deliveredAlerts[deliveredAlerts.length - 1];
+  let shouldSent = false;
   if (isGrown) {
-    let shouldSent = false;
     if (rangeTen > 0) {
       shouldSent = checkIsDelivered(10);
     }
@@ -30,18 +29,21 @@ const alertScheduler = (eventCalc, alertsHistory) => {
         shouldSent = checkIsDelivered(index * 1000);
       }
     }
-    return shouldSent;
+    shouldSent;
   } else if (lastDelivered > eventCalc) {
-    const found = alertsHistory.deliveredAlerts.findIndex(
-      (element) => element > eventCalc
-    );
-    alertsHistory.deliveredAlerts.splice(found);
-    return true;
+    const found = deliveredAlerts.findIndex((element) => element > eventCalc);
+    deliveredAlerts.splice(found);
+    shouldSent = true;
   } else if (eventCalc === 0) {
-    return true;
+    shouldSent = true;
   } else {
-    return false;
+    shouldSent = false;
   }
+  return { shouldSent, deliveredAlerts };
+};
+let alertHistory = {
+  deliveredAlerts: [],
+  lastCount: 0,
 };
 
 module.exports = alertScheduler;

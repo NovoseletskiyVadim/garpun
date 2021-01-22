@@ -7,12 +7,12 @@ const { camerasWatcher } = require('../childProcesses');
 const eventHandler = require('./fileHandler');
 const { rejectFileHandler } = require('../fileExplorer/fileExplorer');
 const getFileMeta = require('../fileExplorer/getFileMeta');
-const { rejectFileLog } = require('../logger/appLoggerToFile');
-const Logger = require('../logger/appLog');
+const { rejectFileLog } = require('../logger/logToFile');
+const appLogger = require('../logger/appLogger');
+const logTypes = require('../logger/logTypes');
 
 module.exports = () => {
   let eventWatcher;
-  const logger = Logger();
   return {
     startWatch: () => {
       eventWatcher = chokidar.watch(process.env.MEDIA_PATH, {
@@ -20,7 +20,10 @@ module.exports = () => {
         persistent: true,
         awaitWriteFinish: true,
       });
-      logger('APP_START_INFO', 'Under watch: ' + process.env.MEDIA_PATH);
+      appLogger.printLog(
+        logTypes.APP_INFO,
+        'Under watch: ' + process.env.MEDIA_PATH
+      );
       eventWatcher
         .on('add', (pathFile) => {
           const fileSize = fs.statSync(pathFile).size;
@@ -42,8 +45,8 @@ module.exports = () => {
                 message: fileMeta.notPassed.join(),
                 file: fileMeta.file,
               });
-              logger(
-                'WRONG_FILE',
+              appLogger.printLog(
+                logTypes.WRONG_FILE,
                 `WRONG ${fileMeta.notPassed.join(' ')} camera:${
                   fileMeta.cameraName
                 } photo:${fileMeta.file.name}${fileMeta.file.ext}`
@@ -53,7 +56,7 @@ module.exports = () => {
           });
         })
         .on('error', function (error) {
-          logger('APP_ERROR', {
+          appLogger.printLog(logTypes.APP_ERROR, {
             errorType: 'FILE_WATCHER_ERROR',
             errorData: error,
           });

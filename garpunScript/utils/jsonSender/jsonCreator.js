@@ -2,9 +2,9 @@ const { v4: uuidv4 } = require('uuid');
 
 const { base64Convertor } = require('../fileExplorer/fileExplorer');
 const Cameras = require('../../models/cameras');
-const Logger = require('../logger/appLog');
 
-const logger = Logger();
+const appLogger = require('../logger/appLogger');
+const logTypes = require('../logger/logTypes');
 
 module.exports = (eventData) => {
   return new Promise((resolve, reject) => {
@@ -35,11 +35,14 @@ module.exports = (eventData) => {
         }
         const eventObject = {
           version: 1,
-          provider: process.env.PROVIDER || '',
+          provider:
+            process.env.PROVIDER || reject(new Error(`PROVIDER is not set`)),
           data: {
             device: {
-              id: cameraInfo.uuid,
-              name: cameraInfo.name,
+              id:
+                cameraInfo.uuid || reject(new Error(`camera UUID is not set`)),
+              name:
+                cameraInfo.name || reject(new Error(`camera NAME Is not set`)),
             },
             event: {
               id: eventData.uuid,
@@ -72,7 +75,7 @@ module.exports = (eventData) => {
         resolve(JSON.stringify(eventObject));
       })
       .catch((err) => {
-        logger('APP_ERROR', {
+        appLogger.printLog(logTypes.APP_ERROR, {
           errorType: 'JSON_CREATOR_ERROR',
           errorData: err,
         });

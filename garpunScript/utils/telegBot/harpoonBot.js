@@ -1,11 +1,15 @@
 const axios = require('axios');
 const { models } = require('../../db/dbConnect').sequelize;
-const jsonResendAlertScheduler = require('./rejectApiAlertScheduler');
+const jsonResendAlertScheduler = require('./jsonReSenderAlertScheduler.js');
 
 const telegramIcons = {
   API_OK: '\xF0\x9F\x9A\x80',
   API_ERROR: '\xE2\x9B\x94',
+  JSON_RESENDER: '\xE2\x8F\xB3',
+  CAMERA_ONLINE: '\xE2\x9C\x85',
+  CAMERA_OFFLINE: '\xE2\x9D\x8C',
 };
+
 const startBot = () => {
   const TelegramBot = require('node-telegram-bot-api');
   const bot = new TelegramBot(process.env.BOT_TOKEN, { polling: true });
@@ -52,7 +56,6 @@ const startBot = () => {
 };
 
 const signedUsersList = process.env.USER_LIST.split(',');
-let apiStatus = 200;
 
 const alarmSignal = (msg) => {
   signedUsersList.forEach((user) => {
@@ -78,12 +81,16 @@ const apiErrorAlarm = (apiState) => {
 
 const jsonReSenderCalcAlert = (textMsg, count, alertsHistory) => {
   const schedulerResult = jsonResendAlertScheduler(count, alertsHistory);
-  console.log(schedulerResult);
+  if (schedulerResult.shouldSent) {
+    alarmSignal(`${textMsg} ${telegramIcons.JSON_RESENDER}`);
+  }
+  return schedulerResult.deliveredAlerts;
 };
 
 module.exports = {
   alarmSignal,
   apiErrorAlarm,
   jsonReSenderCalcAlert,
+  telegramIcons,
   startBot,
 };

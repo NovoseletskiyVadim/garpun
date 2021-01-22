@@ -1,10 +1,10 @@
 const { alarmSignal } = require('../telegBot/harpoonBot');
-const alertScheduler = require('../telegBot/rejectApiAlertScheduler');
+const alertScheduler = require('../telegBot/jsonReSenderAlertScheduler.js');
 const { appErrorLog } = require('./appLoggerToFile');
 const logTypes = require('./logTypes');
 
-module.exports = () => {
-  let alertsHistory = {
+alertsHistorymodule.exports = () => {
+  let = {
     INFO_RESENDER: { deliveredAlerts: [], lastCount: undefined },
   };
   const colorTypes = {

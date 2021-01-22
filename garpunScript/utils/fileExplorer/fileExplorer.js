@@ -4,10 +4,9 @@ const path = require('path');
 const fs = require('fs');
 const fsp = require('fs').promises;
 
-const Logger = require('../logger/appLog');
+const appLogger = require('../logger/appLogger');
 const logTypes = require('../logger/logTypes');
 
-const logger = Logger();
 let today = '';
 
 const oldFilesCleaner = (camName, FILE_DIR) => {
@@ -19,19 +18,19 @@ const oldFilesCleaner = (camName, FILE_DIR) => {
     if (fs.existsSync(dirToDelete)) {
       fs.rmdir(dirToDelete, { recursive: true }, (error) => {
         if (error) {
-          logger(logTypes.APP_ERROR, {
+          appLogger.printLog(logTypes.APP_ERROR, {
             errorType: 'FILE_EXPLORE_ERROR',
             errorData: error.message,
           });
           reject(error);
         }
         const msg = `${FILE_DIR} ${camName} ${dirName} successful cleaned`;
-        logger(logTypes.APP_INFO, msg);
+        appLogger.printLog(logTypes.APP_INFO, msg);
         resolve({ res: true, msg });
       });
     } else {
       const msg = `${FILE_DIR} ${camName} nothing to clean`;
-      logger(logTypes.APP_INFO, msg);
+      appLogger.printLog(logTypes.APP_INFO, msg);
       resolve({ res: false, msg });
     }
   });
@@ -49,7 +48,7 @@ const setFileDirPath = (camName, FILE_DIR) => {
       fs.mkdirSync(folderPath, { recursive: true });
       oldFilesCleaner(camName, FILE_DIR);
     } catch (error) {
-      logger(logTypes.APP_ERROR, {
+      appLogger.printLog(logTypes.APP_ERROR, {
         errorType: 'FILE_EXPLORE_ERROR',
         errorData: error.message,
       });
@@ -79,7 +78,7 @@ const rejectFileHandler = (fileMeta) => {
     .catch(function (error) {
       rd.destroy();
       wr.end();
-      logger(logTypes.APP_ERROR, {
+      appLogger.printLog(logTypes.APP_ERROR, {
         errorType: 'FILE_EXPLORE_ERROR',
         errorData: error.message,
       });
@@ -117,18 +116,24 @@ const base64Convertor = (eventData) => {
         })
         .catch((error) => {
           appErrorLog({ message: { text: 'BASE64_DELETE_ERROR', error } });
-          console.error(error);
+          appLogger.printLog(logTypes.APP_ERROR, {
+            errorType: 'BASE64_DELETE_ERROR',
+            errorData: error.message,
+          });
         });
     });
 
     if (parseInt(process.env.ARCHIVE_DAYS) > 0) {
-      wrStream.on('error', (err) => {
-        console.log(err);
+      wrStream.on('error', (error) => {
+        appLogger.printLog(logTypes.APP_ERROR, {
+          errorType: 'FILE_ARCHIVE_ERROR',
+          errorData: error.message,
+        });
       });
     }
 
     stream.on('error', (error) => {
-      logger(logTypes.APP_ERROR, {
+      appLogger.printLog(logTypes.APP_ERROR, {
         errorType: 'FILE_EXPLORE_ERROR',
         errorData: error.message,
       });

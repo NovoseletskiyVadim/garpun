@@ -1,5 +1,5 @@
 const axios = require('axios');
-const apiLogger = require('./../logger/apiLogger');
+const appLogger = require('../logger/appLogger');
 
 module.exports = (jsonData) => {
   const config = {
@@ -8,8 +8,7 @@ module.exports = (jsonData) => {
       Authentication: process.env.API_KEY,
     },
   };
-  const url =
-    process.env.API_SERVER + '/CollectMoveVehicles/ReceiveMovementHarpoon';
+  const url = process.env.API_SERVER;
 
   return new Promise((resolve, rejects) => {
     axios
@@ -21,7 +20,7 @@ module.exports = (jsonData) => {
         if (status && status === 'OK') {
           isSent = true;
         }
-        apiLogger.setApiState({
+        appLogger.setApiState({
           statusCode: result.status,
           statusMessage: result.statusText,
         });
@@ -39,7 +38,7 @@ module.exports = (jsonData) => {
         } else {
           errorMsg.errorText = error.message;
         }
-        apiLogger.setApiState({
+        appLogger.setApiState({
           statusCode: errorMsg.statusCode,
           statusMessage: errorMsg.errorText,
         });

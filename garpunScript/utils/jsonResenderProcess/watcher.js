@@ -1,7 +1,5 @@
-const Logger = require('../logger/appLog');
-const appLogger = require('../logger/apiLogger');
+const appLogger = require('../logger/appLogger');
 const logTypes = require('../logger/logTypes');
-const logger = Logger();
 
 class RejectWatcher {
   constructor(jsonResend) {
@@ -49,17 +47,13 @@ class RejectWatcher {
             file:
               apiError.fileMeta.file.name + '.' + apiError.fileMeta.file.ext,
           };
-          logger(logTypes.API_ERROR, logData);
+          appLogger.printLog(logTypes.API_ERROR, logData);
           this.setApiErrorConfig();
         }
         if (result.hasOwnProperty('sentList')) {
           this.setApiOkConfig();
         }
         appLogger.printLog(logTypes.INFO_RESENDER, {
-          count: result.count,
-          interval: this.currentInterval,
-        });
-        logger('INFO_RESENDER', {
           count: result.count,
           interval: this.currentInterval,
         });
