@@ -25,4 +25,7 @@ module.exports = sequelize.define('camEvents', {
   fileName: {
     type: DataTypes.STRING,
   },
+  fileErrors: {
+    type: DataTypes.STRING,
+  },
 });

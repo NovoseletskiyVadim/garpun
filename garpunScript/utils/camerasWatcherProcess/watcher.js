@@ -67,9 +67,14 @@ module.exports = () => {
       });
       if (cameraIndex >= 0) {
         if (workingCamList[cameraIndex].statusNow !== 'ON') {
-          const timeInOffline = moment(
-            workingCamList[cameraIndex].startTimeInOffLine
-          ).fromNow(true);
+          let timeInOffline;
+          if (workingCamList[cameraIndex] !== 0) {
+            timeInOffline = moment(
+              workingCamList[cameraIndex].startTimeInOffLine
+            ).fromNow(true);
+          } else {
+            timeInOffline = 0;
+          }
           appLogger.printLog(logTypes.CAMERA_ONLINE, {
             name: cameraName,
             timeInOffline,

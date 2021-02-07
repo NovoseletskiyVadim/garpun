@@ -1,12 +1,15 @@
 const axios = require('axios');
 const appLogger = require('../logger/appLogger');
 
+const REQUEST_TIMEOUT = 5000;
+
 module.exports = (jsonData) => {
   const config = {
     headers: {
       'Content-type': ' application/json; charset=utf-8',
       Authentication: process.env.API_KEY,
     },
+    timeout: REQUEST_TIMEOUT,
   };
   const url = process.env.API_SERVER;
 
@@ -38,10 +41,10 @@ module.exports = (jsonData) => {
         } else {
           errorMsg.errorText = error.message;
         }
-        appLogger.setApiState({
-          statusCode: errorMsg.statusCode,
-          statusMessage: errorMsg.errorText,
-        });
+        // appLogger.setApiState({
+        //   statusCode: errorMsg.statusCode,
+        //   statusMessage: errorMsg.errorText,
+        // });
         rejects(errorMsg);
       });
   });

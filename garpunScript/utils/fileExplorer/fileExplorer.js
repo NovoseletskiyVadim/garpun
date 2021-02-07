@@ -10,30 +10,51 @@ const logTypes = require('../logger/logTypes');
 let today = '';
 
 const oldFilesCleaner = (camName, FILE_DIR) => {
-  const dirName = moment()
-    .subtract(process.env.ARCHIVE_DAYS, 'days')
-    .format('YYYYMMDD');
-  const dirToDelete = path.join(process.env[FILE_DIR], camName, dirName);
-  return new Promise((resolve, reject) => {
-    if (fs.existsSync(dirToDelete)) {
-      fs.rmdir(dirToDelete, { recursive: true }, (error) => {
-        if (error) {
-          appLogger.printLog(logTypes.APP_ERROR, {
-            errorType: 'FILE_EXPLORE_ERROR',
-            errorData: error.message,
-          });
-          reject(error);
-        }
-        const msg = `${FILE_DIR} ${camName} ${dirName} successful cleaned`;
+  const dirToClean = path.join(process.env[FILE_DIR], camName);
+  return fsp
+    .readdir(dirToClean)
+    .then((files) => {
+      if (!files.length) {
+        const msg = `${FILE_DIR} ${camName} nothing to clean`;
         appLogger.printLog(logTypes.APP_INFO, msg);
-        resolve({ res: true, msg });
+        return msg;
+      }
+      let shouldBeSaved = [];
+      for (let index = 0; index < process.env.ARCHIVE_DAYS; index++) {
+        const dayName = moment().subtract(index, 'days').format('YYYYMMDD');
+        shouldBeSaved.push(dayName);
+      }
+      const shouldBeDeleted = files.filter((file) => {
+        const index = shouldBeSaved.indexOf(file);
+        if (index < 0) {
+          return true;
+        }
       });
-    } else {
-      const msg = `${FILE_DIR} ${camName} nothing to clean`;
-      appLogger.printLog(logTypes.APP_INFO, msg);
-      resolve({ res: false, msg });
-    }
-  });
+      if (!shouldBeDeleted.length) {
+        const msg = `${FILE_DIR} ${camName} nothing to clean`;
+        appLogger.printLog(logTypes.APP_INFO, msg);
+        return msg;
+      }
+      const fileList = shouldBeDeleted.map((file) => {
+        const dirToDelete = path.join(process.env[FILE_DIR], camName, file);
+        return fsp.rmdir(dirToDelete, { recursive: true });
+      });
+      return Promise.all(fileList)
+        .then((res) => {
+          const msg = `${FILE_DIR} of ${camName} successful cleaned`;
+          appLogger.printLog(logTypes.APP_INFO, msg);
+          return msg;
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    })
+    .catch((error) => {
+      appLogger.printLog(logTypes.APP_ERROR, {
+        errorType: 'FILE_EXPLORE_ERROR',
+        errorData: error.message,
+      });
+    });
 };
 
 const setFileDirPath = (camName, FILE_DIR) => {

@@ -16,7 +16,9 @@ module.exports = (eventData) => {
       .then((result) => {
         const [dataBase64, cameraInfo] = result;
         if (!Boolean(cameraInfo)) {
-          return reject(new Error(`CAMERA ${eventData.cameraName} NOT_EXIST`));
+          return reject(
+            new Error(`CAMERA_INFO ${eventData.cameraName} NOT_EXIST`)
+          );
         }
         let cameraPosition = {
           lat: '',
@@ -30,7 +32,9 @@ module.exports = (eventData) => {
           };
         } catch (error) {
           return reject(
-            new Error(`CAMERA ${eventData.cameraName} POSITION_ERROR ${error}`)
+            new Error(
+              `CAMERA_INFO ${eventData.cameraName} POSITION_ERROR ${error}`
+            )
           );
         }
         const eventObject = {
@@ -40,9 +44,19 @@ module.exports = (eventData) => {
           data: {
             device: {
               id:
-                cameraInfo.uuid || reject(new Error(`camera UUID is not set`)),
+                cameraInfo.uuid ||
+                reject(
+                  new Error(
+                    `CAMERA_INFO ${eventData.cameraName} UUID is not set`
+                  )
+                ),
               name:
-                cameraInfo.name || reject(new Error(`camera NAME Is not set`)),
+                cameraInfo.name ||
+                reject(
+                  new Error(
+                    `CAMERA_INFO ${eventData.cameraName} NAME is not set`
+                  )
+                ),
             },
             event: {
               id: eventData.uuid,

@@ -1,3 +1,5 @@
+const moment = require('moment');
+
 const {
   apiErrorAlarm,
   jsonReSenderCalcAlert,
@@ -38,9 +40,9 @@ module.exports = {
         break;
 
       case logTypes.INFO_RESENDER:
-        const { count, interval } = loggerData;
+        const { count, interval, limit } = loggerData;
         const alertsHistory = this.resenderAlertsHistory;
-        textMsg = `WAITING_REQUESTS_COUNT: ${count} WAIT_TIMEOUT: ${interval}`;
+        textMsg = `WAITING_REQUESTS_COUNT: ${count} REQUEST_LIMIT: ${limit} WAIT_TIMEOUT: ${interval}`;
         if (alertsHistory.lastCount !== count) {
           console.log(colorTypes.warning, textMsg);
           const newAlertsHistory = jsonReSenderCalcAlert(
@@ -52,14 +54,22 @@ module.exports = {
         }
         this.resenderAlertsHistory.lastCount = count;
         break;
+
       case logTypes.WRONG_FILE:
         console.log(colorTypes.error, loggerData);
         break;
+
       case logTypes.JSON_SENT:
-        let { camera, apiResponse, fileName, sender } = loggerData;
+        let { camera, apiResponse, fileName, sender, time } = loggerData;
+        const eventTime = moment(time);
+        const apiRespTime = moment(apiResponse.datetime);
+        const delayTimeInMs = apiRespTime - eventTime;
+        const minutes = Math.floor(delayTimeInMs / 60000);
+        const seconds = ((delayTimeInMs % 60000) / 1000).toFixed(0);
+        const delayTime = `${minutes}m${seconds}s`;
         textMsg = `${sender} camera:${camera} photo:${fileName} API_RES:${
           apiResponse.status || JSON.stringify(apiResponse.error)
-        }`;
+        } ${delayTime}`;
         console.log(colorTypes.successful, textMsg);
         break;
 
@@ -85,11 +95,13 @@ module.exports = {
           message: { errorType, error: errorData },
         });
         break;
+
       case logTypes.CAMERA_OFFLINE:
         textMsg = `CAMERA ${loggerData} OFFLINE`;
         alarmSignal(`${textMsg} ${telegramIcons.CAMERA_OFFLINE}`);
         console.log(colorTypes.errorSecond, textMsg);
         break;
+
       case logTypes.CAMERA_ONLINE:
         const timeOff = `, OFFLINE ${loggerData.timeInOffline}`;
         textMsg = `CAMERA ${loggerData.name} ONLINE${

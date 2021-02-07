@@ -3,30 +3,36 @@ const logTypes = require('../logger/logTypes');
 
 class RejectWatcher {
   constructor(jsonResend) {
-    this.MAX_TIMEOUT = 100000;
+    this.MAX_TIMEOUT = 5000;
     this.MIN_TIMEOUT = 5000;
-    this.REQUEST_LIMIT = 10;
+    this.TIMEOUT_STEP = 5000;
+    this.MAX_REQUEST_LIMIT = 50;
+    this.MIN_REQUEST_LIMIT = 1;
+    this.REQUEST_LIMIT_STEP = 3;
+
     this.currentInterval = this.MIN_TIMEOUT;
-    this.limit = 1;
+    this.limit = this.MIN_REQUEST_LIMIT;
     this.timer;
     this.jsonResend = jsonResend;
-    this.calc = 1;
   }
   setDefaultConfig() {
-    this.limit = 1;
+    this.limit = this.MIN_REQUEST_LIMIT;
     this.currentInterval = this.MIN_TIMEOUT;
   }
   setApiErrorConfig() {
-    this.limit = 1;
-    this.currentInterval *= 2;
+    this.limit -= this.REQUEST_LIMIT_STEP;
+    if (this.limit < this.MIN_REQUEST_LIMIT) {
+      this.limit = this.MIN_REQUEST_LIMIT;
+    }
+    this.currentInterval += this.TIMEOUT_STEP;
     if (this.currentInterval > this.MAX_TIMEOUT) {
       this.currentInterval = this.MAX_TIMEOUT;
     }
   }
   setApiOkConfig() {
-    this.limit += 1;
-    if (this.limit > this.REQUEST_LIMIT) {
-      this.limit = this.REQUEST_LIMIT;
+    this.limit += this.REQUEST_LIMIT_STEP;
+    if (this.limit > this.MAX_REQUEST_LIMIT) {
+      this.limit = this.MAX_REQUEST_LIMIT;
     }
     this.currentInterval = this.MIN_TIMEOUT;
   }
@@ -44,8 +50,7 @@ class RejectWatcher {
             apiURL: apiError.error.apiURL,
             senderName: 'RESENDER',
             cameraName: apiError.fileMeta.cameraName,
-            file:
-              apiError.fileMeta.file.name + '.' + apiError.fileMeta.file.ext,
+            file: apiError.fileMeta.file.name + apiError.fileMeta.file.ext,
           };
           appLogger.printLog(logTypes.API_ERROR, logData);
           this.setApiErrorConfig();
@@ -56,6 +61,7 @@ class RejectWatcher {
         appLogger.printLog(logTypes.INFO_RESENDER, {
           count: result.count,
           interval: this.currentInterval,
+          limit: this.limit,
         });
         this.startWatch();
       });

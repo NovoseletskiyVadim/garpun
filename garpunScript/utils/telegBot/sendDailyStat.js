@@ -7,39 +7,66 @@ const logToFile = require('../logger/logToFile');
 const dbConnect = require('../../db/dbConnect');
 const Cameras = require('../../models/cameras');
 const CamEvents = require('../../models/camEvent');
-const Users = require('../../models/users');
 const { alarmSignal } = require('../telegBot/harpoonBot');
 
 const today = moment().format('YYYY-MM-DD');
-const yesterday = moment().subtract(1, 'days').format('YYYY-MM-DD');
+const yesterday = moment().subtract(2, 'days').format('YYYY-MM-DD');
 
 const timeZone = moment.tz.zonesForCountry('UA', true);
 const timeOffset = Math.abs(timeZone[0].offset);
 
+const reportRowsNames = {
+  notUploaded: 'NOT_UPLOADED',
+  fileSize: 'FILE_SIZE',
+  fileType: 'FILE_TYPE',
+  eventName: 'EVENT_NAME',
+  plateNumber: 'PLATE_NUMBER',
+  timeStamp: 'TIME_STAMP',
+  camTimeSync: 'CAM_TIME_SYNC',
+  cameraInfo: 'CAMERA_INFO',
+  apiRejected: 'API_REJECT',
+};
+
 function eventTimeRange(reduceResult, camEvent) {
-  const eventTime = moment(camEvent.time, 'YYYY-MM-DD hh:mm:ss.sss').add(
-    timeOffset,
-    'minutes'
-  );
-  const apiRespObject = JSON.parse(camEvent.apiResponse);
-  const apiRespTime = moment(apiRespObject.datetime);
-  const delayTime = (apiRespTime - eventTime) / 60000;
-  if (delayTime >= 60) {
-    reduceResult['60+'] += 1;
-  } else if (delayTime >= 30) {
-    reduceResult['30-60'] += 1;
-  } else if (delayTime >= 15) {
-    reduceResult['15-30'] += 1;
-  } else if (delayTime >= 2) {
-    reduceResult['2-15'] += 1;
-  } else if (delayTime < 2 && delayTime > 0) {
-    reduceResult['0-2'] += 1;
+  if (camEvent.uploaded) {
+    const eventTime = moment(camEvent.time, 'YYYY-MM-DD hh:mm:ss.sss').add(
+      timeOffset,
+      'minutes'
+    );
+    const apiRespObject = JSON.parse(camEvent.apiResponse);
+    const apiRespTime = moment(apiRespObject.datetime);
+    const delayTime = (apiRespTime - eventTime) / 60000;
+    if (isNaN(delayTime)) {
+      console.log('delayTime');
+    }
+    if (delayTime >= 60) {
+      reduceResult['more 60'] += 1;
+    } else if (delayTime >= 30) {
+      reduceResult['30-60'] += 1;
+    } else if (delayTime >= 15) {
+      reduceResult['15-30'] += 1;
+    } else if (delayTime >= 2) {
+      reduceResult['2-15'] += 1;
+    } else if (delayTime < 2 && delayTime > 0) {
+      reduceResult['0-2'] += 1;
+    } else {
+      reduceResult['less 0'] += 1;
+    }
   } else {
-    reduceResult['<0'] += 1;
+    reduceResult[reportRowsNames.notUploaded] += 1;
+    if (camEvent.apiResponse) {
+      reduceResult[reportRowsNames.apiRejected] += 1;
+    }
+    const fileErrorsList = camEvent.fileErrors.split(',');
+    fileErrorsList.forEach((item) => {
+      if (item) {
+        reduceResult[item] += 1;
+      }
+    });
   }
   return reduceResult;
 }
-dbConnect.start().then(() => {
+dbConnect.connectionTest().then(() => {
   console.log('db connection OK.');
   return Cameras.findAll({
     raw: true,
@@ -52,35 +79,54 @@ dbConnect.start().then(() => {
           createdAt: {
             [Op.between]: [
               moment(`${yesterday} 09:00:00`).local(),
-              moment(`${today} 08:59:59`).local(),
+              moment(`${today} 20:59:59`).local(),
             ],
           },
         },
       }).then((eventsList) => {
-        let msg = `${camera.ftpHomeDir} - Total events: ${eventsList.length}`;
+        let cameraStat = {
+          countEvents: eventsList.length,
+          stsMsg: `${camera.ftpHomeDir} - Total events: ${eventsList.length}`,
+        };
         if (eventsList.length > 0) {
           const filtered = eventsList.reduce(eventTimeRange, {
-            '<0': 0,
+            'less 0': 0,
             '0-2': 0,
             '2-15': 0,
             '15-30': 0,
             '30-60': 0,
-            '60+': 0,
+            'more 60': 0,
+            [reportRowsNames.notUploaded]: 0,
+            [reportRowsNames.fileSize]: 0,
+            [reportRowsNames.apiRejected]: 0,
+            [reportRowsNames.timeStamp]: 0,
+            [reportRowsNames.camTimeSync]: 0,
+            [reportRowsNames.plateNumber]: 0,
+            [reportRowsNames.fileType]: 0,
+            [reportRowsNames.cameraInfo]: 0,
           });
           let filteredString = '\nAPI response in minutes:\n';
           Object.keys(filtered).forEach((key) => {
             filteredString += `${key}: ${filtered[key]} \n`;
           });
-          msg += filteredString;
+          cameraStat.stsMsg += filteredString;
         } else {
-          msg += '\n';
+          cameraStat.stsMsg += '\n';
         }
-        return msg;
+        return cameraStat;
       });
     });
     Promise.all(dbQueries).then((result) => {
-      let textMsg = '<b>Garpun daily stat as of 9:00AM</b> \n ';
-      textMsg += result.join('\n');
+      let textMsg = 'Garpun daily stat as of 9:00AM \n';
+      let totalCount = 0;
+      let fullStatMsg = '';
+      result.forEach((item) => {
+        totalCount += item.countEvents;
+        fullStatMsg += `${item.stsMsg} \n`;
+      });
+      textMsg += `Total events count ${totalCount} \n`;
+      textMsg += '______________________________________\n';
+      textMsg += fullStatMsg;
       console.log(textMsg);
       alarmSignal(textMsg);
     });

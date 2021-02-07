@@ -2,8 +2,10 @@ const path = require('path');
 
 const { v4: uuidv4 } = require('uuid');
 const moment = require('moment');
+const TIME_OUT_OF_SYNC = 180000; //allowed max 2 minutes;
 
 module.exports = (pathFile) => {
+  const timeNow = moment().local();
   const uuid = uuidv4();
   const { dir, name, ext } = path.parse(pathFile);
   const splittedPath = dir.split(path.sep);
@@ -46,6 +48,11 @@ module.exports = (pathFile) => {
     fileMeta.isValid = false;
     fileMeta.notPassed.push('TIME_STAMP');
   } else {
+    const camTime = Math.abs(dateInFormat - timeNow);
+    if (camTime > TIME_OUT_OF_SYNC) {
+      fileMeta.notPassed.push('CAM_TIME_SYNC');
+      // fileMeta.isValid = false;
+    }
     fileMeta.eventDate = dateInFormat.format('YYYY-MM-DDTHH:mm:ss.SSSZ');
   }
   return fileMeta;

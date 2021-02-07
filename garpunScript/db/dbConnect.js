@@ -1,6 +1,9 @@
 const path = require('path');
 const Sequelize = require('sequelize');
 
+const appLogger = require('../utils/logger/appLogger');
+const logTypes = require('../utils/logger/logTypes');
+
 const sequelize = new Sequelize({
   dialect: 'sqlite',
   storage: path.join(__dirname, process.env.SQL_DB),
@@ -8,12 +11,11 @@ const sequelize = new Sequelize({
 });
 
 module.exports = {
-  start: () => {
+  connectionTest: () => {
     return sequelize.authenticate();
   },
-  dbCreate: () => {
-    console.log('DB_NAME', process.env.SQL_DB);
-
+  dbTablesCreate: () => {
+    appLogger.printLog(logTypes.APP_INFO, 'DB_NAME: ' + process.env.SQL_DB);
     const CamEvents = require('../models/camEvent');
     const PendingList = require('../models/pendingList');
     const Cameras = require('../models/cameras');

@@ -1,21 +1,13 @@
 const PendingList = require('../../models/pendingList');
-const CamEvents = require('../../models/camEvent');
 const jsonSender = require('../jsonSender/jsonSender');
 const jsonCreator = require('../jsonSender/jsonCreator');
 const appLogger = require('./../logger/appLogger');
 const logTypes = require('./../logger/logTypes');
 
-module.exports = (fileMeta) => {
+module.exports = (fileMeta, eventQuery) => {
   const { uuid, eventDate, cameraName, plateNumber, file } = fileMeta;
-  const dataToLocalDB = {
-    uuid: uuid,
-    time: eventDate,
-    license_plate_number: plateNumber,
-    camera: cameraName,
-    fileName: file.name,
-  };
 
-  jsonCreator({
+  return jsonCreator({
     cameraName,
     plateNumber,
     datetime: eventDate,
@@ -26,23 +18,16 @@ module.exports = (fileMeta) => {
       jsonSender(jsonToSend)
         .then((result) => {
           const { isSent, apiResponse } = result;
-          dataToLocalDB.apiResponse = apiResponse;
-          dataToLocalDB.uploaded = isSent;
-          CamEvents.create(dataToLocalDB)
-            .then((res) => {
-              appLogger.printLog(logTypes.JSON_SENT, {
-                sender: 'SENT',
-                camera: dataToLocalDB.camera,
-                apiResponse: dataToLocalDB.apiResponse,
-                fileName: dataToLocalDB.fileName,
-              });
-            })
-            .catch((error) => {
-              appLogger.printLog(logTypes.APP_ERROR, {
-                errorType: 'DB_ERROR',
-                errorData: error.stack,
-              });
-            });
+          const eventData = {
+            sender: 'SEND',
+            apiResponse,
+            camera: cameraName,
+            fileName: file.name + file.ext,
+          };
+          eventQuery.apiResponse = apiResponse;
+          eventQuery.uploaded = isSent;
+          appLogger.printLog(logTypes.JSON_SENT, eventData);
+          return eventQuery.save();
         })
         .catch((error) => {
           appLogger.printLog(logTypes.API_ERROR, {
@@ -50,28 +35,30 @@ module.exports = (fileMeta) => {
             errorText: error.errorText,
             apiURL: error.apiURL,
             senderName: 'SEND',
-            cameraName: dataToLocalDB.camera,
-            file: dataToLocalDB.fileName,
+            cameraName,
+            file: file.name + file.ext,
           });
-          const savePending = PendingList.create({
+          return PendingList.create({
             status: 'API_ERROR',
             data: jsonToSend,
-            dbID: dataToLocalDB.uuid,
+            dbID: uuid,
             fileMeta,
-          });
-          const saveCamEvent = CamEvents.create(dataToLocalDB);
-          Promise.all([savePending, saveCamEvent]).catch((error) => {
-            appLogger.printLog('APP_ERROR', {
-              errorType: 'EVENTHANDLER_ERROR',
-              errorData: error.stack,
-            });
           });
         });
     })
     .catch((error) => {
+      const regex = new RegExp('CAMERA_INFO');
       appLogger.printLog('APP_ERROR', {
         errorType: 'EVENTHANDLER_ERROR',
         errorData: error.stack,
       });
+      if (regex.test(error.message)) {
+        if (eventQuery.fileErrors.length > 0) {
+          eventQuery.fileErrors += ',CAMERA_INFO';
+        } else {
+          eventQuery.fileErrors += 'CAMERA_INFO';
+        }
+        return eventQuery.save();
+      }
     });
 };
