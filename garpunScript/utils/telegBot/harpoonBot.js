@@ -8,6 +8,7 @@ const telegramIcons = {
   JSON_RESENDER: '\xE2\x8F\xB3',
   CAMERA_ONLINE: '\xE2\x9C\x85',
   CAMERA_OFFLINE: '\xE2\x9D\x8C',
+  API_OK: '\xF0\x9F\x9A\x80',
 };
 
 const signedUsersList = process.env.USER_LIST.split(',');
@@ -37,7 +38,11 @@ const apiErrorAlarm = (apiState) => {
 const jsonReSenderCalcAlert = (textMsg, count, alertsHistory) => {
   const schedulerResult = jsonResendAlertScheduler(count, alertsHistory);
   if (schedulerResult.shouldSent) {
-    alarmSignal(`${textMsg} ${telegramIcons.JSON_RESENDER}`);
+    if (count === 0) {
+      alarmSignal(`API_OK ${telegramIcons.API_OK}`);
+    } else {
+      alarmSignal(`${textMsg} ${telegramIcons.JSON_RESENDER}`);
+    }
   }
   return schedulerResult.deliveredAlerts;
 };

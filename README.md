@@ -1,4 +1,4 @@
-# The garpun
+# Harpoon
 
 This is a app for adapting hikvision cameras to prepare and sending data to the API.
 
@@ -10,11 +10,7 @@ npm v6.14.6
 pm2 4.5.0
 
 -for linux host machine
-sudo apt install -y vsftpd
-sudo apt install -y db-util
-sudo apt install -y sqlite3
-sudo apt install -y curl
-sudo apt install -y git
+sudo apt install -y vsftpd db-util sqlite3 curl git
 git clone https://github.com/NovoseletskiyVadim/garpun.git
 curl -sL https://deb.nodesource.com/setup_12.x | bash -
 sudo apt-get install -y nodejs
@@ -27,17 +23,16 @@ sudo apt-get install -y nodejs
 2 Create .env file
   MEDIA_PATH=
   TRASH_DIR=
+  ARCHIVE_DAYS=
+  MAX_FILE_SIZE=
   API_SERVER=
   API_KEY=
   PROVIDER=
   SQL_DB=
   TIME_TO_CHECK_CAMERAS=
-  ARCHIVE_DAYS=
-  MAX_FILE_SIZE=
-  ARCHIVE_DIR=
   BOT_TOKEN=
-  SOCKET_PORT=
-  SALT_WORK_FACTOR =
+  USER_LIST=
+
  - add for run tests:
   TEST_SOURCE_FILE=
   TEST_LOAD_CAMS=
@@ -46,7 +41,7 @@ for linux host machine
   copy /migrations/setFtp/vsftpd.virtual to /etc/pam.d/ - config for PAM
   usermod -aG ftp user  - add user to ftp group
 
-  $ sudo bash /migrations/addFTPuser.sh   - create user for FTP
+  $ sudo bash /migrations/addFTPuser.sh   - create ftp user
   $ sudo systemctl vsftpd restart
 ```
 

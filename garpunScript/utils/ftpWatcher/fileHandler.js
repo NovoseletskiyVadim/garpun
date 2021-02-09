@@ -23,6 +23,7 @@ module.exports = (fileMeta, eventQuery) => {
             apiResponse,
             camera: cameraName,
             fileName: file.name + file.ext,
+            time: eventDate,
           };
           eventQuery.apiResponse = apiResponse;
           eventQuery.uploaded = isSent;
