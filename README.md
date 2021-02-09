@@ -1,6 +1,6 @@
 # Harpoon
 
-This is a app for adapting hikvision cameras to prepare and sending data to the API.
+This is app for adapting hikvision cameras to prepare and sending data to the API.
 
 ## Config
 
@@ -9,7 +9,6 @@ node v12.13.1
 npm v6.14.6
 pm2 4.5.0
 
--for linux host machine
 sudo apt install -y vsftpd db-util sqlite3 curl git
 git clone https://github.com/NovoseletskiyVadim/garpun.git
 curl -sL https://deb.nodesource.com/setup_12.x | bash -
