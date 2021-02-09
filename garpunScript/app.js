@@ -1,51 +1,48 @@
-'use strict';
 require('dotenv').config();
-// require('./utils/garpunBot');
-const dbConnect = require('./db/dbConnect');
-const { fork } = require('child_process');
-const eventWatcher = require('./utils/eventWatcher')();
-const { appErrorLog } = require('./utils/logger');
-console.log('APP_STARTED_MODE: ' + process.env.NODE_ENV);
 
-let forked;
+const dbConnect = require('./db/dbConnect');
+const ftpWatcher = require('./utils/ftpWatcher/fileWatcher')();
+const appLogger = require('./utils/logger/appLogger');
+const logTypes = require('./utils/logger/logTypes');
+const { camerasWatcher, rejectApiHandler } = require('./utils/childProcesses');
+
+appLogger.printLog(
+  logTypes.APP_INFO,
+  'APP_STARTED_MODE: ' + process.env.NODE_ENV
+);
+appLogger.printLog(logTypes.APP_INFO, 'APP_ID: ' + process.pid);
 
 if (parseInt(process.env.ARCHIVE_DAYS) > 0) {
-  console.log('FILE_ARCHIVE: ' + process.env.ARCHIVE_DAYS);
+  appLogger.printLog(
+    logTypes.APP_INFO,
+    'FILE_ARCHIVE: ' + process.env.ARCHIVE_DAYS
+  );
 } else {
-  console.log('FILE_ARCHIVE: OFF');
+  appLogger.printLog(logTypes.APP_INFO, 'FILE_ARCHIVE: OFF');
 }
 
-dbConnect
-  .dbCreate()
+const app = dbConnect
+  .dbTablesCreate()
   .then(() => {
-    console.log('tables created');
-    return;
+    appLogger.printLog(logTypes.APP_INFO, 'tables created');
+    return true;
   })
   .then(() => {
-    return dbConnect.start().then(() => {
-      console.log('db connection OK.');
-      return;
-    });
-  })
-  .then(() => {
-    forked = fork(`./utils/rejectApiHandler.js`);
-
-    forked.on('message', (msg) => {
-      console.log(msg);
-    });
-
-    eventWatcher.startWatch();
+    camerasWatcher.send({ type: 'START' });
+    rejectApiHandler.send({ type: 'START' });
+    ftpWatcher.startWatch();
   })
   .catch((err) => {
-    console.error('APP_START_ERROR', err.stack);
-    appErrorLog({
-      message: { text: 'APP_START_ERROR', error: err.stack },
+    appLogger.printLog('APP_ERROR', {
+      errorType: 'APP_START_ERROR',
+      errorData: err.stack,
     });
   });
 
 const stopAPP = () => {
-  forked.kill();
-  watch.stopWatcher();
+  rejectApiHandler.kill();
+  camerasWatcher.kill();
+  ftpWatcher.stopWatcher();
 };
 
-module.exports = { stopAPP };
+module.exports = { stopAPP, app };

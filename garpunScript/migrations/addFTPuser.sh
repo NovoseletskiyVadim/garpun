@@ -1,6 +1,6 @@
 #!/bin/bash
 # ADD new camera to db
-GARPUN_DB='/home/garpun/garpunScript/db/garpun.db'
+GARPUN_DB='/home/garpun/garpunAPP/garpunScript/db/garpun.db'
 echo Camera uuid:
 read uuid
 echo Camera ftpHomeDir:
@@ -22,7 +22,8 @@ read answer
 if [ $answer=="y" ];
 then
 #add user to db
-sqlite3 -batch $GARPUN_DB "INSERT INTO cameras(uuid, ftpHomeDir, name, position, ftpPassword, createdAt, updatedAt) VALUES( '$uuid','$ftpHomeDir','$name','$position','$ftp$echo $ftpHomeDir >> logins.txt
+sqlite3 -batch $GARPUN_DB "INSERT INTO cameras(uuid, ftpHomeDir, name, position, ftpPassword, createdAt, updatedAt) VALUES( '$uuid','$ftpHomeDir','$name','$position','$ftpPassword',datetime('now','localtime'),datetime('now','localtime');"
+echo $ftpHomeDir >> logins.txt
 echo $ftpPassword >> logins.txt
 #add user to virtual user list
 db_load -n -T -t hash -f logins.txt /etc/vsftpd-virtual-user.db

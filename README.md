@@ -1,6 +1,6 @@
-# The garpun
+# Harpoon
 
-This is a app for adapting hikvision cameras to prepare and sending data to the API.
+This is app for adapting hikvision cameras to prepare and sending data to the API.
 
 ## Config
 
@@ -9,35 +9,39 @@ node v12.13.1
 npm v6.14.6
 pm2 4.5.0
 
--for linux host machine
-apt install vsftpd
-apt install db-util
-apt install sqlite3
-
+sudo apt install -y vsftpd db-util sqlite3 curl git
+git clone https://github.com/NovoseletskiyVadim/garpun.git
+curl -sL https://deb.nodesource.com/setup_12.x | bash -
+sudo apt-get install -y nodejs
 ```
 
 ## Instalation
 
 ```
-1 $ npm install
+1 npm install
 2 Create .env file
-  MEDIA_PATH= path to FTP dir
-  TRESH_PATH= path where will be stored files with wrong data type and file name
+  MEDIA_PATH=
+  TRASH_DIR=
+  ARCHIVE_DAYS=
+  MAX_FILE_SIZE=
   API_SERVER=
   API_KEY=
-  SQL_DB=
   PROVIDER=
+  SQL_DB=
   TIME_TO_CHECK_CAMERAS=
-  ARCHIVE_DAYS=
-  ARCHIVE_PATH=
   BOT_TOKEN=
+  USER_LIST=
+
  - add for run tests:
   TEST_SOURCE_FILE=
   TEST_LOAD_CAMS=
 for linux host machine
-  copy /migrations/vsftpd.conf to /etc/vsftpd.conf - config for FTP
-  $ sudo bash /migrations/addFTPuser.sh   - create FTP user
-  $ sudo service vsftpd restart
+  copy /migrations/setFtp/vsftpd.conf to /etc/ - config for FTP
+  copy /migrations/setFtp/vsftpd.virtual to /etc/pam.d/ - config for PAM
+  usermod -aG ftp user  - add user to ftp group
+
+  $ sudo bash /migrations/addFTPuser.sh   - create ftp user
+  $ sudo systemctl vsftpd restart
 ```
 
 ##Start
@@ -51,6 +55,8 @@ $ pm2 start ecosystem.config.js  - like a daemon process
 ```
 
 ##Create daemon process
+sudo npm install pm2 -g
+pm2 startup
 
 ```
     If process is not started yet:

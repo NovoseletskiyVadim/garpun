@@ -1,6 +1,8 @@
-'use strict';
 const path = require('path');
 const Sequelize = require('sequelize');
+
+const appLogger = require('../utils/logger/appLogger');
+const logTypes = require('../utils/logger/logTypes');
 
 const sequelize = new Sequelize({
   dialect: 'sqlite',
@@ -8,32 +10,34 @@ const sequelize = new Sequelize({
   logging: false, // Disables logging
 });
 
-require('../models/camEvent')(sequelize);
-require('../models/pendingList')(sequelize);
-require('../models/cameras')(sequelize);
-
 module.exports = {
-  start: () => {
+  connectionTest: () => {
     return sequelize.authenticate();
   },
-  dbCreate: () => {
-    console.log('DB_NAME', process.env.SQL_DB);
-    const { cameras, camEvents, pendingList } = sequelize.models;
+  dbTablesCreate: () => {
+    appLogger.printLog(logTypes.APP_INFO, 'DB_NAME: ' + process.env.SQL_DB);
+    const CamEvents = require('../models/camEvent');
+    const PendingList = require('../models/pendingList');
+    const Cameras = require('../models/cameras');
+    const Users = require('../models/users');
+
     let tablesList = [];
+    //if NODE_ENV === 'DEV' clean test DB table PendingList and CamEvents
     if (process.env.NODE_ENV === 'DEV') {
       tablesList = [
-        cameras.sync({ alter: true }),
-        camEvents.sync({ force: true }),
-        pendingList.sync({ force: true }),
+        Cameras.sync({ alter: true }),
+        CamEvents.sync({ force: true }),
+        PendingList.sync({ force: true }),
+        Users.sync({ alter: true }),
       ];
     } else {
       tablesList = [
-        cameras.sync({ alter: true }),
-        camEvents.sync({ alter: true }),
-        pendingList.sync({ alter: true }),
+        Cameras.sync({ alter: true }),
+        CamEvents.sync({ alter: true }),
+        PendingList.sync({ alter: true }),
+        Users.sync({ alter: true }),
       ];
     }
-
     return Promise.all(tablesList);
   },
   stop: () => {
