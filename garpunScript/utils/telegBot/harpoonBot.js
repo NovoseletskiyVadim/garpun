@@ -14,15 +14,37 @@ const telegramIcons = {
 const signedUsersList = process.env.USER_LIST.split(',');
 
 const alarmSignal = (msg) => {
-  signedUsersList.forEach((user) => {
-    axios
+  const usersMsgReq = signedUsersList.map((user) => {
+    return axios
       .get(
-        `https://api.telegram.org/bot${process.env.BOT_TOKEN}/sendMessage?chat_id=${user}&text=${msg}`
+        `https://api.telegram.org/bot${process.env.BOT_TOKEN}/sendMessage?chat_id=${user}&text=${msg}&parse_mode=HTML`
       )
       .catch((error) => {
+        console.log(error.request);
         console.error(error.message);
       });
   });
+  return Promise.all(usersMsgReq);
+};
+
+const sendManyMessages = (msgArr) => {
+  if (Array.isArray(msgArr)) {
+    let i = 0;
+    const arrLength = msgArr.length;
+    function startQuery() {
+      return alarmSignal(`<i>${i + 1}\\${arrLength}</i>\n${msgArr[i]}`)
+        .then(() => {
+          i += 1;
+          if (i < arrLength) {
+            startQuery();
+          }
+        })
+        .catch((err) => {
+          console.error(err);
+        });
+    }
+    startQuery();
+  }
 };
 
 const apiErrorAlarm = (apiState) => {
@@ -49,6 +71,7 @@ const jsonReSenderCalcAlert = (textMsg, count, alertsHistory) => {
 
 module.exports = {
   alarmSignal,
+  sendManyMessages,
   apiErrorAlarm,
   jsonReSenderCalcAlert,
   telegramIcons,
