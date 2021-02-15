@@ -25,7 +25,7 @@ module.exports = (limitToResend) => {
                 });
                 const updateCamEvent = CamEvents.findOne({
                   where: {
-                    uuid: item.dbID,
+                    id: item.dbID,
                   },
                 }).then((camEvent) => {
                   if (camEvent) {

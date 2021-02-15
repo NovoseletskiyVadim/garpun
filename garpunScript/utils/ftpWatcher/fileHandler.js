@@ -42,7 +42,7 @@ module.exports = (fileMeta, eventQuery) => {
           return PendingList.create({
             status: 'API_ERROR',
             data: jsonToSend,
-            dbID: uuid,
+            dbID: eventQuery.id,
             fileMeta,
           });
         });

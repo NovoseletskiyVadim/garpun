@@ -179,7 +179,7 @@ class GetEventsStat {
           eventCount: eventsList.length,
           filteredByCameras: [],
         };
-        camerasList.forEach((cameraName) => {
+        const filteredByCamerasArray = camerasList.map((cameraName) => {
           const filteredEventsByCamera = eventsList.filter((event) => {
             if (event.camera === cameraName.ftpHomeDir) {
               return event;
@@ -193,13 +193,26 @@ class GetEventsStat {
             this.eventReducer.bind(this),
             reducerDefault
           );
-          statReport.filteredByCameras.push({
-            cameraName: cameraName.ftpHomeDir,
-            eventCount: filteredEventsByCamera.length,
-            filteredByType,
+          return CamEvents.findOne({
+            where: {
+              camera: cameraName.ftpHomeDir,
+            },
+            order: [['id', 'DESC']],
+          }).then((lastTimeEvent) => {
+            statReport.filteredByCameras.push({
+              cameraName: cameraName.ftpHomeDir,
+              eventCount: filteredEventsByCamera.length,
+              filteredByType,
+              lastTimeEvent: lastTimeEvent
+                ? moment(lastTimeEvent.time).format('YYYY-MM-DD hh:mm:ss')
+                : 'Not active',
+            });
+            return;
           });
         });
-        return statReport;
+        return Promise.all(filteredByCamerasArray).then((filtered) => {
+          return statReport;
+        });
       });
     } else {
       return Promise.reject(checkResult.errorMsg);
@@ -216,6 +229,7 @@ class GetEventsStat {
       msgArr.push(textMsg);
       statReport.filteredByCameras.forEach((cameraData) => {
         let cameraStat = `<strong>${cameraData.cameraName} events ${cameraData.eventCount}</strong>\n`;
+        cameraStat += `Last event time: ${cameraData.lastTimeEvent}`;
         Object.keys(cameraData.filteredByType).forEach((filterName) => {
           if (cameraData.filteredByType[filterName] > 0) {
             cameraStat += `${this.reportRowsNames[filterName]} : ${cameraData.filteredByType[filterName]}\n`;

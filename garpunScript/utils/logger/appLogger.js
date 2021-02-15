@@ -61,7 +61,6 @@ module.exports = {
 
       case logTypes.JSON_SENT:
         let { camera, apiResponse, fileName, sender, time } = loggerData;
-        console.log(time);
         const eventTime = moment(time);
         const apiRespTime = moment(apiResponse.datetime);
         const delayTimeInMs = apiRespTime - eventTime;

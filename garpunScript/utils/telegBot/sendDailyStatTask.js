@@ -16,8 +16,10 @@ const task = new GetEventsStat(yesterday);
 task
   .printStatReport()
   .then((text) => {
-    sendManyMessages(text);
+    return sendManyMessages(text);
+    console.log(text);
   })
   .catch((error) => {
-    logToFile({ message: { error } });
+    console.error(error);
+    // logToFile({ message: { error } });
   });
