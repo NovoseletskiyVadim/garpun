@@ -1,7 +1,7 @@
 const { DataTypes } = require('sequelize');
-const { sequelize } = require('../db/dbConnect');
+const { cashReqDbConnection } = require('../db/dbConnect');
 
-module.exports = sequelize.define('pendingList', {
+module.exports = cashReqDbConnection.define('pendingList', {
   status: {
     type: DataTypes.STRING,
   },

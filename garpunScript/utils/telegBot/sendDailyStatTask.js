@@ -2,7 +2,7 @@ const moment = require('moment');
 
 require('dotenv').config({ path: './../../.env' });
 process.env.NODE_ENV = 'PROD';
-const logToFile = require('../logger/logToFile');
+const { appErrorLog } = require('../logger/logToFile');
 
 const dbConnect = require('../../db/dbConnect');
 
@@ -17,9 +17,7 @@ task
   .printStatReport()
   .then((text) => {
     return sendManyMessages(text);
-    console.log(text);
   })
   .catch((error) => {
-    console.error(error);
-    // logToFile({ message: { error } });
+    appErrorLog({ message: { error } });
   });

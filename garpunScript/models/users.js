@@ -1,7 +1,7 @@
 const { DataTypes } = require('sequelize');
-const { sequelize } = require('../db/dbConnect');
+const { mainDbConnection } = require('../db/dbConnect');
 
-module.exports = sequelize.define('users', {
+module.exports = mainDbConnection.define('users', {
   userLogin: {
     type: DataTypes.STRING,
   },

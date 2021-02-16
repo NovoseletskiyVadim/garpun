@@ -22,7 +22,10 @@ if (parseInt(process.env.ARCHIVE_DAYS) > 0) {
 }
 
 const app = dbConnect
-  .dbTablesCreate()
+  .connectionTest()
+  .then(() => {
+    return dbConnect.dbTablesCreate();
+  })
   .then(() => {
     appLogger.printLog(logTypes.APP_INFO, 'tables created');
     return true;

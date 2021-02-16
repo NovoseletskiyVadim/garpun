@@ -4,18 +4,31 @@ const Sequelize = require('sequelize');
 const appLogger = require('../utils/logger/appLogger');
 const logTypes = require('../utils/logger/logTypes');
 
-const sequelize = new Sequelize({
+const mainDbConnection = new Sequelize({
   dialect: 'sqlite',
   storage: path.join(__dirname, process.env.SQL_DB),
   logging: false, // Disables logging
 });
 
+const cashReqDbConnection = new Sequelize({
+  dialect: 'sqlite',
+  storage: path.join(__dirname, 'cashDb.db'),
+  logging: false, // Disables logging
+});
+
 module.exports = {
   connectionTest: () => {
-    return sequelize.authenticate();
+    const main = mainDbConnection.authenticate();
+    const cash = cashReqDbConnection.authenticate();
+    return Promise.all([main, cash]).then(() => {
+      appLogger.printLog(
+        logTypes.APP_INFO,
+        'Connection with ' + process.env.SQL_DB + ' cashDb.db OK'
+      );
+      return true;
+    });
   },
   dbTablesCreate: () => {
-    appLogger.printLog(logTypes.APP_INFO, 'DB_NAME: ' + process.env.SQL_DB);
     const CamEvents = require('../models/camEvent');
     const PendingList = require('../models/pendingList');
     const Cameras = require('../models/cameras');
@@ -43,5 +56,6 @@ module.exports = {
   stop: () => {
     return sequelize.close();
   },
-  sequelize,
+  mainDbConnection,
+  cashReqDbConnection,
 };

@@ -1,7 +1,7 @@
 const { DataTypes } = require('sequelize');
-const { sequelize } = require('../db/dbConnect');
+const { mainDbConnection } = require('../db/dbConnect');
 
-module.exports = sequelize.define('camEvents', {
+module.exports = mainDbConnection.define('camEvents', {
   uuid: {
     type: DataTypes.STRING,
     defaultValue: DataTypes.UUIDV4,

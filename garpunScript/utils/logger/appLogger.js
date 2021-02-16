@@ -97,7 +97,7 @@ module.exports = {
         break;
 
       case logTypes.CAMERA_OFFLINE:
-        textMsg = `CAMERA ${loggerData} OFFLINE`;
+        textMsg = `CAMERA ${loggerData.name} ${loggerData.timeInOffline} OFFLINE`;
         alarmSignal(`${textMsg} ${telegramIcons.CAMERA_OFFLINE}`);
         console.log(colorTypes.errorSecond, textMsg);
         break;
