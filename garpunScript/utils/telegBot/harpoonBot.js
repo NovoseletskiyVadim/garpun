@@ -20,7 +20,6 @@ const alarmSignal = (msg) => {
         `https://api.telegram.org/bot${process.env.BOT_TOKEN}/sendMessage?chat_id=${user}&text=${msg}&parse_mode=HTML`
       )
       .catch((error) => {
-        console.log(error.request);
         console.error(error.message);
       });
   });
