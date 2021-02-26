@@ -1,15 +1,11 @@
 const watcher = require('./watcher')();
-const appLogger = require('../logger/appLogger');
-const logTypes = require('./../logger/logTypes');
+const { printLog, logTypes } = require('../logger/appLogger');
 
 process.on('message', (event) => {
   const { type, data } = event;
   switch (type) {
     case 'START':
-      appLogger.printLog(
-        logTypes.APP_INFO,
-        `CamerasWatcher started ID:${process.pid}`
-      );
+      printLog(logTypes.APP_INFO, `CamerasWatcher started ID:${process.pid}`);
       watcher.startWatch();
       break;
     case 'EVENT':

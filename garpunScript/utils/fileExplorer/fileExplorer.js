@@ -4,8 +4,7 @@ const path = require('path');
 const fs = require('fs');
 const fsp = require('fs').promises;
 
-const appLogger = require('../logger/appLogger');
-const logTypes = require('../logger/logTypes');
+const { printLog, logTypes } = require('../logger/appLogger');
 
 let today = '';
 
@@ -16,7 +15,7 @@ const oldFilesCleaner = (camName, FILE_DIR) => {
     .then((files) => {
       if (!files.length) {
         const msg = `${FILE_DIR} ${camName} nothing to clean`;
-        appLogger.printLog(logTypes.APP_INFO, msg);
+        printLog(logTypes.APP_INFO, msg);
         return msg;
       }
       let shouldBeSaved = [];
@@ -32,7 +31,7 @@ const oldFilesCleaner = (camName, FILE_DIR) => {
       });
       if (!shouldBeDeleted.length) {
         const msg = `${FILE_DIR} ${camName} nothing to clean`;
-        appLogger.printLog(logTypes.APP_INFO, msg);
+        printLog(logTypes.APP_INFO, msg);
         return msg;
       }
       const fileList = shouldBeDeleted.map((file) => {
@@ -42,7 +41,7 @@ const oldFilesCleaner = (camName, FILE_DIR) => {
       return Promise.all(fileList)
         .then((res) => {
           const msg = `${FILE_DIR} of ${camName} successful cleaned`;
-          appLogger.printLog(logTypes.APP_INFO, msg);
+          printLog(logTypes.APP_INFO, msg);
           return msg;
         })
         .catch((err) => {
@@ -50,7 +49,7 @@ const oldFilesCleaner = (camName, FILE_DIR) => {
         });
     })
     .catch((error) => {
-      appLogger.printLog(logTypes.APP_ERROR, {
+      printLog(logTypes.APP_ERROR, {
         errorType: 'FILE_EXPLORE_ERROR',
         errorData: error.message,
       });
@@ -69,7 +68,7 @@ const setFileDirPath = (camName, FILE_DIR) => {
       fs.mkdirSync(folderPath, { recursive: true });
       oldFilesCleaner(camName, FILE_DIR);
     } catch (error) {
-      appLogger.printLog(logTypes.APP_ERROR, {
+      printLog(logTypes.APP_ERROR, {
         errorType: 'FILE_EXPLORE_ERROR',
         errorData: error.message,
       });
@@ -99,7 +98,7 @@ const rejectFileHandler = (fileMeta) => {
     .catch(function (error) {
       rd.destroy();
       wr.end();
-      appLogger.printLog(logTypes.APP_ERROR, {
+      printLog(logTypes.APP_ERROR, {
         errorType: 'FILE_EXPLORE_ERROR',
         errorData: error.message,
       });
@@ -137,7 +136,7 @@ const base64Convertor = (eventData) => {
         })
         .catch((error) => {
           appErrorLog({ message: { text: 'BASE64_DELETE_ERROR', error } });
-          appLogger.printLog(logTypes.APP_ERROR, {
+          printLog(logTypes.APP_ERROR, {
             errorType: 'BASE64_DELETE_ERROR',
             errorData: error.message,
           });
@@ -146,7 +145,7 @@ const base64Convertor = (eventData) => {
 
     if (parseInt(process.env.ARCHIVE_DAYS) > 0) {
       wrStream.on('error', (error) => {
-        appLogger.printLog(logTypes.APP_ERROR, {
+        printLog(logTypes.APP_ERROR, {
           errorType: 'FILE_ARCHIVE_ERROR',
           errorData: error.message,
         });
@@ -154,7 +153,7 @@ const base64Convertor = (eventData) => {
     }
 
     stream.on('error', (error) => {
-      appLogger.printLog(logTypes.APP_ERROR, {
+      printLog(logTypes.APP_ERROR, {
         errorType: 'FILE_EXPLORE_ERROR',
         errorData: error.message,
       });

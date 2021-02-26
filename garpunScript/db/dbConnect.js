@@ -1,18 +1,17 @@
 const path = require('path');
 const Sequelize = require('sequelize');
 
-const appLogger = require('../utils/logger/appLogger');
-const logTypes = require('../utils/logger/logTypes');
+const { printLog, logTypes } = require('../utils/logger/appLogger');
 
 const mainDbConnection = new Sequelize({
   dialect: 'sqlite',
-  storage: path.join(__dirname, process.env.SQL_DB),
+  storage: process.env.MAIN_DB || path.join(__dirname, 'main.db'),
   logging: false, // Disables logging
 });
 
 const cashReqDbConnection = new Sequelize({
   dialect: 'sqlite',
-  storage: path.join(__dirname, 'cashDb.db'),
+  storage: process.env.TEMP_DB_PATH || path.join(__dirname, 'temp.db'),
   logging: false, // Disables logging
 });
 
@@ -21,10 +20,7 @@ module.exports = {
     const main = mainDbConnection.authenticate();
     const cash = cashReqDbConnection.authenticate();
     return Promise.all([main, cash]).then(() => {
-      appLogger.printLog(
-        logTypes.APP_INFO,
-        'Connection with ' + process.env.SQL_DB + ' cashDb.db OK'
-      );
+      printLog(logTypes.APP_INFO, 'Connections with data bases OK');
       return true;
     });
   },

@@ -2,8 +2,7 @@ const fs = require('fs');
 
 const FileType = require('file-type');
 
-const appLogger = require('../logger/appLogger');
-const logTypes = require('../logger/logTypes');
+const { printLog, logTypes } = require('../logger/appLogger');
 const { camerasWatcher } = require('../childProcesses');
 const getFileMeta = require('../fileExplorer/getFileMeta');
 const CamEvents = require('../../models/camEvent');
@@ -13,6 +12,12 @@ const jsonSender = require('../jsonSender/jsonSender');
 const jsonCreator = require('../jsonSender/jsonCreator');
 
 module.exports = (pathFile) => {
+  const fileStat = fs.statSync(pathFile);
+  if (!fileStat.isFile()) {
+    printLog(logTypes.WRONG_FILE, `NOT A FILE ${pathFile}`);
+    return Promise.resolve();
+  }
+
   let fileMeta = getFileMeta(pathFile);
   camerasWatcher.send({ type: 'EVENT', data: fileMeta.cameraName });
   return FileType.fromFile(pathFile)
@@ -25,7 +30,7 @@ module.exports = (pathFile) => {
     })
     .then(() => {
       try {
-        const fileSize = fs.statSync(pathFile).size;
+        const fileSize = fileStat.size;
         if (fileSize > parseInt(process.env.MAX_FILE_SIZE, 10)) {
           fileMeta.isValid = false;
           fileMeta.notPassed.push('FILE_SIZE');
@@ -65,11 +70,11 @@ module.exports = (pathFile) => {
                 };
                 savedEvent.apiResponse = apiResponse;
                 savedEvent.uploaded = isSent;
-                appLogger.printLog(logTypes.JSON_SENT, eventData);
+                printLog(logTypes.JSON_SENT, eventData);
                 return savedEvent.save();
               })
               .catch((error) => {
-                appLogger.printLog(logTypes.API_ERROR, {
+                printLog(logTypes.API_ERROR, {
                   statusCode: error.statusCode,
                   errorText: error.errorText,
                   apiURL: error.apiURL,
@@ -86,7 +91,7 @@ module.exports = (pathFile) => {
               });
           });
         } else {
-          appLogger.printLog(
+          printLog(
             logTypes.WRONG_FILE,
             `WRONG ${fileMeta.notPassed.join(' ')} camera:${
               fileMeta.cameraName
@@ -97,7 +102,7 @@ module.exports = (pathFile) => {
       });
     })
     .catch((error) => {
-      appLogger.printLog('APP_ERROR', {
+      printLog('APP_ERROR', {
         errorType: 'EVENTHANDLER_ERROR',
         errorData: error.stack,
       });

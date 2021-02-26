@@ -1,6 +1,4 @@
-const appLogger = require('../logger/appLogger');
-const logTypes = require('../logger/logTypes');
-
+const { printLog, logTypes } = require('../logger/appLogger');
 class RejectWatcher {
   constructor(jsonResend) {
     this.MAX_TIMEOUT = 5000;
@@ -52,13 +50,13 @@ class RejectWatcher {
             cameraName: apiError.fileMeta.cameraName,
             file: apiError.fileMeta.file.name + apiError.fileMeta.file.ext,
           };
-          appLogger.printLog(logTypes.API_ERROR, logData);
+          printLog(logTypes.API_ERROR, logData);
           this.setApiErrorConfig();
         }
         if (result.hasOwnProperty('sentList')) {
           this.setApiOkConfig();
         }
-        appLogger.printLog(logTypes.INFO_RESENDER, {
+        printLog(logTypes.INFO_RESENDER, {
           count: result.count,
           interval: this.currentInterval,
           limit: this.limit,

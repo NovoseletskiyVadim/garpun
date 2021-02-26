@@ -3,8 +3,7 @@ const { v4: uuidv4 } = require('uuid');
 const { base64Convertor } = require('../fileExplorer/fileExplorer');
 const Cameras = require('../../models/cameras');
 
-const appLogger = require('../logger/appLogger');
-const logTypes = require('../logger/logTypes');
+const { printLog, logTypes } = require('../logger/appLogger');
 
 module.exports = (eventData) => {
   return new Promise((resolve, reject) => {
@@ -89,7 +88,7 @@ module.exports = (eventData) => {
         resolve(JSON.stringify(eventObject));
       })
       .catch((err) => {
-        appLogger.printLog(logTypes.APP_ERROR, {
+        printLog(logTypes.APP_ERROR, {
           errorType: 'JSON_CREATOR_ERROR',
           errorData: err,
         });

@@ -1,8 +1,7 @@
 const moment = require('moment');
 
 const Cameras = require('../../models/cameras');
-const appLogger = require('../logger/appLogger');
-const logTypes = require('../logger/logTypes');
+const { printLog, logTypes } = require('../logger/appLogger');
 
 module.exports = () => {
   let workingCamList = [];
@@ -12,7 +11,7 @@ module.exports = () => {
     camera.alertSend = setTimeout(() => {
       let timeInOffline = moment(camera.lastEvent).fromNow(true);
       if (camera.statusNow) {
-        appLogger.printLog(logTypes.CAMERA_OFFLINE, {
+        printLog(logTypes.CAMERA_OFFLINE, {
           name: camera.ftpHomeDir,
           timeInOffline,
         });
@@ -48,7 +47,7 @@ module.exports = () => {
           timeInOffline = moment(workingCamList[cameraIndex].lastEvent).fromNow(
             true
           );
-          appLogger.printLog(logTypes.CAMERA_ONLINE, {
+          printLog(logTypes.CAMERA_ONLINE, {
             name: cameraName,
             timeInOffline,
           });

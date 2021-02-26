@@ -9,14 +9,16 @@ const {
 const { appErrorLog } = require('./logToFile');
 const logTypes = require('./logTypes');
 
+let resenderAlertsHistory = { deliveredAlerts: [], lastCount: 0 };
+
 module.exports = {
   apiState: {
     statusCode: 200,
     statusMessage: null,
   },
-  resenderAlertsHistory: { deliveredAlerts: [], lastCount: 0 },
 
   setApiState: function (apiRes) {
+    console.log(apiRes);
     if (this.apiState.statusCode !== apiRes.statusCode) {
       this.apiState = apiRes;
       apiErrorAlarm(this.apiState);
@@ -24,7 +26,7 @@ module.exports = {
     }
     return false;
   },
-
+  logTypes,
   printLog: function (type, loggerData) {
     const colorTypes = {
       warning: '\x1b[33m%s\x1b[0m',
@@ -41,7 +43,7 @@ module.exports = {
 
       case logTypes.INFO_RESENDER:
         const { count, interval, limit } = loggerData;
-        const alertsHistory = this.resenderAlertsHistory;
+        const alertsHistory = resenderAlertsHistory;
         textMsg = `WAITING_REQUESTS_COUNT: ${count} REQUEST_LIMIT: ${limit} WAIT_TIMEOUT: ${interval}`;
         if (alertsHistory.lastCount !== count) {
           console.log(colorTypes.warning, textMsg);
@@ -50,9 +52,9 @@ module.exports = {
             count,
             alertsHistory
           );
-          this.resenderAlertsHistory.deliveredAlerts = newAlertsHistory;
+          resenderAlertsHistory.deliveredAlerts = newAlertsHistory;
         }
-        this.resenderAlertsHistory.lastCount = count;
+        resenderAlertsHistory.lastCount = count;
         break;
 
       case logTypes.WRONG_FILE:

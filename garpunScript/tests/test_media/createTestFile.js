@@ -77,7 +77,7 @@ const files = [];
 //     create.validFile();
 //   }, 500);
 // }
-// create.validFile();
+create.validFile();
 // create.wrongNameFile();
 create.wrongSizeFile();
 //   .wrongTimeFile()

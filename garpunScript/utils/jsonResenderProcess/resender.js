@@ -1,8 +1,7 @@
 const jsonSender = require('../jsonSender/jsonSender');
 const PendingList = require('../../models/pendingList');
 const CamEvents = require('../../models/camEvent');
-const appLogger = require('../logger/appLogger');
-const logTypes = require('../logger/logTypes');
+const { printLog, logTypes } = require('../logger/appLogger');
 
 module.exports = (limitToResend) => {
   let finalResult = {};
@@ -41,11 +40,11 @@ module.exports = (limitToResend) => {
                   .then((result) => {
                     let eventData = result[1].dataValues;
                     eventData.sender = 'RESEND';
-                    appLogger.printLog(logTypes.JSON_SENT, eventData);
+                    printLog(logTypes.JSON_SENT, eventData);
                     resolve(eventData);
                   })
                   .catch((err) => {
-                    appLogger.printLog(logTypes.APP_ERROR, {
+                    printLog(logTypes.APP_ERROR, {
                       errorType: 'RESENDER_ERR',
                       errorData: err,
                     });
@@ -68,7 +67,7 @@ module.exports = (limitToResend) => {
       }
     })
     .catch((err) => {
-      appLogger.printLog(logTypes.APP_ERROR, {
+      printLog(logTypes.APP_ERROR, {
         errorType: 'RESENDER_ERR',
         errorData: err,
       });
