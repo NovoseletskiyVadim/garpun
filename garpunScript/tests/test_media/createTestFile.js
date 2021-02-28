@@ -2,9 +2,6 @@ const path = require('path');
 const fs = require('fs');
 
 const moment = require('moment');
-
-require('dotenv').config({ path: '../../.env' });
-
 class TestFileCreator {
   constructor(cameraName) {
     this.cameraNameForAll = cameraName;
@@ -19,70 +16,61 @@ class TestFileCreator {
   }
   createFile(inFilePath, outFilePath) {
     return new Promise((resolve) => {
-      const readStr = fs.ReadStream(inFilePath);
+      function ensureDirectoryExistence(filePath) {
+        var dirname = path.dirname(filePath);
+        if (fs.existsSync(dirname)) {
+          return true;
+        }
+        ensureDirectoryExistence(dirname);
+        fs.mkdirSync(dirname);
+      }
+      const readStr = fs.ReadStream(path.join(__dirname, inFilePath));
       readStr.on('error', (e) => {
         console.log(e);
       });
 
-      const writeStr = fs.WriteStream(outFilePath);
-      readStr.pipe(writeStr);
+      try {
+        if (ensureDirectoryExistence(outFilePath)) {
+          const writeStr = fs.WriteStream(outFilePath);
+          readStr.pipe(writeStr);
 
-      writeStr.on('close', () => {
-        resolve();
-      });
+          writeStr.on('close', () => {
+            resolve(`CREATE_OK ${outFilePath}`);
+          });
 
-      writeStr.on('error', (e) => {
-        console.log(e);
-      });
+          writeStr.on('error', (e) => {
+            console.log(e);
+          });
+        }
+      } catch (error) {
+        console.log(error);
+      }
     });
   }
   validFile(cameraName = this.cameraNameForAll) {
     const fileName = `${this.setTimeStamp()}_CA0000AT_VEHICLE_DETECTION.jpg`;
     const filePath = path.join(process.env.MEDIA_PATH, cameraName, fileName);
-    this.createFile(this.goodFilePath, filePath);
-    return this;
+    return this.createFile(this.goodFilePath, filePath);
   }
   wrongNameFile(cameraName = this.cameraNameForAll) {
     const fileName = `${this.setTimeStamp()}_noPlate_VEHICLE_DETECTION.jpg`;
     const filePath = path.join(process.env.MEDIA_PATH, cameraName, fileName);
-    this.createFile(this.goodFilePath, filePath);
-    return this;
+    return this.createFile(this.goodFilePath, filePath);
   }
   wrongTypeFile(cameraName = this.cameraNameForAll) {
     const fileName = `${this.setTimeStamp()}_CA1111AT_VEHICLE_DETECTION.jpg`;
     const filePath = path.join(process.env.MEDIA_PATH, cameraName, fileName);
-    this.createFile(this.badTypeFile, filePath);
-    return this;
+    return this.createFile(this.badTypeFile, filePath);
   }
   wrongTimeFile(cameraName = this.cameraNameForAll) {
     const fileName = `20201015082313898_CA2222AT_VEHICLE_DETECTION.jpg`;
     const filePath = path.join(process.env.MEDIA_PATH, cameraName, fileName);
-    this.createFile(this.goodFilePath, filePath);
-    return this;
+    return this.createFile(this.goodFilePath, filePath);
   }
   wrongSizeFile(cameraName = this.cameraNameForAll) {
     const fileName = `20201015082313898_CA3333AT_VEHICLE_DETECTION.jpg`;
     const filePath = path.join(process.env.MEDIA_PATH, cameraName, fileName);
-    this.createFile(this.badSizeFile, filePath);
-    return this;
+    return this.createFile(this.badSizeFile, filePath);
   }
 }
-
-const create = new TestFileCreator('test_cam_ok');
-const files = [];
-// for (let index = 0; index < 100; index++) {
-
-//   setTimeout(() => {
-//     console.log(index);
-//     create.validFile();
-//   }, 500);
-// }
-create.validFile();
-// create.wrongNameFile();
-create.wrongSizeFile();
-//   .wrongTimeFile()
-//   .wrongTypeFile()
-//   .validFile('test_cam_uuid')
-//   .validFile('test_cam_name')
-//   .validFile('test_cam_not_exist')
-//   .validFile('test_cam_posit');
+module.exports = TestFileCreator;

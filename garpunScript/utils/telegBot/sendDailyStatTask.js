@@ -11,7 +11,7 @@ const { sendManyMessages } = require('../telegBot/harpoonBot');
 const GetEventsStat = require('../statCollector/eventStat');
 
 const yesterday = moment().subtract(1, 'days').format('YYYY-MM-DD');
-const task = new GetEventsStat(yesterday);
+const task = new GetEventsStat('2021-02-26');
 
 task
   .printStatReport()
@@ -19,5 +19,6 @@ task
     return sendManyMessages(text);
   })
   .catch((error) => {
+    console.log(error);
     appErrorLog({ message: { error } });
   });

@@ -64,29 +64,37 @@ module.exports = (pathFile) => {
                 const eventData = {
                   sender: 'SEND',
                   apiResponse,
-                  camera: cameraName,
-                  fileName: file.name + file.ext,
-                  time: eventDate,
+                  camera: fileMeta.cameraName,
+                  fileName: fileMeta.file.name + fileMeta.file.ext,
                 };
+                if (!isSent || fileMeta.notPassed.length) {
+                  eventData.warning = true;
+                }
                 savedEvent.apiResponse = apiResponse;
                 savedEvent.uploaded = isSent;
                 printLog(logTypes.JSON_SENT, eventData);
                 return savedEvent.save();
               })
               .catch((error) => {
-                printLog(logTypes.API_ERROR, {
-                  statusCode: error.statusCode,
-                  errorText: error.errorText,
-                  apiURL: error.apiURL,
-                  senderName: 'SEND',
-                  cameraName: fileMeta.cameraName,
-                  file: fileMeta.file.name + fileMeta.file.ext,
-                });
-                return PendingList.create({
-                  status: 'API_ERROR',
-                  data: jsonToSend,
-                  dbID: savedEvent.id,
-                  fileMeta,
+                if (error.hasOwnProperty('statusCode')) {
+                  printLog(logTypes.API_ERROR, {
+                    statusCode: error.statusCode,
+                    errorText: error.errorText,
+                    apiURL: error.apiURL,
+                    senderName: 'SEND',
+                    cameraName: fileMeta.cameraName,
+                    file: fileMeta.file.name + fileMeta.file.ext,
+                  });
+                  return PendingList.create({
+                    status: 'API_ERROR',
+                    data: jsonToSend,
+                    dbID: savedEvent.id,
+                    fileMeta,
+                  });
+                }
+                printLog('APP_ERROR', {
+                  errorType: 'EVENTHANDLER_ERROR',
+                  errorData: error.stack,
                 });
               });
           });

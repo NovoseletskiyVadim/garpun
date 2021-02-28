@@ -18,7 +18,6 @@ module.exports = {
   },
 
   setApiState: function (apiRes) {
-    console.log(apiRes);
     if (this.apiState.statusCode !== apiRes.statusCode) {
       this.apiState = apiRes;
       apiErrorAlarm(this.apiState);
@@ -62,7 +61,14 @@ module.exports = {
         break;
 
       case logTypes.JSON_SENT:
-        let { camera, apiResponse, fileName, sender, time } = loggerData;
+        let {
+          camera,
+          apiResponse,
+          fileName,
+          sender,
+          time,
+          warning,
+        } = loggerData;
         const eventTime = moment(time);
         const apiRespTime = moment(apiResponse.datetime);
         const delayTimeInMs = apiRespTime - eventTime;
@@ -72,7 +78,11 @@ module.exports = {
         textMsg = `${sender} camera:${camera} photo:${fileName} API_RES:${
           apiResponse.status || JSON.stringify(apiResponse.error)
         } ${delayTime}`;
-        console.log(colorTypes.successful, textMsg);
+        let color = colorTypes.successful;
+        if (warning) {
+          color = colorTypes.warning;
+        }
+        console.log(color, textMsg);
         break;
 
       case logTypes.API_ERROR:

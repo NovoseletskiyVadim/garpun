@@ -11,15 +11,15 @@ const { printLog, logTypes } = require('./../logger/appLogger');
 
 const dirHandler = (dirInfo, stateUpdate) => {
   const { filesList, maxRequests, dirPath, dirName } = dirInfo;
-  if (filesList.length > 0) {
+  const filesInDir = filesList.length;
+  if (filesInDir > 0) {
     const listToSend = [];
-    const listLength =
-      filesList.length > maxRequests ? maxRequests : filesList.length;
-    for (let index = 0; index < listLength; index++) {
+    const amtToSend = filesInDir > maxRequests ? maxRequests : filesInDir;
+    for (let index = 0; index < amtToSend; index++) {
       listToSend.push(fileHandler(path.join(dirPath, filesList[index])));
     }
     return Promise.all(listToSend).then(() => {
-      dirInfo.filesList.splice(0, listLength);
+      dirInfo.filesList.splice(0, amtToSend);
       return dirHandler(dirInfo, stateUpdate);
     });
   } else {

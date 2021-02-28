@@ -1,81 +1,49 @@
-const fs = require('fs');
-const path = require('path');
-const moment = require('moment');
 require('dotenv').config('./../.env');
+
 const dbConnect = require('./../../db/dbConnect');
+const Cameras = require('./../../models/cameras');
+const TestFileCreator = require('./../test_media/createTestFile');
 
-dbConnect.connectionTest()
-.then(()=>{
-  
-})
+const maxFilesCameras = [20, 4, 40, 30, 50, 70];
+const setFileType = (calcFiles) => {
+  if (calcFiles % 45 === 0) {
+    return 'wrongTypeFile';
+  } else if (calcFiles % 30 === 0) {
+    return 'wrongTimeFile';
+  } else if (calcFiles % 20 === 0) {
+    return 'wrongSizeFile';
+  } else if (calcFiles % 10 === 0) {
+    return 'wrongNameFile';
+  } else {
+    return 'validFile';
+  }
+};
 
-// const cameraNames = [
-//   'Cherk_park_50',
-//   'zolotonosha1',
-//   'zhashkiv1',
-//   'uman1',
-//   'chornobay1',
-//   'gorod1',
-//   'khrystynivka1',
-//   'kam1',
-//   'cherk1',
-//   'smila1',
-//   'zhashkiv2',
-//   'kam3',
-//   'cherk3',
-//   'cherk2',
-//   'zhashkiv4',
-//   'khrystynivka4',
-//   'khrystynivka3',
-//   'khrystynivka2',
-//   'uman10',
-//   'uman9',
-// ];
-// let calc = 1;
-// let calcByFold = {};
-// const addFile = (camName) => {
-//   if (calcByFold[camName] === undefined) {
-//     calcByFold[camName] = 1;
-//   } else {
-//     calcByFold[camName] += 1;
-//   }
-
-//   const date = moment().format('YYYYMMDDHHmmssSSS');
-
-//   const sourceFile = process.env.TEST_SOURCE_FILE;
-//   const inputFolder = path.join(process.env.MEDIA_PATH, camName);
-//   if (!fs.existsSync(inputFolder)) {
-//     fs.mkdirSync(inputFolder);
-//   }
-
-//   const filePath = path.join(
-//     process.env.MEDIA_PATH,
-//     camName,
-//     `${date}_CA5402AO_VEHICLE_DETECTION.jpg`
-//   );
-//   console.log(calc, { camName: camName }, date, calcByFold);
-//   fs.copyFile(sourceFile, filePath, function (e) {
-//     if (e) {
-//       console.log('copy', e);
-//     }
-//   });
-//   calc++;
-//   // const time = Math.floor(Math.random() * (30000 - 500)) + 500;
-//   const time = 1000;
-
-//   setTimeout(() => {
-//     if (calc < 1000) {
-//       addFile(camName);
-//     }
-//   }, time);
-// };
-
-// let workingCams = process.env.TEST_LOAD_CAMS || 1;
-// if (workingCams > cameraNames.length) {
-//   console.log('set max cams to ' + cameraNames.length);
-//   workingCams = cameraNames.length;
-// }
-
-// for (let i = 0; i < workingCams; i++) {
-//   addFile(cameraNames[i]);
-// }
+dbConnect.connectionTest().then(() => {
+  Cameras.findAll({
+    raw: true,
+    where: {
+      isOnLine: true,
+    },
+  }).then((camerasList) => {
+    let filesCreator = [];
+    filesCreator = camerasList.map((camera) => {
+      return new TestFileCreator(camera.ftpHomeDir);
+    });
+    filesCreator.forEach((element, i) => {
+      let calc = 0;
+      const startLoop = () => {
+        const res = setTimeout(() => {
+          if (maxFilesCameras[i] > calc) {
+            calc += 1;
+            element[setFileType(calc)]().then((res) => {
+              console.log(res);
+              startLoop();
+            });
+          }
+        }, 1000);
+      };
+      startLoop();
+    });
+  });
+});

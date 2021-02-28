@@ -186,8 +186,8 @@ class GetEventsStat {
             }
           });
           let reducerDefault = {};
-          Object.keys(this.reportRowsNames).forEach((nameRove) => {
-            reducerDefault[nameRove] = 0;
+          Object.keys(this.reportRowsNames).forEach((nameRow) => {
+            reducerDefault[nameRow] = 0;
           });
           const filteredByType = filteredEventsByCamera.reduce(
             this.eventReducer.bind(this),
@@ -204,7 +204,7 @@ class GetEventsStat {
               eventCount: filteredEventsByCamera.length,
               filteredByType,
               lastTimeEvent: lastTimeEvent
-                ? moment(lastTimeEvent.time).format('YYYY-MM-DD hh:mm:ss')
+                ? moment(lastTimeEvent.createdAt).format('YYYY-MM-DD HH:mm:ss')
                 : 'Not active',
             });
             return;
@@ -221,6 +221,15 @@ class GetEventsStat {
 
   printStatReport() {
     return this.getStat().then((statReport) => {
+      statReport.filteredByCameras.sort((a, b) => {
+        if (a.cameraName < b.cameraName) {
+          return -1;
+        }
+        if (a.cameraName > b.cameraName) {
+          return 1;
+        }
+        return 0;
+      });
       let msgArr = [];
       let textMsg = `<strong>Harpoon daily stat from ${statReport.timeFilter.dateFrom} to ${statReport.timeFilter.dateTo}</strong> \n`;
       if (!this.cameraName) {
@@ -229,7 +238,7 @@ class GetEventsStat {
       msgArr.push(textMsg);
       statReport.filteredByCameras.forEach((cameraData) => {
         let cameraStat = `<strong>${cameraData.cameraName} events ${cameraData.eventCount}</strong>\n`;
-        cameraStat += `Last event time: ${cameraData.lastTimeEvent}`;
+        cameraStat += `Last event time: ${cameraData.lastTimeEvent}\n`;
         Object.keys(cameraData.filteredByType).forEach((filterName) => {
           if (cameraData.filteredByType[filterName] > 0) {
             cameraStat += `${this.reportRowsNames[filterName]} : ${cameraData.filteredByType[filterName]}\n`;

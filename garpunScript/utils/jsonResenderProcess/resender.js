@@ -40,6 +40,9 @@ module.exports = (limitToResend) => {
                   .then((result) => {
                     let eventData = result[1].dataValues;
                     eventData.sender = 'RESEND';
+                    if (!eventData.uploaded || eventData.fileErrors.length) {
+                      eventData.warning = true;
+                    }
                     printLog(logTypes.JSON_SENT, eventData);
                     resolve(eventData);
                   })
