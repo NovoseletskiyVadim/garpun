@@ -1,7 +1,7 @@
 const alertScheduler = (eventCalc, alertsHistory) => {
   const { lastCount, deliveredAlerts } = alertsHistory;
   const isGrown = lastCount < eventCalc && true;
-  const rangeTen = Math.floor(eventCalc / 10);
+  // const rangeTen = Math.floor(eventCalc / 10);
   const rangeOneHundred = Math.floor(eventCalc / 100);
   const rangeThousand = Math.floor(eventCalc / 1000);
 
@@ -18,9 +18,9 @@ const alertScheduler = (eventCalc, alertsHistory) => {
   const lastDelivered = deliveredAlerts[deliveredAlerts.length - 1];
   let shouldSent = false;
   if (isGrown) {
-    if (rangeTen > 0) {
-      shouldSent = checkIsDelivered(10);
-    }
+    // if (rangeTen > 0) {
+    //   shouldSent = checkIsDelivered(10);
+    // }
     if (rangeOneHundred > 0) {
       shouldSent = checkIsDelivered(100);
     }
