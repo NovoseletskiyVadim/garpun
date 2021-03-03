@@ -2,6 +2,7 @@ require('dotenv').config();
 
 const dbConnect = require('./db/dbConnect');
 const { printLog, logTypes } = require('./utils/logger/appLogger');
+const { appStartAlert } = require('./utils/telegBot/harpoonBot');
 const harpoonStarter = require('./utils/starter/starter');
 const { camerasWatcher, rejectApiHandler } = require('./utils/childProcesses');
 
@@ -16,20 +17,21 @@ if (parseInt(process.env.ARCHIVE_DAYS) > 0) {
 
 const app = dbConnect
   .connectionTest()
-  // uncomment for first start
-  .then(() => {
-    return dbConnect.dbTablesCreate().then(() => {
-      printLog(logTypes.APP_INFO, 'tables created');
-      return true;
-    });
-  })
+  // uncomment this for first start
+  // .then(() => {
+  //   return dbConnect.dbTablesCreate().then(() => {
+  //     printLog(logTypes.APP_INFO, 'tables created');
+  //     return true;
+  //   });
+  // })
   .then(() => {
     camerasWatcher.send({ type: 'START' });
     rejectApiHandler.send({ type: 'START' });
+    appStartAlert();
     return harpoonStarter();
   })
   .catch((err) => {
-    printLog('APP_ERROR', {
+    printLog(logTypes.APP_ERROR, {
       errorType: 'APP_START_ERROR',
       errorData: err.stack,
     });

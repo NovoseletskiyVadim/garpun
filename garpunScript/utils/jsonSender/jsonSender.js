@@ -1,7 +1,7 @@
 const axios = require('axios');
 const appLogger = require('../logger/appLogger');
 
-const REQUEST_TIMEOUT = 5000;
+const REQUEST_TIMEOUT = process.env.REQUEST_TIMEOUT || 30000;
 
 module.exports = (jsonData) => {
   const config = {
@@ -41,10 +41,6 @@ module.exports = (jsonData) => {
         } else {
           errorMsg.errorText = error.message;
         }
-        // appLogger.setApiState({
-        //   statusCode: errorMsg.statusCode,
-        //   statusMessage: errorMsg.errorText,
-        // });
         rejects(errorMsg);
       });
   });

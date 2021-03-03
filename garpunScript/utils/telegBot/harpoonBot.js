@@ -9,6 +9,7 @@ const telegramIcons = {
   CAMERA_ONLINE: '\xE2\x9C\x85',
   CAMERA_OFFLINE: '\xE2\x9D\x8C',
   API_OK: '\xF0\x9F\x9A\x80',
+  APP_START: '\xF0\x9F\x94\x84',
 };
 
 const signedUsersList = process.env.USER_LIST.split(',');
@@ -24,6 +25,11 @@ const alarmSignal = (msg) => {
       });
   });
   return Promise.all(usersMsgReq);
+};
+
+const appStartAlert = () => {
+  const msg = `Harpoon launched ${telegramIcons.APP_START}`;
+  alarmSignal(msg);
 };
 
 const sendManyMessages = (msgArr) => {
@@ -70,6 +76,7 @@ const jsonReSenderCalcAlert = (textMsg, count, alertsHistory) => {
 
 module.exports = {
   alarmSignal,
+  appStartAlert,
   sendManyMessages,
   apiErrorAlarm,
   jsonReSenderCalcAlert,

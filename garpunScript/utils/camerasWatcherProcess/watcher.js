@@ -31,7 +31,12 @@ module.exports = () => {
             return cam;
           });
         })
-        .catch(console.error);
+        .catch((error) => {
+          printLog(logTypes.APP_ERROR, {
+            errorType: 'CAM_WATCHER_ERROR',
+            errorData: error.stack,
+          });
+        });
     },
 
     cameraAction: (cameraName) => {

@@ -105,7 +105,7 @@ const harpoonStarter = () => {
               return dirHandler(dir, calcMaxReqForDir);
             });
             Promise.all(listDirsInProcess).then((resultList) => {
-              console.log('All dir under watch' + resultList.join(', '));
+              console.log('All folder under watch: ' + resultList.join(', '));
             });
           });
         });

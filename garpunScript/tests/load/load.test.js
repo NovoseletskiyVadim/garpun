@@ -1,7 +1,5 @@
 require('dotenv').config({ path: './../../.env' });
 
-console.log(process.env);
-
 const dbConnect = require('./../../db/dbConnect');
 const Cameras = require('./../../models/cameras');
 const TestFileCreator = require('./../test_media/createTestFile');
@@ -27,7 +25,6 @@ Cameras.findAll({
     isOnLine: true,
   },
 }).then((camerasList) => {
-  console.log(camerasList);
   let filesCreator = [];
   filesCreator = camerasList.map((camera) => {
     return new TestFileCreator(camera.ftpHomeDir);
