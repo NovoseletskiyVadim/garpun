@@ -66,6 +66,7 @@ module.exports = (pathFile) => {
                   apiResponse,
                   camera: fileMeta.cameraName,
                   fileName: fileMeta.file.name + fileMeta.file.ext,
+                  time: fileMeta.eventDate,
                 };
                 if (!isSent || fileMeta.notPassed.length) {
                   eventData.warning = true;
