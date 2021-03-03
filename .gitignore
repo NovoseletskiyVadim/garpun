@@ -116,3 +116,4 @@ dist
 *.jpg
 garpunFrontServer/public/images
 addFTPuser.sh
+.vscode

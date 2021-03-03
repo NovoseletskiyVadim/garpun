@@ -40,8 +40,6 @@ const app = dbConnect
 const stopAPP = () => {
   rejectApiHandler.kill();
   camerasWatcher.kill();
-  // harpoonStarter();
-  // ftpWatcher.stopWatcher();
 };
 
 module.exports = { stopAPP, app };
