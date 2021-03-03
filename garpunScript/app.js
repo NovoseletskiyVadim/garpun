@@ -17,12 +17,11 @@ if (parseInt(process.env.ARCHIVE_DAYS) > 0) {
 const app = dbConnect
   .connectionTest()
   // uncomment for first start
-  // .then(() => {
-  //   return dbConnect.dbTablesCreate();
-  // })
   .then(() => {
-    printLog(logTypes.APP_INFO, 'tables created');
-    return true;
+    return dbConnect.dbTablesCreate().then(() => {
+      printLog(logTypes.APP_INFO, 'tables created');
+      return true;
+    });
   })
   .then(() => {
     camerasWatcher.send({ type: 'START' });

@@ -5,8 +5,7 @@ const { printLog, logTypes } = require('../logger/appLogger');
 
 module.exports = () => {
   let workingCamList = [];
-  const TIMEOUT_TO_ALERT = 3600000; // after one hour
-
+  const TIMEOUT_TO_ALERT = process.env.TIMEOUT_CAMERA_OFF_ALERT || 3600000; // after one hour
   const setAlertTimeOut = (camera, timeOut) => {
     camera.alertSend = setTimeout(() => {
       let timeInOffline = moment(camera.lastEvent).fromNow(true);

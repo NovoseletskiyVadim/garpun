@@ -1,4 +1,6 @@
-require('dotenv').config('./../.env');
+require('dotenv').config({ path: './../../.env' });
+
+console.log(process.env);
 
 const dbConnect = require('./../../db/dbConnect');
 const Cameras = require('./../../models/cameras');
@@ -19,31 +21,30 @@ const setFileType = (calcFiles) => {
   }
 };
 
-dbConnect.connectionTest().then(() => {
-  Cameras.findAll({
-    raw: true,
-    where: {
-      isOnLine: true,
-    },
-  }).then((camerasList) => {
-    let filesCreator = [];
-    filesCreator = camerasList.map((camera) => {
-      return new TestFileCreator(camera.ftpHomeDir);
-    });
-    filesCreator.forEach((element, i) => {
-      let calc = 0;
-      const startLoop = () => {
-        const res = setTimeout(() => {
-          if (maxFilesCameras[i] > calc) {
-            calc += 1;
-            element[setFileType(calc)]().then((res) => {
-              console.log(res);
-              startLoop();
-            });
-          }
-        }, 1000);
-      };
-      startLoop();
-    });
+Cameras.findAll({
+  raw: true,
+  where: {
+    isOnLine: true,
+  },
+}).then((camerasList) => {
+  console.log(camerasList);
+  let filesCreator = [];
+  filesCreator = camerasList.map((camera) => {
+    return new TestFileCreator(camera.ftpHomeDir);
+  });
+  filesCreator.forEach((element, i) => {
+    let calc = 0;
+    const startLoop = () => {
+      const res = setTimeout(() => {
+        if (maxFilesCameras[i] > calc) {
+          calc += 1;
+          element[setFileType(calc)]().then((res) => {
+            console.log(res);
+            startLoop();
+          });
+        }
+      }, 1000);
+    };
+    startLoop();
   });
 });
