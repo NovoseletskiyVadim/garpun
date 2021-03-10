@@ -1,7 +1,6 @@
 const moment = require('moment');
 
 const {
-  apiErrorAlarm,
   jsonReSenderCalcAlert,
   telegramIcons,
   alarmSignal,
@@ -12,19 +11,6 @@ const logTypes = require('./logTypes');
 let resenderAlertsHistory = { deliveredAlerts: [], lastCount: 0 };
 
 module.exports = {
-  apiState: {
-    statusCode: 200,
-    statusMessage: null,
-  },
-
-  setApiState: function (apiRes) {
-    if (this.apiState.statusCode !== apiRes.statusCode) {
-      this.apiState = apiRes;
-      apiErrorAlarm(this.apiState);
-      return true;
-    }
-    return false;
-  },
   logTypes,
   printLog: function (type, loggerData) {
     const colorTypes = {

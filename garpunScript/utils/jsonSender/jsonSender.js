@@ -17,16 +17,22 @@ module.exports = (jsonData) => {
     axios
       .post(url, jsonData, config)
       .then((result) => {
-        const { status } = result.data;
-        const apiResponse = result.data;
+        const { status, error } = result.data;
+        let apiResponse = '';
         let isSent = false;
         if (status && status === 'OK') {
           isSent = true;
         }
-        appLogger.setApiState({
-          statusCode: result.status,
-          statusMessage: result.statusText,
-        });
+        if (error || status) {
+          apiResponse = result.data;
+        } else {
+          let errorMsg = {
+            errorText: 'UNEXPECTED_RES_TYPE',
+            statusCode: 200,
+            apiURL: url,
+          };
+          rejects(errorMsg);
+        }
         resolve({ isSent, apiResponse });
       })
       .catch((error) => {

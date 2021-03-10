@@ -3,6 +3,7 @@ const alertScheduler = require('./../../utils/telegBot/jsonReSenderAlertSchedule
 let alertHistory = {
   deliveredAlerts: [],
   lastCount: 0,
+  isBigQueue: false,
 };
 
 describe('test json ReSender Alert Scheduler', function () {
@@ -10,76 +11,101 @@ describe('test json ReSender Alert Scheduler', function () {
     const result = alertScheduler(9, alertHistory);
     expect(result).to.deep.equal({
       shouldSent: false,
+      isBigQueue: false,
       deliveredAlerts: [],
     });
   });
-  it('10 events lastCount: 0 should sent', function () {
-    const result = alertScheduler(10, alertHistory);
+
+  it('0 events lastCount: 9 should not sent', function () {
+    alertHistory = {
+      deliveredAlerts: [],
+      lastCount: 9,
+      isBigQueue: false,
+    };
+    const result = alertScheduler(0, alertHistory);
     expect(result).to.deep.equal({
-      shouldSent: true,
-      deliveredAlerts: [10],
+      shouldSent: false,
+      isBigQueue: false,
+      deliveredAlerts: [],
     });
   });
-  it('100 events lastCount: 0 should sent', function () {
+
+  it('100 events lastCount: 9 should sent', function () {
     const result = alertScheduler(100, alertHistory);
     expect(result).to.deep.equal({
       shouldSent: true,
-      deliveredAlerts: [10, 100],
+      deliveredAlerts: [100],
+      isBigQueue: true,
     });
   });
 
-  it('2 events lastCount: 11 should sent', function () {
+  it('0 events lastCount: 100 should sent', function () {
     alertHistory = {
-      deliveredAlerts: [10],
-      lastCount: 11,
+      deliveredAlerts: [],
+      lastCount: 100,
+      isBigQueue: true,
     };
-
-    const result = alertScheduler(2, alertHistory);
+    const result = alertScheduler(0, alertHistory);
     expect(result).to.deep.equal({
       shouldSent: true,
       deliveredAlerts: [],
+      isBigQueue: false,
     });
   });
 
-  it('1000 events lastCount: 11 should sent', function () {
+  it('1000 events lastCount: 2 should sent', function () {
     alertHistory = {
       deliveredAlerts: [],
       lastCount: 2,
+      isBigQueue: false,
     };
     const result = alertScheduler(1000, alertHistory);
     expect(result).to.deep.equal({
       shouldSent: true,
-      deliveredAlerts: [10, 100, 1000],
+      deliveredAlerts: [100, 1000],
+      isBigQueue: true,
     });
   });
+
   it('1001 events lastCount: 1000 after 1000 should not sent', function () {
     alertHistory = {
       lastCount: 1000,
-      deliveredAlerts: [10, 100, 1000],
+      deliveredAlerts: [100, 1000],
+      isBigQueue: true,
     };
     const result = alertScheduler(1001, alertHistory);
     expect(result).to.deep.equal({
       shouldSent: false,
-      deliveredAlerts: [10, 100, 1000],
+      deliveredAlerts: [100, 1000],
+      isBigQueue: true,
     });
   });
+
   it('999 events lastCount:1001  should sent', function () {
     alertHistory = {
       lastCount: 1001,
-      deliveredAlerts: [10, 100, 1000],
+      deliveredAlerts: [100, 1000],
+      isBigQueue: true,
     };
     const result = alertScheduler(999, alertHistory);
     expect(result).to.deep.equal({
       shouldSent: true,
-      deliveredAlerts: [10, 100],
+      deliveredAlerts: [100],
+      isBigQueue: true,
     });
   });
+
   it('19999 events lastCount:1001 should sent', function () {
+    alertHistory = {
+      lastCount: 1001,
+      deliveredAlerts: [100, 1000],
+      isBigQueue: true,
+    };
     const result = alertScheduler(19999, alertHistory);
     expect(result).to.deep.equal({
       shouldSent: true,
+      isBigQueue: true,
       deliveredAlerts: [
-        10,
         100,
         1000,
         2000,
@@ -106,12 +132,40 @@ describe('test json ReSender Alert Scheduler', function () {
   it('0 events lastCount:1001  should sent', function () {
     alertHistory = {
       lastCount: 1001,
-      deliveredAlerts: [10, 100, 1000],
+      deliveredAlerts: [100, 1000],
+      isBigQueue: true,
     };
     const result = alertScheduler(0, alertHistory);
     expect(result).to.deep.equal({
       shouldSent: true,
       deliveredAlerts: [],
+      isBigQueue: false,
+    });
+  });
+  it('0 events lastCount:0  should not sent', function () {
+    alertHistory = {
+      lastCount: 0,
+      deliveredAlerts: [],
+      isBigQueue: false,
+    };
+    const result = alertScheduler(0, alertHistory);
+    expect(result).to.deep.equal({
+      shouldSent: false,
+      deliveredAlerts: [],
+      isBigQueue: false,
+    });
+  });
+  it('100 events lastCount:100  should not sent', function () {
+    alertHistory = {
+      lastCount: 100,
+      deliveredAlerts: [100],
+      isBigQueue: true,
+    };
+    const result = alertScheduler(100, alertHistory);
+    expect(result).to.deep.equal({
+      shouldSent: false,
+      deliveredAlerts: [100],
+      isBigQueue: true,
     });
   });
 });

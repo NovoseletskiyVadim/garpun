@@ -9,7 +9,7 @@ const telegramIcons = {
   CAMERA_ONLINE: '\xE2\x9C\x85',
   CAMERA_OFFLINE: '\xE2\x9D\x8C',
   API_OK: '\xF0\x9F\x9A\x80',
-  APP_START: '\xF0\x9F\x94\x84',
+  APP_START: '\xF0\x9F\x94\xB1',
 };
 
 const signedUsersList = process.env.USER_LIST.split(',');
@@ -52,16 +52,6 @@ const sendManyMessages = (msgArr) => {
   }
 };
 
-const apiErrorAlarm = (apiState) => {
-  const msgType = apiState.statusCode === 200 ? 'API_OK' : 'API_ERROR';
-  const statusCode = apiState.statusCode > 0 ? apiState.statusCode : '';
-  const msgIcon = telegramIcons[msgType];
-  const msg = `${msgType} ${statusCode} ${
-    apiState.statusMessage || ''
-  } ${msgIcon}`;
-  alarmSignal(msg);
-};
-
 const jsonReSenderCalcAlert = (textMsg, count, alertsHistory) => {
   const schedulerResult = jsonResendAlertScheduler(count, alertsHistory);
   if (schedulerResult.shouldSent) {
@@ -78,7 +68,6 @@ module.exports = {
   alarmSignal,
   appStartAlert,
   sendManyMessages,
-  apiErrorAlarm,
   jsonReSenderCalcAlert,
   telegramIcons,
 };

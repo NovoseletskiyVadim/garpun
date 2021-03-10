@@ -22,7 +22,12 @@ module.exports = () => {
   };
   return {
     startWatch: () => {
-      Cameras.findAll({ raw: true })
+      Cameras.findAll({
+        raw: true,
+        where: {
+          isOnLine: true,
+        },
+      })
         .then((camerasList) => {
           workingCamList = camerasList.map((cam) => {
             setAlertTimeOut(cam, TIMEOUT_TO_ALERT);
