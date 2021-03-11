@@ -8,7 +8,11 @@ const {
 const { appErrorLog } = require('./logToFile');
 const logTypes = require('./logTypes');
 
-let resenderAlertsHistory = { deliveredAlerts: [], lastCount: 0 };
+let resenderAlertsHistory = {
+  deliveredAlerts: [],
+  lastCount: 0,
+  isBigQueue: false,
+};
 
 module.exports = {
   logTypes,
@@ -32,12 +36,13 @@ module.exports = {
         textMsg = `WAITING_REQUESTS_COUNT: ${count} REQUEST_LIMIT: ${limit} WAIT_TIMEOUT: ${interval}`;
         if (alertsHistory.lastCount !== count) {
           console.log(colorTypes.warning, textMsg);
-          const newAlertsHistory = jsonReSenderCalcAlert(
+          const {deliveredAlerts, isBigQueue} = jsonReSenderCalcAlert(
             textMsg,
             count,
             alertsHistory
           );
-          resenderAlertsHistory.deliveredAlerts = newAlertsHistory;
+          resenderAlertsHistory.deliveredAlerts = deliveredAlerts;
+          resenderAlertsHistory.isBigQueue = isBigQueue;
         }
         resenderAlertsHistory.lastCount = count;
         break;

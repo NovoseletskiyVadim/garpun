@@ -4,7 +4,7 @@ const dbConnect = require('./../../db/dbConnect');
 const Cameras = require('./../../models/cameras');
 const TestFileCreator = require('./../test_media/createTestFile');
 
-const maxFilesCameras = [20, 4, 40, 30, 50, 70];
+const maxFilesCameras = [100, 4, 40, 30, 50, 70];
 const setFileType = (calcFiles) => {
   if (calcFiles % 45 === 0) {
     return 'wrongTypeFile';
@@ -24,24 +24,26 @@ Cameras.findAll({
   where: {
     isOnLine: true,
   },
-}).then((camerasList) => {
-  let filesCreator = [];
-  filesCreator = camerasList.map((camera) => {
-    return new TestFileCreator(camera.ftpHomeDir);
-  });
-  filesCreator.forEach((element, i) => {
-    let calc = 0;
-    const startLoop = () => {
-      const res = setTimeout(() => {
-        if (maxFilesCameras[i] > calc) {
-          calc += 1;
-          element[setFileType(calc)]().then((res) => {
-            console.log(res);
-            startLoop();
-          });
-        }
-      }, 1000);
-    };
-    startLoop();
-  });
-});
+})
+  .then((camerasList) => {
+    let filesCreator = [];
+    filesCreator = camerasList.map((camera) => {
+      return new TestFileCreator(camera.ftpHomeDir);
+    });
+    filesCreator.forEach((element, i) => {
+      let calc = 0;
+      const startLoop = () => {
+        const res = setTimeout(() => {
+          if (maxFilesCameras[i] > calc) {
+            calc += 1;
+            element[setFileType(calc)]().then((res) => {
+              console.log(res);
+              startLoop();
+            });
+          }
+        }, 1000);
+      };
+      startLoop();
+    });
+  })
+  .catch(console.error);
