@@ -19,7 +19,7 @@
     "moment": "^2.29.1",
     "node-telegram-bot-api": "^0.50.0",
     "sequelize": "^6.5.0",
-    "sqlite3": "^5.0.2",
+    "sqlite3": "^5.0.0",
     "uuid": "^8.3.2"
   },
   "devDependencies": {

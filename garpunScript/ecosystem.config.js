@@ -1,7 +1,7 @@
 module.exports = {
   apps: [
     {
-      name: 'garpunScript3',
+      name: 'garpunScript4',
       script: './app.js',
       watch: true,
       ignore_watch: ['[/\\]./', 'node_modules', 'logs', 'db'],
@@ -16,7 +16,6 @@ module.exports = {
       },
       env_production: {
         NODE_ENV: 'PROD',
-        SQL_DB: 'garpun.db',
       },
     },
   ],
