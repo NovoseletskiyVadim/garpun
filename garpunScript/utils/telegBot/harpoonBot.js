@@ -53,15 +53,18 @@ const sendManyMessages = (msgArr) => {
 };
 
 const jsonReSenderCalcAlert = (textMsg, count, alertsHistory) => {
-  const schedulerResult = jsonResendAlertScheduler(count, alertsHistory);
-  if (schedulerResult.shouldSent) {
+  const { isBigQueue, shouldSent, deliveredAlerts } = jsonResendAlertScheduler(
+    count,
+    alertsHistory
+  );
+  if (shouldSent) {
     if (count === 0) {
       alarmSignal(`API_OK ${telegramIcons.API_OK}`);
     } else {
       alarmSignal(`${textMsg} ${telegramIcons.JSON_RESENDER}`);
     }
   }
-  return schedulerResult.deliveredAlerts;
+  return { deliveredAlerts, isBigQueue };
 };
 
 module.exports = {
