@@ -48,7 +48,7 @@ module.exports = (pathFile) => {
     fileMeta.isValid = false;
     fileMeta.notPassed.push('TIME_STAMP');
   } else {
-    const camTime = dateInFormat - timeNow;
+    const camTime = timeNow - dateInFormat;
     if (camTime > TIME_OUT_OF_SYNC || camTime < 0) {
       fileMeta.notPassed.push('CAM_TIME_SYNC');
       // fileMeta.isValid = false;
