@@ -135,7 +135,6 @@ const base64Convertor = (eventData) => {
           resolve(fileInBase64);
         })
         .catch((error) => {
-          appErrorLog({ message: { text: 'BASE64_DELETE_ERROR', error } });
           printLog(logTypes.APP_ERROR, {
             errorType: 'BASE64_DELETE_ERROR',
             errorData: error.message,
@@ -157,7 +156,7 @@ const base64Convertor = (eventData) => {
         errorType: 'FILE_EXPLORE_ERROR',
         errorData: error.message,
       });
-      rejects(err);
+      rejects(error);
     });
   });
 };
