@@ -36,7 +36,7 @@ module.exports = {
         textMsg = `WAITING_REQUESTS_COUNT: ${count} REQUEST_LIMIT: ${limit} WAIT_TIMEOUT: ${interval}`;
         if (alertsHistory.lastCount !== count) {
           console.log(colorTypes.warning, textMsg);
-          const {deliveredAlerts, isBigQueue} = jsonReSenderCalcAlert(
+          const { deliveredAlerts, isBigQueue } = jsonReSenderCalcAlert(
             textMsg,
             count,
             alertsHistory
@@ -52,39 +52,32 @@ module.exports = {
         break;
 
       case logTypes.JSON_SENT:
-        let {
-          camera,
-          apiResponse,
-          fileName,
-          sender,
-          time,
-          warning,
-        } = loggerData;
-        const eventTime = moment(time);
-        const apiRespTime = moment(apiResponse.datetime);
-        const delayTimeInMs = apiRespTime - eventTime;
-        const minutes = Math.floor(delayTimeInMs / 60000);
-        const seconds = ((delayTimeInMs % 60000) / 1000).toFixed(0);
-        const delayTime = `${minutes}m${seconds}s`;
-        textMsg = `${sender} camera:${camera} photo:${fileName} API_RES:${
-          apiResponse.status || JSON.stringify(apiResponse.error)
-        } ${delayTime}`;
-        let color = colorTypes.successful;
-        if (warning) {
-          color = colorTypes.warning;
+        let { camera, apiResponse, fileName, sender, time, warning } =
+          loggerData;
+        try {
+          const eventTime = moment(time);
+          const apiRespTime = moment(apiResponse.datetime);
+          const delayTimeInMs = apiRespTime - eventTime;
+          const minutes = Math.floor(delayTimeInMs / 60000);
+          const seconds = ((delayTimeInMs % 60000) / 1000).toFixed(0);
+          const delayTime = `${minutes}m${seconds}s`;
+          textMsg = `${sender} camera:${camera} photo:${fileName} API_RES:${
+            apiResponse.status || JSON.stringify(apiResponse.error)
+          } ${delayTime}`;
+          let color = colorTypes.successful;
+          if (warning) {
+            color = colorTypes.warning;
+          }
+          console.log(color, textMsg);
+        } catch (error) {
+          console.error(loggerData);
+          console.error(errorType, error);
         }
-        console.log(color, textMsg);
         break;
 
       case logTypes.API_ERROR:
-        let {
-          statusCode,
-          errorText,
-          apiURL,
-          senderName,
-          cameraName,
-          file,
-        } = loggerData;
+        let { statusCode, errorText, apiURL, senderName, cameraName, file } =
+          loggerData;
         textMsg = `${senderName}_API_ERROR ${
           (statusCode, errorText)
         } UPL:${apiURL} camera: ${cameraName} fileName: ${file}`;

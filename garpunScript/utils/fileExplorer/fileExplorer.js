@@ -79,6 +79,9 @@ const setFileDirPath = (camName, FILE_DIR) => {
 
 const rejectFileHandler = (fileMeta) => {
   const { fullPath, name: fileName, ext } = fileMeta.file;
+  if (parseInt(process.env.ARCHIVE_DAYS) === 0){
+    return fsp.unlink(fullPath);
+  }
   const cameraName = fileMeta.cameraName;
   const fileTrashPath = path.join(
     setFileDirPath(cameraName, 'TRASH_DIR'),

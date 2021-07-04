@@ -2,10 +2,10 @@ const { printLog, logTypes } = require('../logger/appLogger');
 class RejectWatcher {
   constructor(jsonResend) {
     this.MAX_TIMEOUT = 5000;
-    this.MIN_TIMEOUT = 5000;
+    this.MIN_TIMEOUT = 2000;
     this.TIMEOUT_STEP = 5000;
     this.MAX_REQUEST_LIMIT = process.env.MAX_REQUESTS_COUNT || 50;
-    this.MIN_REQUEST_LIMIT = 1;
+    this.MIN_REQUEST_LIMIT = 50;
     this.REQUEST_LIMIT_STEP = 3;
 
     this.currentInterval = this.MIN_TIMEOUT;

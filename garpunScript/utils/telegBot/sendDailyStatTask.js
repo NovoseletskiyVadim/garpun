@@ -16,7 +16,7 @@ const task = new GetEventsStat(yesterday);
 task
   .printStatReport()
   .then((text) => {
-    setTimeout(sendManyMessages(text), 18000000);
+    return sendManyMessages(text);
   })
   .catch((error) => {
     console.log(error);
