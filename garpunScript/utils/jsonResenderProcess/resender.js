@@ -4,24 +4,27 @@ const CamEvents = require('../../models/camEvent');
 const { printLog, logTypes } = require('../logger/appLogger');
 
 module.exports = (limitToResend) => {
-  let finalResult = {};
+  const finalResult = {};
   return PendingList.findAndCountAll({ limit: limitToResend })
     .then((result) => {
       const { count, rows } = result;
       finalResult.count = count;
       if (rows.length === 0) {
         return finalResult;
-      } else {
-        const preparedRequests = rows.map((item) => {
-          return new Promise((resolve, reject) => {
+      }
+      const preparedRequests = rows.map(
+        (item) =>
+          new Promise((resolve, reject) => {
             jsonSender(item.data)
-              .then((result) => {
-                const { isSent, apiResponse } = result;
+              .then((apiResp) => {
+                const { isSent, apiResponse } = apiResp;
+
                 const deleteFromPendingList = PendingList.destroy({
                   where: {
                     id: item.id,
                   },
                 });
+
                 const updateCamEvent = CamEvents.findOne({
                   where: {
                     id: item.dbID,
@@ -30,15 +33,15 @@ module.exports = (limitToResend) => {
                   if (camEvent) {
                     return camEvent.update({
                       uploaded: isSent,
-                      apiResponse: apiResponse,
+                      apiResponse,
                     });
                   }
                   throw new Error(`CamEvent ID: ${item.dbID} not found`);
                 });
 
                 Promise.all([deleteFromPendingList, updateCamEvent])
-                  .then((result) => {
-                    let eventData = result[1].dataValues;
+                  .then((deleteUpdateResults) => {
+                    const eventData = deleteUpdateResults[1].dataValues;
                     eventData.sender = 'RESEND';
                     if (!eventData.uploaded || eventData.fileErrors.length) {
                       eventData.warning = true;
@@ -54,20 +57,22 @@ module.exports = (limitToResend) => {
                   });
               })
               .catch((error) => {
-                reject({ error, fileMeta: item.fileMeta });
+                printLog(logTypes.API_ERROR, {
+                  statusCode: error.statusCode,
+                  errorText: error.errorText,
+                  apiURL: error.apiURL,
+                  senderName: 'RESENDER',
+                  cameraName: item.fileMeta.cameraName,
+                  file: item.fileMeta.file.name + item.fileMeta.file.ext,
+                });
+                reject(error);
               });
-          });
-        });
-        return Promise.all(preparedRequests)
-          .then((result) => {
-            finalResult.sentList = result;
-            return finalResult;
           })
-          .catch((error) => {
-            finalResult.apiError = error;
-            return finalResult;
-          });
-      }
+      );
+      return Promise.allSettled(preparedRequests).then((reqResults) => {
+        finalResult.sentList = reqResults;
+        return finalResult;
+      });
     })
     .catch((err) => {
       printLog(logTypes.APP_ERROR, {

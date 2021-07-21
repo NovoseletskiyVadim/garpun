@@ -5,7 +5,7 @@ class RejectWatcher {
     this.MIN_TIMEOUT = 2000;
     this.TIMEOUT_STEP = 5000;
     this.MAX_REQUEST_LIMIT = process.env.MAX_REQUESTS_COUNT || 50;
-    this.MIN_REQUEST_LIMIT = 50;
+    this.MIN_REQUEST_LIMIT = 1;
     this.REQUEST_LIMIT_STEP = 3;
 
     this.currentInterval = this.MIN_TIMEOUT;
@@ -38,32 +38,43 @@ class RejectWatcher {
     this.timer = setTimeout(() => {
       this.jsonResend(this.limit)
         .then((result) => {
-          if (result.hasOwnProperty('count') && result.count === 0) {
+          const { count, sentList } = result;
+          let countOfSent;
+          if (count && count === 0) {
             this.setDefaultConfig();
           }
-          if (result.hasOwnProperty('apiError')) {
-            let { apiError } = result;
-            const logData = {
-              statusCode: apiError.error.statusCode,
-              errorText: apiError.error.errorText,
-              apiURL: apiError.error.apiURL,
-              senderName: 'RESENDER',
-              cameraName: apiError.fileMeta.cameraName,
-              file: apiError.fileMeta.file.name + apiError.fileMeta.file.ext,
-            };
-            printLog(logTypes.API_ERROR, logData);
-            this.setApiErrorConfig();
+          if (sentList && sentList.length) {
+            const calcResult = sentList.reduce(
+              (acc, item) => {
+                if (item.status === 'rejected') {
+                  acc.rejected += 1;
+                }
+                if (item.status === 'fulfilled') {
+                  acc.fulfilled += 1;
+                }
+                return acc;
+              },
+              { rejected: 0, fulfilled: 0 }
+            );
+            countOfSent = calcResult.fulfilled;
+            const percentageOfDelivered = (100 * countOfSent) / this.limit;
+            console.log(percentageOfDelivered);
+            if (percentageOfDelivered < 50) {
+              this.setApiErrorConfig();
+            } else {
+              this.setApiOkConfig();
+            }
           }
-          if (result.hasOwnProperty('sentList')) {
-            this.setApiOkConfig();
-          }
+
           printLog(logTypes.INFO_RESENDER, {
             count: result.count,
             interval: this.currentInterval,
             limit: this.limit,
+            countOfSent,
           });
         })
         .catch((error) => {
+          console.log(error);
           printLog(logTypes.API_ERROR, error);
         })
         .finally(this.startWatch());

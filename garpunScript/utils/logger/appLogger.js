@@ -31,9 +31,9 @@ module.exports = {
         break;
 
       case logTypes.INFO_RESENDER:
-        const { count, interval, limit } = loggerData;
+        const { count, interval, limit, countOfSent } = loggerData;
         const alertsHistory = resenderAlertsHistory;
-        textMsg = `WAITING_REQUESTS_COUNT: ${count} REQUEST_LIMIT: ${limit} WAIT_TIMEOUT: ${interval}`;
+        textMsg = `WAITING_REQUESTS_COUNT: ${count} REQUEST_LIMIT: ${limit} COUNT_OF_SENT: ${countOfSent} WAIT_TIMEOUT: ${interval}`;
         if (alertsHistory.lastCount !== count) {
           console.log(colorTypes.warning, textMsg);
           const { deliveredAlerts, isBigQueue } = jsonReSenderCalcAlert(
@@ -71,7 +71,7 @@ module.exports = {
           console.log(color, textMsg);
         } catch (error) {
           console.error(loggerData);
-          console.error(errorType, error);
+          // console.error(errorType, error);
         }
         break;
 

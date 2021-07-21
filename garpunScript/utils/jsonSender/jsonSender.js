@@ -11,8 +11,7 @@ module.exports = (jsonData) => {
     },
     timeout: REQUEST_TIMEOUT,
   };
-  const url = process.env.API_SERVER;
-
+  const url = process.env.API_SERVER_URL;
   return new Promise((resolve, rejects) => {
     axios
       .post(url, jsonData, config)
@@ -26,7 +25,7 @@ module.exports = (jsonData) => {
         if (error || status) {
           apiResponse = result.data;
         } else {
-          let errorMsg = {
+          const errorMsg = {
             errorText: 'UNEXPECTED_RES_TYPE',
             statusCode: 200,
             apiURL: url,
@@ -36,7 +35,7 @@ module.exports = (jsonData) => {
         resolve({ isSent, apiResponse });
       })
       .catch((error) => {
-        let errorMsg = {
+        const errorMsg = {
           errorText: '',
           statusCode: 0,
           apiURL: url,

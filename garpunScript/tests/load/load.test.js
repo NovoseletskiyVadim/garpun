@@ -26,6 +26,7 @@ Cameras.findAll({
   },
 })
   .then((camerasList) => {
+    console.log(camerasList);
     let filesCreator = [];
     filesCreator = camerasList.map((camera) => {
       return new TestFileCreator(camera.ftpHomeDir);

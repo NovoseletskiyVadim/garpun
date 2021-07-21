@@ -1,10 +1,11 @@
 const path = require('path');
 const Sequelize = require('sequelize');
 
+const config = require('./../common/config');
 const { printLog, logTypes } = require('../utils/logger/appLogger');
 
-const mainDbPath = process.env.MAIN_DB || path.join(__dirname, 'main.db');
-const cashDbPath = process.env.TEMP_DB_PATH || path.join(__dirname, 'temp.db');
+const mainDbPath = config.MAIN_DB_PATH || path.join(__dirname, 'main.db');
+const cashDbPath = config.TEMP_DB_PATH || path.join(__dirname, 'temp.db');
 
 const mainDbConnection = new Sequelize({
   dialect: 'sqlite',
