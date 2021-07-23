@@ -4,6 +4,8 @@ const moment = require('moment');
 const Cameras = require('../../models/cameras');
 const CamEvents = require('../../models/camEvent');
 
+const REQUEST_TIME_OUT = 1000;
+
 class GetEventsStat {
   constructor(timeFrom, timeTo, cameraName, eventFilter) {
     this.timeFrom = timeFrom || moment().format('YYYY-MM-DD');
@@ -179,9 +181,9 @@ class GetEventsStat {
           eventCount: eventsList.length,
           filteredByCameras: [],
         };
-        const filteredByCamerasArray = camerasList.map((cameraName) => {
+        const filteredByCamerasArray = camerasList.map((camera, i) => {
           const filteredEventsByCamera = eventsList.filter((event) => {
-            if (event.camera === cameraName.ftpHomeDir) {
+            if (event.camera === camera.ftpHomeDir) {
               return event;
             }
           });
@@ -193,22 +195,18 @@ class GetEventsStat {
             this.eventReducer.bind(this),
             reducerDefault
           );
-          return CamEvents.findOne({
-            where: {
-              camera: cameraName.ftpHomeDir,
-            },
-            order: [['id', 'DESC']],
-          }).then((lastTimeEvent) => {
-            statReport.filteredByCameras.push({
-              cameraName: cameraName.ftpHomeDir,
-              eventCount: filteredEventsByCamera.length,
-              filteredByType,
-              lastTimeEvent: lastTimeEvent
-                ? moment(lastTimeEvent.createdAt).format('YYYY-MM-DD HH:mm:ss')
-                : 'Not active',
-            });
-            return;
-          });
+          const reqDelay = REQUEST_TIME_OUT * (i + 1);
+          return this.getLastEventTime(camera.ftpHomeDir, reqDelay).then(
+            (lastTimeEvent) => {
+              statReport.filteredByCameras.push({
+                cameraName: camera.ftpHomeDir,
+                eventCount: filteredEventsByCamera.length,
+                filteredByType,
+                lastTimeEvent,
+              });
+              return;
+            }
+          );
         });
         return Promise.all(filteredByCamerasArray).then((filtered) => {
           return statReport;
@@ -217,6 +215,35 @@ class GetEventsStat {
     } else {
       return Promise.reject(checkResult.errorMsg);
     }
+  }
+
+  getLastEventTime(cameraName, timeOutRequest) {
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        CamEvents.findOne({
+          where: {
+            camera: cameraName,
+          },
+          order: [['id', 'DESC']],
+        })
+          .then((lastEvent) => {
+            let lastTimeEvent = 'Not active';
+            if (lastEvent) {
+              const { createdAt } = lastEvent;
+              try {
+                lastTimeEvent = moment(createdAt).format('YYYY-MM-DD HH:mm:ss');
+              } catch (error) {
+                console.error(error);
+                lastTimeEvent = createdAt;
+              }
+            }
+            return resolve(lastTimeEvent);
+          })
+          .catch((error) => {
+            reject(error);
+          });
+      }, timeOutRequest);
+    });
   }
 
   printStatReport() {

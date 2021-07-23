@@ -4,12 +4,13 @@ const fileHandler = require('./fileHandler');
 const { printLog, logTypes } = require('../logger/appLogger');
 
 module.exports = () => {
+  const ignoredFiles = ['.*DVRWorkDirectory.*', '\\..'];
   let dirWatchersList = new Map();
   return {
     addDirToWatch: (options) => {
       const { dirName, watchPath } = options;
       const watcher = chokidar.watch(watchPath, {
-        ignored: /^\./,
+        ignored: new RegExp(ignoredFiles.join('|'), 'gi'),
         persistent: true,
         awaitWriteFinish: true,
       });

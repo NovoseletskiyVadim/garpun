@@ -56,9 +56,9 @@ class RejectWatcher {
               },
               { rejected: 0, fulfilled: 0 }
             );
-            countOfSent = calcResult.fulfilled;
-            const percentageOfDelivered = (100 * countOfSent) / this.limit;
-            console.log(percentageOfDelivered);
+            countOfSent = `${calcResult.fulfilled}/${sentList.length}`;
+            const percentageOfDelivered =
+              (100 * calcResult.fulfilled) / sentList.length;
             if (percentageOfDelivered < 50) {
               this.setApiErrorConfig();
             } else {
@@ -74,8 +74,7 @@ class RejectWatcher {
           });
         })
         .catch((error) => {
-          console.log(error);
-          printLog(logTypes.API_ERROR, error);
+          console.error(error);
         })
         .finally(this.startWatch());
     }, this.currentInterval);
