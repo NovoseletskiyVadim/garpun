@@ -1,7 +1,7 @@
 module.exports = {
   apps: [
     {
-      name: 'garpunScript4',
+      name: 'garpunScript5',
       script: './app.js',
       watch: true,
       ignore_watch: ['[/\\]./', 'node_modules', 'logs', 'db'],

@@ -4,7 +4,7 @@ const fileHandler = require('./fileHandler');
 const { printLog, logTypes } = require('../logger/appLogger');
 
 module.exports = () => {
-  const ignoredFiles = ['.*DVRWorkDirectory.*', '\\..'];
+  const ignoredFiles = ['.*DVRWorkDirectory.*'];
   let dirWatchersList = new Map();
   return {
     addDirToWatch: (options) => {
