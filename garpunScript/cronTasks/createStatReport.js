@@ -6,7 +6,7 @@ const appErrorLog = require('../utils/logger/logToFile');
 const GetEventsStat = require('../utils/statCollector/eventStat');
 const ReportsQuery = require('../models/reports');
 
-const yesterday = moment().subtract(0, 'days').format('YYYY-MM-DD');
+const yesterday = moment().subtract(1, 'days').format('YYYY-MM-DD');
 console.log(yesterday);
 const task = new GetEventsStat(yesterday);
 
@@ -18,7 +18,6 @@ task
     return ReportsQuery.create({ reportData: jsonReport }).then((newReport) => {
       return newReport.save();
     });
-    // return sendManyMessages(text);
   })
   .then(() => {
     dbConnect.stop();

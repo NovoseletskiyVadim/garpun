@@ -29,7 +29,7 @@ ReportsQuery.findOne({
         type: 'line',
         data: {
           labels,
-          datasets: [{ label: 'Foo', data }],
+          datasets: [{ label: 'Load chart', data }],
         },
       })
       .setWidth(800)

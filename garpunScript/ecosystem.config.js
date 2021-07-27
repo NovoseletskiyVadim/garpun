@@ -3,7 +3,7 @@ module.exports = {
     {
       name: 'garpunScript5',
       script: './app.js',
-      watch: true,
+      watch: false,
       ignore_watch: ['[/\\]./', 'node_modules', 'logs', 'db'],
       max_memory_restart: '250M',
       error_file: './logs/pm2-err.log',

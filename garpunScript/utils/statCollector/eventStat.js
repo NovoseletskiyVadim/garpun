@@ -35,6 +35,7 @@ class GetEventsStat {
   };
 
   eventReducer(reduceResult, camEvent) {
+    const { reportRowsNames } = GetEventsStat;
     if (camEvent.uploaded) {
       const eventTime = moment(camEvent.time, 'YYYY-MM-DD hh:mm:ss.sss').add(
         this.timeOffset,
@@ -82,8 +83,8 @@ class GetEventsStat {
       ) {
         const fileErrorsList = camEvent.fileErrors.split(',');
         fileErrorsList.forEach((item) => {
-          const keyName = Object.keys(this.reportRowsNames).find(
-            (key) => this.reportRowsNames[key] === item
+          const keyName = Object.keys(reportRowsNames).find(
+            (key) => reportRowsNames[key] === item
           );
           if (keyName) {
             reduceResult[keyName] += 1;
@@ -198,7 +199,7 @@ class GetEventsStat {
             }
           });
           let reducerDefault = {};
-          Object.keys(this.reportRowsNames).forEach((nameRow) => {
+          Object.keys(GetEventsStat.reportRowsNames).forEach((nameRow) => {
             reducerDefault[nameRow] = 0;
           });
           const filteredByType = filteredEventsByCamera.reduce(
