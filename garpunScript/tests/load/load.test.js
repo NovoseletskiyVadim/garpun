@@ -1,4 +1,4 @@
-require('dotenv').config({ path: './../../.env' });
+require('dotenv').config();
 
 const dbConnect = require('./../../db/dbConnect');
 const Cameras = require('./../../models/cameras');

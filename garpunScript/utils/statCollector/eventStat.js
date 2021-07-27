@@ -14,25 +14,25 @@ class GetEventsStat {
     this.eventFilter = eventFilter || false;
     this.timeZone = moment.tz.zonesForCountry('UA', true);
     this.timeOffset = Math.abs(this.timeZone[0].offset);
-    this.reportRowsNames = {
-      timeFrom0to2: '0-2',
-      timeFrom2to15: '2-15',
-      timeFrom15to30: '15-30',
-      timeFrom30to60: '30-60',
-      timeMore60: 'More 60',
-      timeLess0: 'Less 0',
-      notUploaded: 'NOT_UPLOADED',
-      fileSize: 'FILE_SIZE',
-      fileType: 'FILE_TYPE',
-      eventName: 'EVENT_NAME',
-      plateNumber: 'PLATE_NUMBER',
-      timeStamp: 'TIME_STAMP',
-      camTimeSync: 'CAM_TIME_SYNC',
-      cameraInfo: 'CAMERA_INFO',
-      apiRejected: 'API_REJECT',
-      apiErrorRes: 'API_ERROR_RES',
-    };
   }
+  static reportRowsNames = {
+    timeFrom0to2: '0-2',
+    timeFrom2to15: '2-15',
+    timeFrom15to30: '15-30',
+    timeFrom30to60: '30-60',
+    timeMore60: 'More 60',
+    timeLess0: 'Less 0',
+    notUploaded: 'NOT_UPLOADED',
+    fileSize: 'FILE_SIZE',
+    fileType: 'FILE_TYPE',
+    eventName: 'EVENT_NAME',
+    plateNumber: 'PLATE_NUMBER',
+    timeStamp: 'TIME_STAMP',
+    camTimeSync: 'CAM_TIME_SYNC',
+    cameraInfo: 'CAMERA_INFO',
+    apiRejected: 'API_REJECT',
+    apiErrorRes: 'API_ERROR_RES',
+  };
 
   eventReducer(reduceResult, camEvent) {
     if (camEvent.uploaded) {
@@ -180,7 +180,17 @@ class GetEventsStat {
           timeFilter: checkResult,
           eventCount: eventsList.length,
           filteredByCameras: [],
+          eventsByTime: {},
         };
+        eventsList.forEach((event) => {
+          const eventTime = moment(event.createdAt, 'YYYY-MM-DD hh:mm:ss.sss')
+            .add(this.timeOffset, 'minutes')
+            .get('h');
+          if (!statReport.eventsByTime[eventTime]) {
+            statReport.eventsByTime[eventTime] = 0;
+          }
+          statReport.eventsByTime[eventTime] += 1;
+        });
         const filteredByCamerasArray = camerasList.map((camera, i) => {
           const filteredEventsByCamera = eventsList.filter((event) => {
             if (event.camera === camera.ftpHomeDir) {
@@ -221,10 +231,11 @@ class GetEventsStat {
     return new Promise((resolve, reject) => {
       setTimeout(() => {
         CamEvents.findOne({
+          limit: 1,
           where: {
             camera: cameraName,
           },
-          order: [['id', 'DESC']],
+          order: [['createdAt', 'DESC']],
         })
           .then((lastEvent) => {
             let lastTimeEvent = 'Not active';
@@ -246,35 +257,34 @@ class GetEventsStat {
     });
   }
 
-  printStatReport() {
-    return this.getStat().then((statReport) => {
-      statReport.filteredByCameras.sort((a, b) => {
-        if (a.cameraName < b.cameraName) {
-          return -1;
-        }
-        if (a.cameraName > b.cameraName) {
-          return 1;
-        }
-        return 0;
-      });
-      let msgArr = [];
-      let textMsg = `<strong>Harpoon daily stat from ${statReport.timeFilter.dateFrom} to ${statReport.timeFilter.dateTo}</strong> \n`;
-      if (!this.cameraName) {
-        textMsg += `Total events count ${statReport.eventCount} \n\n`;
+  static printStatReport(statReport) {
+    statReport.filteredByCameras.sort((a, b) => {
+      if (a.cameraName < b.cameraName) {
+        return -1;
       }
-      msgArr.push(textMsg);
-      statReport.filteredByCameras.forEach((cameraData) => {
-        let cameraStat = `<strong>${cameraData.cameraName} events ${cameraData.eventCount}</strong>\n`;
-        cameraStat += `Last event time: ${cameraData.lastTimeEvent}\n`;
-        Object.keys(cameraData.filteredByType).forEach((filterName) => {
-          if (cameraData.filteredByType[filterName] > 0) {
-            cameraStat += `${this.reportRowsNames[filterName]} : ${cameraData.filteredByType[filterName]}\n`;
-          }
-        });
-        msgArr.push(cameraStat);
-      });
-      return msgArr;
+      if (a.cameraName > b.cameraName) {
+        return 1;
+      }
+      return 0;
     });
+    let msgArr = [];
+    let textMsg = `<strong>Harpoon daily stat from ${statReport.timeFilter.dateFrom} to ${statReport.timeFilter.dateTo}</strong> \n`;
+    textMsg += `Total events count ${statReport.eventCount} \n\n`;
+    msgArr.push(textMsg);
+    statReport.filteredByCameras.forEach((cameraData) => {
+      const { cameraName, eventCount, lastTimeEvent, filteredByType } =
+        cameraData;
+      let cameraStat = `<strong>${cameraName} events ${eventCount}</strong>\n`;
+      cameraStat += `Last event time: ${lastTimeEvent}\n`;
+
+      Object.keys(filteredByType).forEach((filterName) => {
+        if (filteredByType[filterName] > 0) {
+          cameraStat += `${GetEventsStat.reportRowsNames[filterName]} : ${cameraData.filteredByType[filterName]}\n`;
+        }
+      });
+      msgArr.push(cameraStat);
+    });
+    return msgArr;
   }
 }
 

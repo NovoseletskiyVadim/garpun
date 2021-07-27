@@ -37,6 +37,7 @@ module.exports = {
     const PendingList = require('../models/pendingList');
     const Cameras = require('../models/cameras');
     const Users = require('../models/users');
+    const Reports = require('../models/reports');
 
     let tablesList = [];
     //if NODE_ENV === 'DEV' clean test DB table PendingList and CamEvents
@@ -46,6 +47,7 @@ module.exports = {
         CamEvents.sync({ force: true }),
         PendingList.sync({ force: true }),
         Users.sync({ alter: true }),
+        Reports.sync({ alter: true }),
       ];
     } else {
       tablesList = [
@@ -53,12 +55,13 @@ module.exports = {
         CamEvents.sync({ alter: true }),
         PendingList.sync({ alter: true }),
         Users.sync({ alter: true }),
+        Reports.sync({ alter: true }),
       ];
     }
     return Promise.all(tablesList);
   },
   stop: () => {
-    return sequelize.close();
+    return mainDbConnection.close();
   },
   mainDbConnection,
   cashReqDbConnection,
