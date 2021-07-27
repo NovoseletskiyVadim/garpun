@@ -61,7 +61,8 @@ module.exports = {
     return Promise.all(tablesList);
   },
   stop: () => {
-    return mainDbConnection.close();
+    mainDbConnection.close();
+    cashReqDbConnection.close();
   },
   mainDbConnection,
   cashReqDbConnection,
