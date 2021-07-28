@@ -34,65 +34,107 @@ class GetEventsStat {
     apiErrorRes: 'API_ERROR_RES',
   };
 
-  eventReducer(reduceResult, camEvent) {
-    const { reportRowsNames } = GetEventsStat;
+  getEventsByTimeStat(camEvent, acc) {
+    const { ...statObject } = acc;
+    const eventHour = moment(camEvent.createdAt, 'YYYY-MM-DD hh:mm:ss.sss')
+      .add(this.timeOffset, 'minutes')
+      .get('h');
+    if (!statObject[eventHour]) {
+      statObject[eventHour] = 0;
+    }
+    statObject[eventHour] += 1;
+    return statObject;
+  }
+
+  getEventErrorStat(camEvent, acc) {
+    const { ...statObject } = acc;
+    if (
+      camEvent.hasOwnProperty('fileErrors') &&
+      typeof camEvent.fileErrors === 'string'
+    ) {
+      const fileErrorsList = camEvent.fileErrors.split(',');
+      fileErrorsList.forEach((item) => {
+        if (!item) return;
+        if (!statObject[item]) {
+          statObject[item] = 0;
+        }
+        statObject[item] += 1;
+      });
+    }
+    return statObject;
+  }
+
+  getApiResTimeStat(camEvent, acc) {
+    const { ...statObject } = acc;
+    let notUploaded = statObject.notUploaded || 0;
+    let apiErrorRes = statObject.apiErrorRes || 0;
+    let timeFrom0to2 = statObject.timeFrom0to2 || 0;
+    let timeFrom2to15 = statObject.timeFrom2to15 || 0;
+    let timeFrom15to30 = statObject.timeFrom15to30 || 0;
+    let timeFrom30to60 = statObject.timeFrom30to60 || 0;
+    let timeMore60 = statObject.timeMore60 || 0;
+    let timeLess0 = statObject.timeLess0 || 0;
     if (camEvent.uploaded) {
-      const eventTime = moment(camEvent.time, 'YYYY-MM-DD hh:mm:ss.sss').add(
-        this.timeOffset,
-        'minutes'
-      );
-      let dateTime;
       try {
+        const eventTime = moment(camEvent.time, 'YYYY-MM-DD hh:mm:ss.sss').add(
+          this.timeOffset,
+          'minutes'
+        );
         const apiRespObject = JSON.parse(camEvent.apiResponse);
         if (apiRespObject.hasOwnProperty('datetime')) {
-          dateTime = apiRespObject.datetime;
+          const { dateTime } = apiRespObject;
+          const apiRespTime = moment(dateTime);
+          const delayTime = (apiRespTime - eventTime) / 60000;
+          if (isNaN(delayTime)) {
+            apiErrorRes += 1;
+          }
+          if (delayTime >= 60) {
+            timeMore60 += 1;
+          } else if (delayTime >= 30) {
+            timeFrom30to60 += 1;
+          } else if (delayTime >= 15) {
+            timeFrom15to30 += 1;
+          } else if (delayTime >= 2) {
+            timeFrom2to15 += 1;
+          } else if (delayTime < 2 && delayTime > 0) {
+            timeFrom0to2 += 1;
+          } else {
+            timeLess0 += 1;
+          }
         } else {
-          reduceResult.apiErrorRes += 1;
-          return reduceResult;
+          apiErrorRes += 1;
         }
       } catch (error) {
-        reduceResult.apiErrorRes += 1;
-        return reduceResult;
-      }
-      const apiRespTime = moment(dateTime);
-      const delayTime = (apiRespTime - eventTime) / 60000;
-      if (isNaN(delayTime)) {
-        console.log('delayTime');
-      }
-      if (delayTime >= 60) {
-        reduceResult.timeMore60 += 1;
-      } else if (delayTime >= 30) {
-        reduceResult.timeFrom30to60 += 1;
-      } else if (delayTime >= 15) {
-        reduceResult.timeFrom15to30 += 1;
-      } else if (delayTime >= 2) {
-        reduceResult.timeFrom2to15 += 1;
-      } else if (delayTime < 2 && delayTime > 0) {
-        reduceResult.timeFrom0to2 += 1;
-      } else {
-        reduceResult.timeLess0 += 1;
+        console.log(error);
+        apiErrorRes += 1;
       }
     } else {
-      reduceResult.notUploaded += 1;
-      if (camEvent.apiResponse) {
-        reduceResult.apiRejected += 1;
-      }
-      if (
-        camEvent.hasOwnProperty('fileErrors') &&
-        typeof camEvent.fileErrors === 'string'
-      ) {
-        const fileErrorsList = camEvent.fileErrors.split(',');
-        fileErrorsList.forEach((item) => {
-          const keyName = Object.keys(reportRowsNames).find(
-            (key) => reportRowsNames[key] === item
-          );
-          if (keyName) {
-            reduceResult[keyName] += 1;
-          }
-        });
-      }
+      notUploaded += 1;
     }
-    return reduceResult;
+    return {
+      notUploaded,
+      apiErrorRes,
+      timeFrom0to2,
+      timeFrom2to15,
+      timeFrom15to30,
+      timeFrom30to60,
+      timeMore60,
+      timeLess0,
+    };
+  }
+
+  getStatFormEventsArray(eventsArray) {
+    let apiResTime = {};
+    let eventsByTime = {};
+    let eventsErrorsStat = {};
+    eventsArray.forEach((camEvent) => {
+      eventsErrorsStat = {
+        ...this.getEventErrorStat(camEvent, eventsErrorsStat),
+      };
+      eventsByTime = { ...this.getEventsByTimeStat(camEvent, eventsByTime) };
+      apiResTime = { ...this.getApiResTimeStat(camEvent, apiResTime) };
+    });
+    return { apiResTime, eventsByTime, eventsErrorsStat };
   }
 
   checkTimeFormat(dateTime, timeType) {
@@ -177,42 +219,32 @@ class GetEventsStat {
       const eventsList = CamEvents.findAll(eventsDbRequest);
       return Promise.all([camerasList, eventsList]).then((result) => {
         const [camerasList, eventsList] = result;
+        const { apiResTime, eventsByTime, eventsErrorsStat } =
+          this.getStatFormEventsArray(eventsList);
+
         let statReport = {
           timeFilter: checkResult,
           eventCount: eventsList.length,
+          eventsByTime,
+          apiResTime,
+          eventsErrorsStat,
           filteredByCameras: [],
-          eventsByTime: {},
         };
-        eventsList.forEach((event) => {
-          const eventTime = moment(event.createdAt, 'YYYY-MM-DD hh:mm:ss.sss')
-            .add(this.timeOffset, 'minutes')
-            .get('h');
-          if (!statReport.eventsByTime[eventTime]) {
-            statReport.eventsByTime[eventTime] = 0;
-          }
-          statReport.eventsByTime[eventTime] += 1;
-        });
         const filteredByCamerasArray = camerasList.map((camera, i) => {
-          const filteredEventsByCamera = eventsList.filter((event) => {
+          const eventsByCameraArray = eventsList.filter((event) => {
             if (event.camera === camera.ftpHomeDir) {
               return event;
             }
           });
-          let reducerDefault = {};
-          Object.keys(GetEventsStat.reportRowsNames).forEach((nameRow) => {
-            reducerDefault[nameRow] = 0;
-          });
-          const filteredByType = filteredEventsByCamera.reduce(
-            this.eventReducer.bind(this),
-            reducerDefault
-          );
+          const cameraEventsStat =
+            this.getStatFormEventsArray(eventsByCameraArray);
           const reqDelay = REQUEST_TIME_OUT * (i + 1);
           return this.getLastEventTime(camera.ftpHomeDir, reqDelay).then(
             (lastTimeEvent) => {
               statReport.filteredByCameras.push({
                 cameraName: camera.ftpHomeDir,
-                eventCount: filteredEventsByCamera.length,
-                filteredByType,
+                eventCount: eventsByCameraArray.length,
+                cameraEventsStat,
                 lastTimeEvent,
               });
               return;
@@ -273,14 +305,33 @@ class GetEventsStat {
     textMsg += `Total events count ${statReport.eventCount} \n\n`;
     msgArr.push(textMsg);
     statReport.filteredByCameras.forEach((cameraData) => {
-      const { cameraName, eventCount, lastTimeEvent, filteredByType } =
+      const { cameraName, eventCount, lastTimeEvent, cameraEventsStat } =
         cameraData;
+      const { apiResTime, eventsByTime, eventsErrorsStat } = cameraEventsStat;
       let cameraStat = `<strong>${cameraName} events ${eventCount}</strong>\n`;
-      cameraStat += `Last event time: ${lastTimeEvent}\n`;
-
-      Object.keys(filteredByType).forEach((filterName) => {
-        if (filteredByType[filterName] > 0) {
-          cameraStat += `${GetEventsStat.reportRowsNames[filterName]} : ${cameraData.filteredByType[filterName]}\n`;
+      cameraStat += `<strong>Last event time:</strong> ${lastTimeEvent}\n`;
+      Object.keys(eventsByTime).forEach((filterName, i) => {
+        if (eventsByTime[filterName] > 0) {
+          if (i === 0) {
+            cameraStat += `<strong>Events by time:</strong>\n`;
+          }
+          cameraStat += `${filterName} : ${eventsByTime[filterName]}\n`;
+        }
+      });
+      Object.keys(apiResTime).forEach((filterName, i) => {
+        if (apiResTime[filterName] > 0) {
+          if (i === 0) {
+            cameraStat += `<strong>API response time:</strong>\n`;
+          }
+          cameraStat += `${GetEventsStat.reportRowsNames[filterName]} : ${apiResTime[filterName]}\n`;
+        }
+      });
+      Object.keys(eventsErrorsStat).forEach((filterName, i) => {
+        if (eventsErrorsStat[filterName] > 0) {
+          if (i === 0) {
+            cameraStat += `<strong>Event errors:</strong>\n`;
+          }
+          cameraStat += `${filterName} : ${eventsErrorsStat[filterName]}\n`;
         }
       });
       msgArr.push(cameraStat);
