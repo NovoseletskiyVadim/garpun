@@ -13,7 +13,7 @@ const task = new GetEventsStat(yesterday);
 task
   .getStat()
   .then((report) => {
-    console.log(report.filteredByCameras[0]);
+    console.log(report);
     const jsonReport = JSON.stringify(report);
     return ReportsQuery.create({ reportData: jsonReport }).then((newReport) => {
       return newReport.save();
