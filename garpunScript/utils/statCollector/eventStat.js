@@ -3,6 +3,7 @@ const moment = require('moment');
 
 const Cameras = require('../../models/cameras');
 const CamEvents = require('../../models/camEvent');
+const ChartCreator = require('./chartCreator');
 
 const REQUEST_TIME_OUT = 1000;
 
@@ -82,8 +83,13 @@ class GetEventsStat {
         );
         const apiRespObject = JSON.parse(camEvent.apiResponse);
         if (apiRespObject.hasOwnProperty('datetime')) {
+<<<<<<< HEAD
           const { dateTime } = apiRespObject;
           const apiRespTime = moment(dateTime);
+=======
+          const { datetime } = apiRespObject;
+          const apiRespTime = moment(datetime);
+>>>>>>> apiResTimeChart
           const delayTime = (apiRespTime - eventTime) / 60000;
           if (isNaN(delayTime)) {
             apiErrorRes += 1;
@@ -290,8 +296,66 @@ class GetEventsStat {
     });
   }
 
-  static printStatReport(statReport) {
-    statReport.filteredByCameras.sort((a, b) => {
+  static async printStatReport(statReport) {
+    const {
+      eventsByTime,
+      apiResTime,
+      eventsErrorsStat,
+      filteredByCameras,
+      timeFilter,
+      eventCount,
+    } = statReport;
+    let msgChunkArray = [];
+    msgChunkArray.push(
+      `<strong>Harpoon daily stat from ${timeFilter.dateFrom} to ${timeFilter.dateTo}</strong>\n<strong>Total events count:</strong> ${eventCount}`
+    );
+    if (Object.keys(eventsByTime).length > 0) {
+      const eventsByTimeChart = new ChartCreator(
+        eventsByTime,
+        'line',
+        'Events by time'
+      );
+      const eventsByTimeChartUrl = await eventsByTimeChart
+        .createChart()
+        .getShortUrl();
+      msgChunkArray.push(eventsByTimeChartUrl);
+    }
+    if (Object.keys(apiResTime).length > 0) {
+      let filteredEventsByTime = {};
+      Object.keys(apiResTime).forEach((filterName, i) => {
+        if (apiResTime[filterName] > 0) {
+          filteredEventsByTime[GetEventsStat.reportRowsNames[filterName]] =
+            apiResTime[filterName];
+        }
+      });
+      const apiResTimeChart = new ChartCreator(
+        filteredEventsByTime,
+        'doughnut',
+        'API response time'
+      );
+      const apiResTimeChartUrl = await apiResTimeChart
+        .createChart()
+        .getShortUrl();
+      msgChunkArray.push(apiResTimeChartUrl);
+    }
+    if (Object.keys(eventsErrorsStat).length > 0) {
+      let filteredEventsErrors = {};
+      Object.keys(eventsErrorsStat).forEach((filterName, i) => {
+        if (eventsErrorsStat[filterName] > 0) {
+          filteredEventsErrors[filterName] = eventsErrorsStat[filterName];
+        }
+      });
+      const eventsErrorsStatChart = new ChartCreator(
+        filteredEventsErrors,
+        'pie',
+        'Events errors'
+      );
+      const eventsErrorsStatChartUrl = await eventsErrorsStatChart
+        .createChart()
+        .getShortUrl();
+      msgChunkArray.push(eventsErrorsStatChartUrl);
+    }
+    filteredByCameras.sort((a, b) => {
       if (a.cameraName < b.cameraName) {
         return -1;
       }
@@ -300,43 +364,70 @@ class GetEventsStat {
       }
       return 0;
     });
-    let msgArr = [];
-    let textMsg = `<strong>Harpoon daily stat from ${statReport.timeFilter.dateFrom} to ${statReport.timeFilter.dateTo}</strong> \n`;
-    textMsg += `Total events count ${statReport.eventCount} \n\n`;
-    msgArr.push(textMsg);
-    statReport.filteredByCameras.forEach((cameraData) => {
-      const { cameraName, eventCount, lastTimeEvent, cameraEventsStat } =
-        cameraData;
-      const { apiResTime, eventsByTime, eventsErrorsStat } = cameraEventsStat;
-      let cameraStat = `<strong>${cameraName} events ${eventCount}</strong>\n`;
-      cameraStat += `<strong>Last event time:</strong> ${lastTimeEvent}\n`;
-      Object.keys(eventsByTime).forEach((filterName, i) => {
-        if (eventsByTime[filterName] > 0) {
-          if (i === 0) {
-            cameraStat += `<strong>Events by time:</strong>\n`;
+    const statByCameras = filteredByCameras.map((cameraData) => {
+      return new Promise((resolve, reject) => {
+        let cameraStatMsg = [];
+        const { cameraName, eventCount, lastTimeEvent, cameraEventsStat } =
+          cameraData;
+        const { apiResTime, eventsByTime, eventsErrorsStat } = cameraEventsStat;
+        cameraStatMsg.push(
+          `<strong>${cameraName} events ${eventCount}</strong>\n`
+        );
+        cameraStatMsg.push(
+          `<strong>Last event time:</strong> ${lastTimeEvent}\n`
+        );
+
+        let apiResTimeMsg = '';
+        Object.keys(apiResTime).forEach((filterName, i) => {
+          if (apiResTime[filterName] > 0) {
+            if (i === 0) {
+              apiResTimeMsg += `<strong>API response time:</strong>\n`;
+            }
+            apiResTimeMsg += `${GetEventsStat.reportRowsNames[filterName]} : ${apiResTime[filterName]}\n`;
           }
-          cameraStat += `${filterName} : ${eventsByTime[filterName]}\n`;
+        });
+        if (apiResTimeMsg.length) {
+          cameraStatMsg.push(apiResTimeMsg);
+        }
+
+        let eventsErrorsStatMsg = '';
+        Object.keys(eventsErrorsStat).forEach((filterName, i) => {
+          if (eventsErrorsStat[filterName] > 0) {
+            if (i === 0) {
+              eventsErrorsStatMsg += `<strong>Event errors:</strong>\n`;
+            }
+            eventsErrorsStatMsg += `${filterName} : ${eventsErrorsStat[filterName]}\n`;
+          }
+        });
+        if (eventsErrorsStatMsg.length) {
+          cameraStatMsg.push(eventsErrorsStatMsg);
+        }
+        if (Object.keys(eventsByTime).length > 0) {
+          const eventsByTimeChart = new ChartCreator(
+            eventsByTime,
+            'line',
+            'Events by time'
+          );
+          return eventsByTimeChart
+            .createChart()
+            .getShortUrl()
+            .then((chartUrl) => {
+              cameraStatMsg.push(`${chartUrl} \n`);
+              return resolve(cameraStatMsg.join(''));
+            })
+            .catch((err) => {
+              cameraStatMsg.push(`Url - Error \n`);
+              return resolve(cameraStatMsg.join(''));
+            });
+        } else {
+          resolve(cameraStatMsg.join(''));
         }
       });
-      Object.keys(apiResTime).forEach((filterName, i) => {
-        if (apiResTime[filterName] > 0) {
-          if (i === 0) {
-            cameraStat += `<strong>API response time:</strong>\n`;
-          }
-          cameraStat += `${GetEventsStat.reportRowsNames[filterName]} : ${apiResTime[filterName]}\n`;
-        }
-      });
-      Object.keys(eventsErrorsStat).forEach((filterName, i) => {
-        if (eventsErrorsStat[filterName] > 0) {
-          if (i === 0) {
-            cameraStat += `<strong>Event errors:</strong>\n`;
-          }
-          cameraStat += `${filterName} : ${eventsErrorsStat[filterName]}\n`;
-        }
-      });
-      msgArr.push(cameraStat);
     });
-    return msgArr;
+
+    return Promise.all(statByCameras).then((statByCameras) => {
+      return [...msgChunkArray, ...statByCameras];
+    });
   }
 }
 
