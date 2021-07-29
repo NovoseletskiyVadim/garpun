@@ -83,13 +83,8 @@ class GetEventsStat {
         );
         const apiRespObject = JSON.parse(camEvent.apiResponse);
         if (apiRespObject.hasOwnProperty('datetime')) {
-<<<<<<< HEAD
-          const { dateTime } = apiRespObject;
-          const apiRespTime = moment(dateTime);
-=======
           const { datetime } = apiRespObject;
           const apiRespTime = moment(datetime);
->>>>>>> apiResTimeChart
           const delayTime = (apiRespTime - eventTime) / 60000;
           if (isNaN(delayTime)) {
             apiErrorRes += 1;
