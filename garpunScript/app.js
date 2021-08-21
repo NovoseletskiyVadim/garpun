@@ -5,6 +5,7 @@ const { printLog, logTypes } = require('./utils/logger/appLogger');
 const { appStartAlert } = require('./utils/telegBot/harpoonBot');
 const harpoonStarter = require('./utils/starter/starter');
 const { camerasWatcher, rejectApiHandler } = require('./utils/childProcesses');
+const TaskScheduler = require('./utils/TaskScheduler/taskScheduler');
 
 printLog(logTypes.APP_INFO, 'APP_STARTED_MODE: ' + process.env.NODE_ENV);
 printLog(logTypes.APP_INFO, 'APP_ID: ' + process.pid);
@@ -14,6 +15,15 @@ if (parseInt(process.env.ARCHIVE_DAYS) > 0) {
 } else {
   printLog(logTypes.APP_INFO, 'FILE_ARCHIVE: OFF');
 }
+
+process.on('uncaughtException', async (error) => {
+     console.error('uncaughtException', error);
+});
+
+process.on('unhandledRejection', async ( error) => {
+    console.error('unhandledRejection', error);
+});
+
 
 const app = dbConnect
   .connectionTest()
@@ -25,6 +35,7 @@ const app = dbConnect
   //   });
   // })
   .then(() => {
+    new TaskScheduler().start();  
     camerasWatcher.send({ type: 'START' });
     rejectApiHandler.send({ type: 'START' });
     appStartAlert();
