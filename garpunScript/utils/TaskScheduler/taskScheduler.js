@@ -14,8 +14,8 @@ class TaskScheduler {
 /**
  * Task for collect and save in db cameras stat for a day. Task runs on the 3 o'clock
  */
-        schedule.scheduleJob('* 3 * * *', () => {
-            const yesterday = moment().subtract(35, 'days').format('YYYY-MM-DD');
+        schedule.scheduleJob('43 21 * * *', () => {
+            const yesterday = moment().subtract(1, 'days').format('YYYY-MM-DD');
             printLog(logTypes.APP_INFO, `Start task for collect events stat for ${yesterday}`)
             new GetEventsStat(yesterday).getStat()
             .then((report) => {
@@ -32,7 +32,7 @@ class TaskScheduler {
 /**
  * Task for send cameras stat to telegram. Task runs at the 9 o'clock
  */
-        schedule.scheduleJob('* 9 * * *', () => {
+        schedule.scheduleJob('45 21 * * *', () => {
             const timeToday = moment().format('YYYY-MM-DD');
             printLog(logTypes.APP_INFO, `Start task for send cameras stat by ${timeToday} to telegram`);
             const telegSended = new SenderStatReport(timeToday);
