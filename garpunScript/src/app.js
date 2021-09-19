@@ -34,21 +34,23 @@ const app = dbConnect
     // uncomment this for first start
     //   .then(() =>
     //     dbConnect.dbTablesCreate().then(() => {
-    //       printLog(logTypes.APP_INFO, 'tables created');
+    //   printLog('tables created').appInfoMessage();
     //       return true;
     //     })
     //   )
     .then(() => {
-        camerasWatcher.send({ type: 'START' });
-        camerasWatcher.on('message', (data) => {
-            const { status } = data;
-            if (status) {
-                new TaskScheduler().start();
-                rejectApiHandler.send({ type: 'START' });
-                appStartAlert();
-                harpoonStarter();
-            }
-        });
+        rejectApiHandler.send({ type: 'START' });
+        // harpoonStarter();
+        // camerasWatcher.send({ type: 'START' });
+        // camerasWatcher.on('message', (data) => {
+        //     const { status } = data;
+        //     if (status) {
+        //         new TaskScheduler().start();
+        //         rejectApiHandler.send({ type: 'START' });
+        //         appStartAlert();
+        //
+        //     }
+        // });
     })
     .catch((error) => {
         printLog(new AppError(error, 'APP_START_ERROR').error().toErrorLog());

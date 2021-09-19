@@ -1,7 +1,7 @@
 const axios = require('axios');
 
 const config = require('../../common/config');
-const jsonResendAlertScheduler = require('./jsonReSenderAlertScheduler');
+const jsonResendAlertScheduler = require('../jsonResenderProcess/alertScheduler');
 
 const telegramIcons = {
     API_OK: '\xF0\x9F\x9A\x80',

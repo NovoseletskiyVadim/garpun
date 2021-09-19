@@ -70,10 +70,7 @@ module.exports = {
             },
 
             botMessage(iconType) {
-                let icon = '';
-                if (iconType) {
-                    icon = botIcons[iconType];
-                }
+                let icon = iconType || '';
                 alarmSignal(`${message} ${icon}`);
             },
         };

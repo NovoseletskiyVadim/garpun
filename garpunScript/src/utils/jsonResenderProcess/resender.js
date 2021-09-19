@@ -9,6 +9,25 @@ const {
 } = require('../errorHandlers');
 
 const MODULE_NAME = 'RESENDER';
+/**
+ * @typedef ResultREsender
+ * @property {number} count True if the token is valid.
+ * @property {Array} sentList The list of result sending to the API.
+ */
+
+/**
+ * @module resender
+ * @function
+ * @description This function gets from db the count of total pending requests and requests data by the limit.
+ * After trying to send to the API.
+ * If the request is successfully sent, the data is deleted from the cash db
+ * and in the main db for the event with id  ===  requests.dbID  add response data from the api.
+ * If api not sent nothing to do with request
+ * @param {number} limitToResend Limit requests to the API
+ * @returns {Promise<ResultREsender>} result
+ * @returns {Promise<ResultREsender>} result.count
+ * @returns {Promise<ResultREsender>} result.sentList
+ */
 
 module.exports = (limitToResend) => {
     const finalResult = {};
@@ -68,25 +87,28 @@ module.exports = (limitToResend) => {
                                     })
                                     .catch((error) => {
                                         printLog(
-                                            logTypes.APP_ERROR,
-                                            new AppError(error, MODULE_NAME)
-                                        );
+                                            new AppError(
+                                                error,
+                                                MODULE_NAME
+                                            ).toPrint()
+                                        ).error();
                                     });
                             })
                             .catch((error) => {
                                 if (error instanceof JsonSenderError) {
                                     printLog(
-                                        logTypes.API_ERROR,
                                         new EventHandlerError(error, {
                                             senderName: MODULE_NAME,
                                             fileMeta: item.fileMeta,
-                                        })
-                                    );
+                                        }).toPrint()
+                                    ).error();
                                 } else {
                                     printLog(
-                                        logTypes.APP_ERROR,
-                                        new AppError(error, MODULE_NAME)
-                                    );
+                                        new AppError(
+                                            error,
+                                            MODULE_NAME
+                                        ).toPrint()
+                                    ).error();
                                 }
                                 reject(error);
                             });
@@ -98,6 +120,6 @@ module.exports = (limitToResend) => {
             });
         })
         .catch((error) => {
-            printLog(logTypes.APP_ERROR, new AppError(error, MODULE_NAME));
+            printLog(new AppError(error, MODULE_NAME).toPrint()).error();
         });
 };

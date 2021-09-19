@@ -18,7 +18,7 @@ class EventHandlerError {
         return false;
     }
 
-    printLog() {
+    toPrint() {
         return `[${
             this.senderName
         }_API_ERROR] ${`${this.statusCode} ${this.errorText}`} ${
