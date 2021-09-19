@@ -10,11 +10,11 @@
       "eslint:recommended",
       "prettier"
     ],
+    "parser": "babel-eslint",
     "parserOptions": {
         "ecmaVersion": 12
     },
     "rules": {
-
         "linebreak-style": [
             "error",
             "unix"
@@ -27,5 +27,6 @@
             "error",
             "always"
         ]
-    }
+    },
+    "ignorePatterns": ["**/_test_/**", "**/vendor/*.js"],
 }

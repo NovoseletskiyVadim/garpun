@@ -2,9 +2,9 @@ module.exports = {
   apps: [
     {
       name: 'garpunScript5',
-      script: './app.js',
+      script: './srs/app.js',
       watch: false,
-      ignore_watch: ['[/\\]./', 'node_modules', 'logs', 'db'],
+      ignore_watch: ['[/\\]./', 'node_modules', 'logs', 'dataBase'],
       max_memory_restart: '250M',
       error_file: './logs/pm2-err.log',
       out_file: './logs/pm2-out.log',
