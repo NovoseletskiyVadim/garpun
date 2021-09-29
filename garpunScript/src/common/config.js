@@ -23,9 +23,6 @@ const {
 if (!BOT_TOKEN) {
     throw new Error('[CONFIG] Set bot token');
 }
-if (!MEDIA_PATH) {
-    throw new Error('[CONFIG] Set MEDIA_PATH in env file');
-}
 
 const setBotUserList = (userList) => {
     if (userList) {
@@ -51,6 +48,6 @@ module.exports = {
     MAX_REQUESTS_COUNT: parseInt(MAX_REQUESTS_COUNT, 10) || 50,
     REQUEST_TIMEOUT: REQUEST_TIMEOUT || 1000,
     SEND_PACKAGE_TIMEOUT: SEND_PACKAGE_TIMEOUT || 5000,
-    LOG_PATH,
+    LOG_PATH: LOG_PATH || './LOG_PATH',
     USER_LIST: setBotUserList(USER_LIST),
 };
