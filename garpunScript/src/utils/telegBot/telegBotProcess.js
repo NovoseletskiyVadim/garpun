@@ -3,6 +3,7 @@ const TelegramBot = require('node-telegram-bot-api');
 const config = require('../../common/config');
 
 require('dotenv').config({ path: './../../../.env' });
+
 console.log(process.pid);
 
 const bot = new TelegramBot(config.BOT_TOKEN, { polling: true });

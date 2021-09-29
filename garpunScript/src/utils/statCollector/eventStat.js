@@ -113,7 +113,6 @@ class GetEventsStat {
                     apiErrorRes += 1;
                 }
             } catch (error) {
-                console.log(error);
                 apiErrorRes += 1;
             }
         } else {
@@ -277,6 +276,34 @@ class GetEventsStat {
         });
     }
 
+    static async createStatMessage(dataArray, messageHeader, chartType = null) {
+        const dataKeys = Object.keys(dataArray);
+        let message = '';
+        if (dataKeys.length > 0) {
+            message += `<strong>${messageHeader}:</strong>\n`;
+            const dateObjForChart = {};
+            dataKeys.forEach((keyName) => {
+                const value = dataArray[keyName];
+                if (value > 0) {
+                    const keyNameForMsg =
+                        GetEventsStat.reportRowsNames[keyName] || keyName;
+                    message += `${keyNameForMsg}: ${value}\n`;
+                    dateObjForChart[keyNameForMsg] = value;
+                }
+            });
+            if (chartType) {
+                const chart = new ChartCreator(
+                    dateObjForChart,
+                    chartType,
+                    messageHeader
+                );
+                const chartUrl = await chart.createChart().getShortUrl();
+                message += `${chartUrl}\n`;
+            }
+        }
+        return message;
+    }
+
     static async printStatReport(statReport) {
         const {
             eventsByTime,
@@ -287,9 +314,8 @@ class GetEventsStat {
             eventCount,
         } = statReport;
         const msgChunkArray = [];
-        msgChunkArray.push(
-            `<strong>Harpoon daily stat from ${timeFilter.dateFrom} to ${timeFilter.dateTo}</strong>\n<strong>Total events count:</strong> ${eventCount}`
-        );
+        let globalEventCalcMsg = `<strong>Harpoon daily stat from ${timeFilter.dateFrom} to ${timeFilter.dateTo}</strong>\n<strong>Total events count:</strong> ${eventCount}\n`;
+
         if (Object.keys(eventsByTime).length > 0) {
             const eventsByTimeChart = new ChartCreator(
                 eventsByTime,
@@ -299,45 +325,24 @@ class GetEventsStat {
             const eventsByTimeChartUrl = await eventsByTimeChart
                 .createChart()
                 .getShortUrl();
-            msgChunkArray.push(eventsByTimeChartUrl);
+            globalEventCalcMsg += eventsByTimeChartUrl;
         }
-        if (Object.keys(apiResTime).length > 0) {
-            const filteredEventsByTime = {};
-            Object.keys(apiResTime).forEach((filterName) => {
-                if (apiResTime[filterName] > 0) {
-                    filteredEventsByTime[
-                        GetEventsStat.reportRowsNames[filterName]
-                    ] = apiResTime[filterName];
-                }
-            });
-            const apiResTimeChart = new ChartCreator(
-                filteredEventsByTime,
-                'doughnut',
-                'API response time'
-            );
-            const apiResTimeChartUrl = await apiResTimeChart
-                .createChart()
-                .getShortUrl();
-            msgChunkArray.push(apiResTimeChartUrl);
-        }
-        if (Object.keys(eventsErrorsStat).length > 0) {
-            const filteredEventsErrors = {};
-            Object.keys(eventsErrorsStat).forEach((filterName) => {
-                if (eventsErrorsStat[filterName] > 0) {
-                    filteredEventsErrors[filterName] =
-                        eventsErrorsStat[filterName];
-                }
-            });
-            const eventsErrorsStatChart = new ChartCreator(
-                filteredEventsErrors,
-                'pie',
-                'Events errors'
-            );
-            const eventsErrorsStatChartUrl = await eventsErrorsStatChart
-                .createChart()
-                .getShortUrl();
-            msgChunkArray.push(eventsErrorsStatChartUrl);
-        }
+        msgChunkArray.push(globalEventCalcMsg);
+        msgChunkArray.push(
+            await GetEventsStat.createStatMessage(
+                apiResTime,
+                'API response time',
+                'doughnut'
+            )
+        );
+        msgChunkArray.push(
+            await GetEventsStat.createStatMessage(
+                eventsErrorsStat,
+                'Events errors',
+                'pie'
+            )
+        );
+
         filteredByCameras.sort((a, b) => {
             if (a.cameraName < b.cameraName) {
                 return -1;
@@ -348,85 +353,63 @@ class GetEventsStat {
             return 0;
         });
         const lastCamEventsTime = await GetEventsStat.getLastCamsEventsTime();
-        const statByCameras = filteredByCameras.map(
-            (cameraData) =>
-                new Promise((resolve) => {
-                    const cameraStatMsg = [];
-                    const { cameraName, eventCount, cameraEventsStat } =
-                        cameraData;
-                    const lastTimeEvent = lastCamEventsTime.find(
-                        (cameraInfo) => {
-                            if (cameraInfo.ftpHomeDir === cameraName) {
-                                return cameraInfo;
-                            }
-                            return false;
-                        }
-                    );
-                    const { apiResTime, eventsByTime, eventsErrorsStat } =
-                        cameraEventsStat;
-                    cameraStatMsg.push(
-                        `<strong>${cameraName} events ${eventCount}</strong>\n`
-                    );
-                    cameraStatMsg.push(
-                        `<strong>Last event time:</strong> ${
-                            lastTimeEvent
-                                ? moment(lastTimeEvent.lastEvent).add(
-                                      this.timeOffset,
-                                      'minutes'
-                                  )
-                                : 'Not active'
-                        }\n`
-                    );
+        const statByCameras = filteredByCameras.map(async (cameraData) => {
+            const cameraStatMsg = [];
+            const { cameraName, eventCount, cameraEventsStat } = cameraData;
+            const lastTimeEvent = lastCamEventsTime.find((cameraInfo) => {
+                if (cameraInfo.ftpHomeDir === cameraName) {
+                    return cameraInfo;
+                }
+                return false;
+            });
+            const { apiResTime, eventsByTime, eventsErrorsStat } =
+                cameraEventsStat;
+            cameraStatMsg.push(
+                `<strong>${cameraName} events ${eventCount}</strong>\n`
+            );
+            cameraStatMsg.push(
+                `<strong>Last event time:</strong> ${
+                    lastTimeEvent
+                        ? moment(lastTimeEvent.lastEvent).add(
+                              this.timeOffset,
+                              'minutes'
+                          )
+                        : 'Not active'
+                }\n`
+            );
 
-                    let apiResTimeMsg = '';
-                    Object.keys(apiResTime).forEach((filterName, i) => {
-                        if (apiResTime[filterName] > 0) {
-                            if (i === 0) {
-                                apiResTimeMsg +=
-                                    '<strong>API response time:</strong>\n';
-                            }
-                            apiResTimeMsg += `${GetEventsStat.reportRowsNames[filterName]} : ${apiResTime[filterName]}\n`;
-                        }
-                    });
-                    if (apiResTimeMsg.length) {
-                        cameraStatMsg.push(apiResTimeMsg);
-                    }
+            const apiResTimeMsg = await GetEventsStat.createStatMessage(
+                apiResTime,
+                'API response time'
+            );
 
-                    let eventsErrorsStatMsg = '';
-                    Object.keys(eventsErrorsStat).forEach((filterName, i) => {
-                        if (eventsErrorsStat[filterName] > 0) {
-                            if (i === 0) {
-                                eventsErrorsStatMsg +=
-                                    '<strong>Event errors:</strong>\n';
-                            }
-                            eventsErrorsStatMsg += `${filterName} : ${eventsErrorsStat[filterName]}\n`;
-                        }
-                    });
-                    if (eventsErrorsStatMsg.length) {
-                        cameraStatMsg.push(eventsErrorsStatMsg);
-                    }
-                    if (Object.keys(eventsByTime).length > 0) {
-                        const eventsByTimeChart = new ChartCreator(
-                            eventsByTime,
-                            'line',
-                            'Events by time'
-                        );
-                        return eventsByTimeChart
-                            .createChart()
-                            .getShortUrl()
-                            .then((chartUrl) => {
-                                cameraStatMsg.push(`${chartUrl} \n`);
-                                return resolve(cameraStatMsg.join(''));
-                            })
-                            .catch(() => {
-                                cameraStatMsg.push('Url - Error \n');
-                                return resolve(cameraStatMsg.join(''));
-                            });
-                    }
-                    return resolve(cameraStatMsg.join(''));
-                })
-        );
+            if (apiResTimeMsg.length) {
+                cameraStatMsg.push(apiResTimeMsg);
+            }
 
+            const eventsErrorsStatMsg = await GetEventsStat.createStatMessage(
+                eventsErrorsStat,
+                'Event errors'
+            );
+
+            if (eventsErrorsStatMsg.length) {
+                cameraStatMsg.push(eventsErrorsStatMsg);
+            }
+            if (Object.keys(eventsByTime).length > 0) {
+                const eventsByTimeChart = new ChartCreator(
+                    eventsByTime,
+                    'line',
+                    'Events by time'
+                );
+                const chartUrl = await eventsByTimeChart
+                    .createChart()
+                    .getShortUrl();
+
+                cameraStatMsg.push(`${chartUrl} \n`);
+                return cameraStatMsg.join('');
+            }
+            return cameraStatMsg.join('');
+        });
         return Promise.all(statByCameras).then((statByCamerasResult) => [
             ...msgChunkArray,
             ...statByCamerasResult,

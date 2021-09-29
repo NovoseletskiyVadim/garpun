@@ -1,7 +1,8 @@
 const jsonSender = require('../jsonSender/jsonSender');
+const SuccessfulResponseHandler = require('../jsonSender/successfulResponseHandler');
 const PendingList = require('../../models/pendingList');
 const CamEvents = require('../../models/camEvent');
-const { printLog, logTypes } = require('../logger/appLogger');
+const { printLog } = require('../logger/appLogger');
 const {
     JsonSenderError,
     AppError,
@@ -76,13 +77,19 @@ module.exports = (limitToResend) => {
                                         const eventData =
                                             deleteUpdateResults[1].dataValues;
                                         eventData.sender = `[${MODULE_NAME}]`;
+                                        const logData = printLog(
+                                            new SuccessfulResponseHandler(
+                                                eventData
+                                            ).toPrint()
+                                        );
                                         if (
                                             !eventData.uploaded ||
                                             eventData.fileErrors.length
                                         ) {
-                                            eventData.warning = true;
+                                            logData.warning();
+                                        } else {
+                                            logData.successful();
                                         }
-                                        printLog(logTypes.JSON_SENT, eventData);
                                         resolve(eventData);
                                     })
                                     .catch((error) => {

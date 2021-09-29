@@ -28,5 +28,5 @@
             "always"
         ]
     },
-    "ignorePatterns": ["**/_test_/**", "**/vendor/*.js"],
+    "ignorePatterns": ["**/_test_/**", "**/vendor/*.js"]
 }

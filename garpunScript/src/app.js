@@ -39,18 +39,19 @@ const app = dbConnect
     //     })
     //   )
     .then(() => {
-        rejectApiHandler.send({ type: 'START' });
-        // harpoonStarter();
-        // camerasWatcher.send({ type: 'START' });
-        // camerasWatcher.on('message', (data) => {
-        //     const { status } = data;
-        //     if (status) {
-        //         new TaskScheduler().start();
-        //         rejectApiHandler.send({ type: 'START' });
-        //         appStartAlert();
-        //
-        //     }
-        // });
+        // rejectApiHandler.send({ type: 'START' });
+
+        camerasWatcher.send({ type: 'START' });
+
+        camerasWatcher.on('message', (data) => {
+            const { status } = data;
+            if (status) {
+                new TaskScheduler().start();
+                rejectApiHandler.send({ type: 'START' });
+                harpoonStarter();
+                appStartAlert();
+            }
+        });
     })
     .catch((error) => {
         printLog(new AppError(error, 'APP_START_ERROR').error().toErrorLog());

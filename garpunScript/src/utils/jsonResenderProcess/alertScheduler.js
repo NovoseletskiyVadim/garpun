@@ -3,7 +3,7 @@ const alertScheduler = (eventCalc, alertsHistory) => {
     let deliveredAlerts = Array.isArray(alertsHistory.deliveredAlerts)
         ? [...alertsHistory.deliveredAlerts]
         : [];
-    let isBigQueue = alertsHistory.isBigQueue;
+    let { isBigQueue } = alertsHistory;
     const isGrown = lastCount < eventCalc && true;
     const rangeOneHundred = Math.floor(eventCalc / 100);
     const rangeThousand = Math.floor(eventCalc / 1000);
@@ -12,9 +12,8 @@ const alertScheduler = (eventCalc, alertsHistory) => {
         if (!deliveredAlerts.includes(num)) {
             deliveredAlerts.push(num);
             return true;
-        } else {
-            return false;
         }
+        return false;
     };
 
     const lastDelivered = deliveredAlerts[deliveredAlerts.length - 1];

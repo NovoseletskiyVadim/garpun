@@ -27,6 +27,7 @@ class RejectWatcher {
         this.alertScheduler = alertScheduler;
         this.setDefaultConfig();
     }
+
     /**
      * @method isShouldSendToBot
      * @description For to calculate if it is necessary send message to the bot
@@ -50,10 +51,12 @@ class RejectWatcher {
      * @description Set default config for watching on the start and if query = 0
      * @returns {void}
      */
+
     setDefaultConfig() {
         this.limit = this.MIN_REQUEST_LIMIT;
         this.currentInterval = this.MIN_TIMEOUT;
     }
+
     /**
      * @method setApiErrorConfig
      * @description Set this config when api received less 50% of requests
@@ -69,6 +72,7 @@ class RejectWatcher {
             this.currentInterval = this.MAX_TIMEOUT;
         }
     }
+
     /**
      * @method setApiOkConfig
      * @description Set this config when api received more 50% of requests
@@ -86,6 +90,7 @@ class RejectWatcher {
      * @description This method launch work jsonResend and after timeout restarts it again
      * @returns {void}
      */
+
     startWatch() {
         this.timer = setTimeout(() => {
             this.jsonResend(this.limit)
@@ -134,7 +139,7 @@ class RejectWatcher {
                                     : botIcons.QUERY_DOWN;
                                 logInstance.botMessage(` ${botIcon}`);
                             } else {
-                                printLog(`API_OK `).botMessage(botIcons.API_OK);
+                                printLog('API_OK').botMessage(botIcons.API_OK);
                             }
                         }
                     }
@@ -147,6 +152,7 @@ class RejectWatcher {
                 .finally(this.startWatch());
         }, this.currentInterval);
     }
+
     /**
      * @method startWatch
      * @description This method for stop jsonResend work

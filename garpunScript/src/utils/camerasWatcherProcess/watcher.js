@@ -3,20 +3,34 @@ const moment = require('moment');
 
 const Cameras = require('../../models/cameras');
 const CamEvents = require('../../models/camEvent');
-const { printLog, logTypes } = require('../logger/appLogger');
+const { printLog } = require('../logger/appLogger');
 const config = require('../../common/config');
 const { AppError } = require('../errorHandlers');
+const botIcons = require('../telegBot/botIcons');
+
+/**
+ * @module camerasWatcher
+ * @function
+ * @description  This function at the beginning of work get info about cameras  from main db.
+ * After for each cameras set timeout for the alert in the log and bot with msg -
+ * 'CAMERA {name} OFFLINE {timeOffLine} Last event {timeLastEvent}'.
+ * Is statusNow for the camera not changed to alert msg does not sent.
+ * If camerasWatcher received event from camera timeout is reset to TIMEOUT_CAMERA_OFF_ALERT
+ * If camera was in offline and camerasWatcher received event from that camera, sent msg -
+ * 'CAMERA {cameraName} ONLINE, OFFLINE {timeInOffLine} ' and change statusNow to true
+ * @returns {void}
+ */
 
 module.exports = () => {
     const workingCamList = [];
     const setAlertTimeOut = (camera, timeOut) => {
         camera.alertSend = setTimeout(() => {
-            const timeInOffline = moment(camera.lastEvent).fromNow(true);
             if (camera.statusNow) {
-                printLog(logTypes.CAMERA_OFFLINE, {
-                    name: camera.ftpHomeDir,
-                    timeInOffline,
-                });
+                const timeInOffline = moment(camera.lastEvent).fromNow(true);
+                const textMsg = `CAMERA ${camera.ftpHomeDir} OFFLINE ${timeInOffline}\nLast event at ${camera.lastEvent}`;
+                printLog(textMsg)
+                    .errorSecond()
+                    .botMessage(` ${botIcons.CAMERA_OFFLINE}`);
             }
             camera.statusNow = false;
 
@@ -31,6 +45,7 @@ module.exports = () => {
          * @returns {Promise<boolean>}
          */
         startWatch() {
+            printLog('Start fetching cameras info').appInfoMessage();
             return Cameras.findAll({
                 raw: true,
                 where: {
@@ -52,10 +67,9 @@ module.exports = () => {
                                 const { createdAt } = lastEvent;
                                 cam.lastEvent = moment(createdAt);
                             }
-                            printLog(logTypes.APP_INFO, {
-                                cameraName: cam.ftpHomeDir,
-                                lastEvent: cam.lastEvent,
-                            });
+                            printLog(
+                                `cameraName: ${cam.ftpHomeDir} lastEvent: ${cam.lastEvent}`
+                            ).successful();
                             return cam;
                         });
                     });
@@ -73,9 +87,8 @@ module.exports = () => {
                 })
                 .catch((error) => {
                     printLog(
-                        logTypes.APP_ERROR,
-                        new AppError(error, 'CAM_WATCHER_ERROR')
-                    );
+                        new AppError(error, 'CAM_WATCHER_ERROR').toPrint()
+                    ).error();
                 });
         },
         /**
@@ -99,10 +112,14 @@ module.exports = () => {
                     timeInOffline = lastEvent
                         ? moment(lastEvent).fromNow(true)
                         : 0;
-                    printLog(logTypes.CAMERA_ONLINE, {
-                        name: cameraName,
-                        timeInOffline,
-                    });
+                    const timeOffLineText = `, OFFLINE ${timeInOffline}`;
+                    const textMsg = `CAMERA ${cameraName} ONLINE${
+                        timeInOffline !== 0 ? timeOffLineText : ''
+                    }`;
+
+                    printLog(textMsg)
+                        .successful()
+                        .botMessage(` ${botIcons.CAMERA_ONLINE}`);
                     workingCamList[cameraIndex].statusNow = true;
                 }
                 workingCamList[cameraIndex].lastEvent = moment();

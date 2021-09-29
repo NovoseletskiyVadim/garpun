@@ -1,7 +1,7 @@
 const chokidar = require('chokidar');
 
 const fileHandler = require('./fileHandler');
-const { printLog, logTypes } = require('../logger/appLogger');
+const { printLog } = require('../logger/appLogger');
 const { AppError } = require('../errorHandlers');
 
 module.exports = () => {
@@ -16,21 +16,20 @@ module.exports = () => {
                 awaitWriteFinish: true,
             });
             dirWatchersList.set(dirName, watcher);
-            printLog(logTypes.APP_INFO, `Under watch: ${watchPath}`);
+            printLog(`Under watch: ${watchPath}`).appInfoMessage();
             watcher
                 .on('add', (pathFile) => fileHandler(pathFile))
                 .on('error', (error) => {
                     printLog(
-                        logTypes.APP_ERROR,
-                        new AppError(error, 'FILE_WATCHER_ERROR')
-                    );
+                        new AppError(error, 'FILE_WATCHER_ERROR').toPrint()
+                    ).error();
                 });
         },
         stopWatchDir: (dirName) => {
             const watcher = dirWatchersList.get(dirName);
             watcher.close().then(() => {
                 dirWatchersList.delete(dirName);
-                printLog(logTypes.APP_INFO, `Stop watch: ${dirName}`);
+                printLog(`Stop watch: ${dirName}`).appInfoMessage();
             });
         },
     };

@@ -26,7 +26,8 @@ const alarmSignal = (msg) => {
 };
 
 const appStartAlert = () => {
-    const msg = `Harpoon launched ${telegramIcons.APP_START}`;
+    const isDevMode = process.env.NODE_ENV === 'DEV' && 'DEV';
+    const msg = `Harpoon ${isDevMode} launched ${telegramIcons.APP_START}`;
     alarmSignal(msg);
 };
 

@@ -4,7 +4,7 @@ const fs = require('fs');
 const FileType = require('file-type');
 
 const { MAX_FILE_SIZE } = require('../../common/config');
-const { printLog, logTypes } = require('../logger/appLogger');
+const { printLog } = require('../logger/appLogger');
 const { camerasWatcher } = require('../childProcesses');
 const getFileMeta = require('../fileExplorer/getFileMeta');
 const CamEvents = require('../../models/camEvent');
@@ -12,6 +12,7 @@ const { rejectFileHandler } = require('../fileExplorer/fileExplorer');
 const PendingList = require('../../models/pendingList');
 const jsonSender = require('../jsonSender/jsonSender');
 const jsonCreator = require('../jsonSender/jsonCreator');
+const SuccessfulResponseHandler = require('../jsonSender/successfulResponseHandler');
 const {
     AppError,
     JsonSenderError,
@@ -23,7 +24,7 @@ const MODULE_NAME = 'FILE_HANDLER';
 module.exports = (pathFile, emitter = MODULE_NAME) => {
     const fileStat = fs.statSync(pathFile);
     if (!fileStat.isFile()) {
-        printLog(logTypes.WRONG_FILE, `NOT A FILE ${pathFile}`);
+        printLog(`NOT A FILE ${pathFile}`).errorSecond();
         return Promise.resolve();
     }
     const fileMeta = getFileMeta(pathFile);
@@ -83,24 +84,29 @@ module.exports = (pathFile, emitter = MODULE_NAME) => {
                                         fileMeta.file.name + fileMeta.file.ext,
                                     time: fileMeta.eventDate,
                                 };
+                                const logData = printLog(
+                                    new SuccessfulResponseHandler(
+                                        eventData
+                                    ).toPrint()
+                                );
                                 if (!isSent || fileMeta.notPassed.length) {
-                                    eventData.warning = true;
+                                    logData.warning();
+                                } else {
+                                    logData.successful();
                                 }
                                 savedEvent.apiResponse = apiResponse;
                                 savedEvent.uploaded = isSent;
-                                printLog(logTypes.JSON_SENT, eventData);
                                 // Save API request in db
                                 return savedEvent.save();
                             })
                             .catch((error) => {
                                 if (error instanceof JsonSenderError) {
                                     printLog(
-                                        logTypes.API_ERROR,
                                         new EventHandlerError(error, {
                                             senderName: emitter,
                                             fileMeta,
-                                        })
-                                    );
+                                        }).toPrint()
+                                    ).error();
                                     // If API no response or response not valid, save event to temp db for re-send
                                     return PendingList.create({
                                         status: 'API_ERROR',
@@ -110,24 +116,22 @@ module.exports = (pathFile, emitter = MODULE_NAME) => {
                                     });
                                 }
                                 printLog(
-                                    logTypes.APP_ERROR,
-                                    new AppError(error, MODULE_NAME)
-                                );
+                                    new AppError(error, MODULE_NAME).toPrint()
+                                ).error();
                                 return false;
                             })
                     );
                 }
                 printLog(
-                    logTypes.WRONG_FILE,
                     `WRONG ${fileMeta.notPassed.join(' ')} camera:${
                         fileMeta.cameraName
                     } photo:${fileMeta.file.name}${fileMeta.file.ext}`
-                );
+                ).errorSecond();
                 // If file is not valid move to trash folder or if ARCHIVE_DAYS = 0 - delete
                 return rejectFileHandler(fileMeta);
             })
             .catch((error) => {
-                printLog(logTypes.APP_ERROR, new AppError(error, MODULE_NAME));
+                printLog(new AppError(error, MODULE_NAME).toPrint());
             })
     );
 };

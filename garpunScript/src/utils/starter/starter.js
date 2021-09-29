@@ -6,7 +6,7 @@ const Cameras = require('../../models/cameras');
 const dirWatcher = require('../ftpWatcher/dirWatcher')();
 const fileHandler = require('../ftpWatcher/fileHandler');
 const { MAX_REQUESTS_COUNT, MEDIA_PATH } = require('../../common/config');
-const { printLog, logTypes } = require('../logger/appLogger');
+const { printLog } = require('../logger/appLogger');
 const { AppError } = require('../errorHandlers');
 
 const dirHandler = (dirInfo, stateUpdate) => {
@@ -55,9 +55,8 @@ const maxRequestsCalculator = (dirList) => () => {
         }
         if (item.maxRequests !== allowedRequests) {
             printLog(
-                logTypes.APP_INFO,
                 `cameraName: ${item.dirName} filesInFolder: ${item.filesList.length} allowedRequests: ${allowedRequests}`
-            );
+            ).appInfoMessage();
         }
         item.maxRequests = allowedRequests;
 
@@ -110,11 +109,10 @@ const harpoonStarter = () =>
                         return Promise.all(listDirsInProcess).then(
                             (resultList) => {
                                 printLog(
-                                    logTypes.APP_INFO,
                                     `All folder is under watch:\n ${resultList.join(
                                         '\n '
                                     )}`
-                                );
+                                ).successful();
                             }
                         );
                     }
@@ -122,7 +120,7 @@ const harpoonStarter = () =>
             });
         })
         .catch((error) => {
-            printLog(logTypes.APP_ERROR, new AppError(error, 'STARTER_ERROR'));
+            printLog(new AppError(error, 'STARTER_ERROR').toPrint()).error();
             process.exitCode = 1;
         });
 
