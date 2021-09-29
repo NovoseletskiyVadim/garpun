@@ -39,7 +39,7 @@ const app = dbConnect
     //     })
     //   )
     .then(() => {
-        // rejectApiHandler.send({ type: 'START' });
+        rejectApiHandler.send({ type: 'START' });
 
         camerasWatcher.send({ type: 'START' });
 
