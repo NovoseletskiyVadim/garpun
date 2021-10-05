@@ -11,6 +11,7 @@ const {
     TEMP_DB_PATH,
     TIMEOUT_CAMERA_OFF_ALERT,
     ARCHIVE_DAYS,
+    TRASH_ARCHIVE_DAYS,
     MAX_FILE_SIZE,
     BOT_TOKEN,
     MAX_REQUESTS_COUNT,
@@ -22,9 +23,6 @@ const {
 
 if (!BOT_TOKEN) {
     throw new Error('[CONFIG] Set bot token');
-}
-if (!MEDIA_PATH) {
-    throw new Error('[CONFIG] Set MEDIA_PATH in env file');
 }
 
 const setBotUserList = (userList) => {
@@ -45,12 +43,12 @@ module.exports = {
     TEMP_DB_PATH,
     TIMEOUT_CAMERA_OFF_ALERT: TIMEOUT_CAMERA_OFF_ALERT || 3600000,
     ARCHIVE_DAYS: parseInt(ARCHIVE_DAYS, 10) || 0,
-    TRASH_ARCHIVE_DAYS: parseInt(ARCHIVE_DAYS, 10) || 0,
+    TRASH_ARCHIVE_DAYS: parseInt(TRASH_ARCHIVE_DAYS, 10) || 0,
     MAX_FILE_SIZE: parseInt(MAX_FILE_SIZE, 10) || 250000,
     BOT_TOKEN,
     MAX_REQUESTS_COUNT: parseInt(MAX_REQUESTS_COUNT, 10) || 50,
     REQUEST_TIMEOUT: REQUEST_TIMEOUT || 1000,
     SEND_PACKAGE_TIMEOUT: SEND_PACKAGE_TIMEOUT || 5000,
-    LOG_PATH,
+    LOG_PATH: LOG_PATH || './LOG_PATH',
     USER_LIST: setBotUserList(USER_LIST),
 };

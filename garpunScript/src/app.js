@@ -16,6 +16,11 @@ if (parseInt(config.ARCHIVE_DAYS, 10) > 0) {
 } else {
     printLog('FILE_ARCHIVE: OFF').appInfoMessage();
 }
+if (parseInt(config.TRASH_ARCHIVE_DAYS, 10) > 0) {
+    printLog(`TRASH_ARCHIVE: ${config.TRASH_ARCHIVE_DAYS}`).appInfoMessage();
+} else {
+    printLog('TRASH_ARCHIVE: OFF').appInfoMessage();
+}
 
 process.on('uncaughtException', async (error) => {
     printLog(new AppError(error, 'UNCAUGHTEXCEPTION').toPrint())

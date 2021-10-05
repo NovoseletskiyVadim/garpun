@@ -1,6 +1,6 @@
 {
   "name": "cam_adapter",
-  "version": "1.4.0",
+  "version": "1.4.4",
   "description": "This is a app for adapting hikvision cameras to prepare and sending data to the API.",
   "main": "app.js",
   "scripts": {

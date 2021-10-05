@@ -16,8 +16,10 @@ class TaskScheduler {
          * Task for collect and save in db cameras stat for a day. Task runs on the 3 o'clock
          *
          */
-        schedule.scheduleJob('* 3 * * *', () => {
-            const yesterday = moment().subtract(1, 'days').format('YYYY-MM-DD');
+        schedule.scheduleJob('0 3 * * *', () => {
+            const yesterday = moment()
+                .subtract(44, 'days')
+                .format('YYYY-MM-DD');
             printLog(
                 `Start task for collect cameras stat for ${yesterday}`
             ).appInfoMessage();
@@ -39,7 +41,7 @@ class TaskScheduler {
         /**
          * Task for send cameras stat to telegram. Task runs at the 9 o'clock
          */
-        schedule.scheduleJob('* 9 * * *', () => {
+        schedule.scheduleJob('0 9 * * *', () => {
             const timeToday = moment().format('YYYY-MM-DD');
             printLog(
                 `Start task for send cameras stat by ${timeToday} to telegram`

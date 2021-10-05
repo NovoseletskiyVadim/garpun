@@ -7,6 +7,7 @@ const { camerasWatcher } = require('../childProcesses');
 const Cameras = require('../../models/cameras');
 const CamEvents = require('../../models/camEvent');
 const ChartCreator = require('./chartCreator');
+const botIcons = require('../telegBot/botIcons');
 
 class GetEventsStat {
     constructor(timeFrom, timeTo, cameraName, eventFilter) {
@@ -87,11 +88,11 @@ class GetEventsStat {
                 if (
                     Object.prototype.hasOwnProperty.call(
                         apiRespObject,
-                        'dateTime'
+                        'datetime'
                     )
                 ) {
-                    const { dateTime } = apiRespObject;
-                    const apiRespTime = moment(dateTime);
+                    const { datetime } = apiRespObject;
+                    const apiRespTime = moment(datetime);
                     const delayTime = (apiRespTime - eventTime) / 60000;
                     if (Number.isNaN(delayTime)) {
                         apiErrorRes += 1;
@@ -367,15 +368,25 @@ class GetEventsStat {
             cameraStatMsg.push(
                 `<strong>${cameraName} events ${eventCount}</strong>\n`
             );
+            let lastEventMsg = 'Not active';
+            if (lastTimeEvent && lastTimeEvent.lastEvent) {
+                const lastEventTime = moment(lastTimeEvent.lastEvent).add(
+                    this.timeOffset,
+                    'minutes'
+                );
+                const timeNow = moment();
+                lastEventMsg = moment(lastEventTime).format(
+                    'YYYY-MM-DD hh:mm:ss'
+                );
+                if (
+                    parseInt(((timeNow - lastEventTime) / 1000).toFixed(), 10) >
+                    86400
+                ) {
+                    lastEventMsg += ` ${botIcons.CAMERA_OFFLINE_WARNING}`;
+                }
+            }
             cameraStatMsg.push(
-                `<strong>Last event time:</strong> ${
-                    lastTimeEvent
-                        ? moment(lastTimeEvent.lastEvent).add(
-                              this.timeOffset,
-                              'minutes'
-                          )
-                        : 'Not active'
-                }\n`
+                `<strong>Last event time:</strong> ${lastEventMsg}\n`
             );
 
             const apiResTimeMsg = await GetEventsStat.createStatMessage(
