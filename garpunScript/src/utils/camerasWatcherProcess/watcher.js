@@ -27,7 +27,10 @@ module.exports = () => {
         camera.alertSend = setTimeout(() => {
             if (camera.statusNow) {
                 const timeInOffline = moment(camera.lastEvent).fromNow(true);
-                const textMsg = `CAMERA ${camera.ftpHomeDir} OFFLINE ${timeInOffline}\nLast event at ${camera.lastEvent}`;
+                const lastEvent = moment(camera.lastEvent).format(
+                    'YYYY-MM-DD hh:mm:ss'
+                );
+                const textMsg = `CAMERA ${camera.ftpHomeDir} OFFLINE ${timeInOffline}\nLast event at ${lastEvent}`;
                 printLog(textMsg)
                     .errorSecond()
                     .botMessage(` ${botIcons.CAMERA_OFFLINE}`);
