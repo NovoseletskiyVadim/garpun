@@ -2,6 +2,7 @@
 const schedule = require('node-schedule');
 const moment = require('moment');
 
+const config = require('../../common/config');
 const ReportsQuery = require('../../models/reports');
 const GetEventsStat = require('../statCollector/eventStat');
 const { printLog } = require('../logger/appLogger');
@@ -16,10 +17,8 @@ class TaskScheduler {
          * Task for collect and save in db cameras stat for a day. Task runs on the 3 o'clock
          *
          */
-        schedule.scheduleJob('0 3 * * *', () => {
-            const yesterday = moment()
-                .subtract(44, 'days')
-                .format('YYYY-MM-DD');
+        schedule.scheduleJob(config.TASK_SCHEDULER_GET_STAT, () => {
+            const yesterday = moment().subtract(1, 'days').format('YYYY-MM-DD');
             printLog(
                 `Start task for collect cameras stat for ${yesterday}`
             ).appInfoMessage();
@@ -41,7 +40,7 @@ class TaskScheduler {
         /**
          * Task for send cameras stat to telegram. Task runs at the 9 o'clock
          */
-        schedule.scheduleJob('0 9 * * *', () => {
+        schedule.scheduleJob(config.TASK_SCHEDULER_SEND_STAT, () => {
             const timeToday = moment().format('YYYY-MM-DD');
             printLog(
                 `Start task for send cameras stat by ${timeToday} to telegram`
