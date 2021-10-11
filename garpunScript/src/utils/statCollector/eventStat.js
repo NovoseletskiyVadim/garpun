@@ -376,7 +376,7 @@ class GetEventsStat {
                 );
                 const timeNow = moment();
                 lastEventMsg = moment(lastEventTime).format(
-                    'YYYY-MM-DD hh:mm:ss'
+                    'YYYY-MM-DD HH:mm:ss'
                 );
                 if (
                     parseInt(((timeNow - lastEventTime) / 1000).toFixed(), 10) >

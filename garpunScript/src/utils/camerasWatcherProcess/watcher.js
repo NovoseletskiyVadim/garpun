@@ -28,12 +28,12 @@ module.exports = () => {
             if (camera.statusNow) {
                 const timeInOffline = moment(camera.lastEvent).fromNow(true);
                 const lastEvent = moment(camera.lastEvent).format(
-                    'YYYY-MM-DD hh:mm:ss'
+                    'YYYY-MM-DD HH:mm:ss'
                 );
-                const textMsg = `CAMERA ${camera.ftpHomeDir} OFFLINE ${timeInOffline}\nLast event at ${lastEvent}`;
+                const textMsg = `${botIcons.CAMERA_OFFLINE}CAMERA ${camera.ftpHomeDir} OFFLINE ${timeInOffline}\nLast event at ${lastEvent}`;
                 printLog(textMsg)
                     .errorSecond()
-                    .botMessage(` ${botIcons.CAMERA_OFFLINE}`);
+                    .botMessage();
             }
             camera.statusNow = false;
 
@@ -115,14 +115,14 @@ module.exports = () => {
                     timeInOffline = lastEvent
                         ? moment(lastEvent).fromNow(true)
                         : 0;
-                    const timeOffLineText = `, OFFLINE ${timeInOffline}`;
-                    const textMsg = `CAMERA ${cameraName} ONLINE${
+                    const timeOffLineText = `\nOFFLINE ${timeInOffline}`;
+                    const textMsg = `${botIcons.CAMERA_ONLINE}CAMERA ${cameraName} ONLINE ${
                         timeInOffline !== 0 ? timeOffLineText : ''
                     }`;
 
                     printLog(textMsg)
                         .successful()
-                        .botMessage(` ${botIcons.CAMERA_ONLINE}`);
+                        .botMessage();
                     workingCamList[cameraIndex].statusNow = true;
                 }
                 workingCamList[cameraIndex].lastEvent = moment();
