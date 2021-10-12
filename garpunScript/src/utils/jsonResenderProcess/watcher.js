@@ -10,8 +10,8 @@ const jsonResend = require('./resender');
  */
 class RejectWatcher {
     constructor() {
-        this.MAX_TIMEOUT = 5000;
-        this.MIN_TIMEOUT = 2000;
+        this.MAX_TIMEOUT = 60000;
+        this.MIN_TIMEOUT = 5000;
         this.TIMEOUT_STEP = 5000;
         this.MAX_REQUEST_LIMIT = MAX_REQUESTS_COUNT;
         this.MIN_REQUEST_LIMIT = 1;
