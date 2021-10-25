@@ -2,6 +2,9 @@ const { DataTypes } = require('sequelize');
 const { mainDbConnection } = require('../db/dbConnect');
 
 module.exports = mainDbConnection.define('users', {
+    userName: {
+        type: DataTypes.STRING,
+    },
     userLogin: {
         type: DataTypes.STRING,
     },

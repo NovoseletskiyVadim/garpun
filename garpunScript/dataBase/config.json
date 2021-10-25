@@ -1,0 +1,7 @@
+{
+    "dev": {
+        "dialect": "sqlite",
+        "storage": "./dataBase/main.db"
+    },
+    "production": {}
+  }

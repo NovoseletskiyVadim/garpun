@@ -92,9 +92,10 @@ module.exports = (eventData) =>
                 return resolve(JSON.stringify(eventObject));
             })
             .catch((err) => {
-                printLog(
-                    new AppError(err, 'JSON_CREATOR_ERROR').toPrint()
-                ).error();
+                printLog(new AppError(err, 'JSON_CREATOR_ERROR'))
+                    .error()
+                    .toErrorLog()
+                    .errorGroupChatMessage();
                 reject(err);
             });
     });

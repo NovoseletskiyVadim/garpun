@@ -120,7 +120,10 @@ const harpoonStarter = () =>
             });
         })
         .catch((error) => {
-            printLog(new AppError(error, 'STARTER_ERROR').toPrint()).error();
+            printLog(new AppError(error, 'STARTER_ERROR'))
+                .error()
+                .toErrorLog()
+                .errorGroupChatMessage();
             process.exitCode = 1;
         });
 

@@ -6,7 +6,7 @@ class EventHandlerError {
         this.senderName = props.senderName;
         this.cameraName = props.fileMeta ? props.fileMeta.cameraName : '?';
         this.file = props.fileMeta
-            ? props.fileMeta.file
+            ? props.fileMeta?.file
             : { name: '', ext: '' };
     }
 

@@ -6,7 +6,7 @@ const CamEvents = require('../../models/camEvent');
 const { printLog } = require('../logger/appLogger');
 const config = require('../../common/config');
 const { AppError } = require('../errorHandlers');
-const botIcons = require('../telegBot/botIcons');
+const { HarpoonBotMsgSender } = require('../telegBot/harpoonBot');
 
 /**
  * @module camerasWatcher
@@ -33,7 +33,9 @@ module.exports = () => {
                 const textMsg = `CAMERA ${camera.ftpHomeDir} OFFLINE ${timeInOffline}\nLast event at ${lastEvent}`;
                 printLog(textMsg)
                     .errorSecond()
-                    .botMessage(` ${botIcons.CAMERA_OFFLINE}`);
+                    .botMessage(
+                        ` ${HarpoonBotMsgSender.telegramIcons.CAMERA_OFFLINE}`
+                    );
             }
             camera.statusNow = false;
 
@@ -89,9 +91,10 @@ module.exports = () => {
                     return true;
                 })
                 .catch((error) => {
-                    printLog(
-                        new AppError(error, 'CAM_WATCHER_ERROR').toPrint()
-                    ).error();
+                    printLog(new AppError(error, 'CAM_WATCHER_ERROR'))
+                        .error()
+                        .toErrorLog()
+                        .errorGroupChatMessage();
                 });
         },
         /**
@@ -122,7 +125,9 @@ module.exports = () => {
 
                     printLog(textMsg)
                         .successful()
-                        .botMessage(` ${botIcons.CAMERA_ONLINE}`);
+                        .botMessage(
+                            ` ${HarpoonBotMsgSender.telegramIcons.CAMERA_ONLINE}`
+                        );
                     workingCamList[cameraIndex].statusNow = true;
                 }
                 workingCamList[cameraIndex].lastEvent = moment();

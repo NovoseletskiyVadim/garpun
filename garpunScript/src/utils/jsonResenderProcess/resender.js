@@ -1,3 +1,4 @@
+const appConfig = require('../../common/config');
 const jsonSender = require('../jsonSender/jsonSender');
 const SuccessfulResponseHandler = require('../jsonSender/successfulResponseHandler');
 const PendingList = require('../../models/pendingList');
@@ -94,11 +95,11 @@ module.exports = (limitToResend) => {
                                     })
                                     .catch((error) => {
                                         printLog(
-                                            new AppError(
-                                                error,
-                                                MODULE_NAME
-                                            ).toPrint()
-                                        ).error();
+                                            new AppError(error, MODULE_NAME)
+                                        )
+                                            .error()
+                                            .toErrorLog()
+                                            .errorGroupChatMessage();
                                     });
                             })
                             .catch((error) => {
@@ -107,15 +108,13 @@ module.exports = (limitToResend) => {
                                         new EventHandlerError(error, {
                                             senderName: MODULE_NAME,
                                             fileMeta: item.fileMeta,
-                                        }).toPrint()
+                                        })
                                     ).error();
                                 } else {
-                                    printLog(
-                                        new AppError(
-                                            error,
-                                            MODULE_NAME
-                                        ).toPrint()
-                                    ).error();
+                                    printLog(new AppError(error, MODULE_NAME))
+                                        .error()
+                                        .toErrorLog()
+                                        .errorGroupChatMessage();
                                 }
                                 reject(error);
                             });
@@ -127,6 +126,9 @@ module.exports = (limitToResend) => {
             });
         })
         .catch((error) => {
-            printLog(new AppError(error, MODULE_NAME).toPrint()).error();
+            printLog(new AppError(error, MODULE_NAME))
+                .error()
+                .toErrorLog()
+                .errorGroupChatMessage();
         });
 };

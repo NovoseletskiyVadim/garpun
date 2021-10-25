@@ -1,3 +1,8 @@
+/**
+ * Class for handling app error
+ * @param {Erorr} error
+ *  @param {string} emitter
+ */
 class AppError extends Error {
     constructor(error, emitter) {
         super(error);

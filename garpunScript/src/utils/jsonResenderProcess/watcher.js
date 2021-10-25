@@ -1,9 +1,10 @@
-const { printLog } = require('../logger/appLogger');
 const { AppError } = require('../errorHandlers');
-const { MAX_REQUESTS_COUNT } = require('../../common/config');
 const alertScheduler = require('./alertScheduler');
-const botIcons = require('../telegBot/botIcons');
 const jsonResend = require('./resender');
+const { HarpoonBotMsgSender } = require('../telegBot/harpoonBot');
+const { MAX_REQUESTS_COUNT } = require('../../common/config');
+const { printLog } = require('../logger/appLogger');
+
 /**
  * @Class RejectWatcher
  * @description Class for management jsonResend work. It sets timeout for check cash db and  amount of requests to the api
@@ -135,11 +136,14 @@ class RejectWatcher {
                         if (shouldSent) {
                             if (count > 0) {
                                 const botIcon = isGrown
-                                    ? botIcons.QUERY_UP
-                                    : botIcons.QUERY_DOWN;
+                                    ? HarpoonBotMsgSender.telegramIcons.QUERY_UP
+                                    : HarpoonBotMsgSender.telegramIcons
+                                          .QUERY_DOWN;
                                 logInstance.botMessage(` ${botIcon}`);
                             } else {
-                                printLog('API_OK').botMessage(botIcons.API_OK);
+                                printLog('API_OK').botMessage(
+                                    HarpoonBotMsgSender.telegramIcons.API_OK
+                                );
                             }
                         }
                     }
