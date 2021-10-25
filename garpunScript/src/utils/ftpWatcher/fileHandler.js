@@ -105,8 +105,8 @@ module.exports = (pathFile, emitter = MODULE_NAME) => {
                                         new EventHandlerError(error, {
                                             senderName: emitter,
                                             fileMeta,
-                                        })
-                                    ).error();
+                                        }).toPrint()
+                                    ).errorSecond();
                                     // If API no response or response not valid, save event to temp db for re-send
                                     return PendingList.create({
                                         status: 'API_ERROR',

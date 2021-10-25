@@ -28,14 +28,10 @@ module.exports = () => {
             if (camera.statusNow) {
                 const timeInOffline = moment(camera.lastEvent).fromNow(true);
                 const lastEvent = moment(camera.lastEvent).format(
-                    'YYYY-MM-DD hh:mm:ss'
+                    'YYYY-MM-DD HH:mm:ss'
                 );
-                const textMsg = `CAMERA ${camera.ftpHomeDir} OFFLINE ${timeInOffline}\nLast event at ${lastEvent}`;
-                printLog(textMsg)
-                    .errorSecond()
-                    .botMessage(
-                        ` ${HarpoonBotMsgSender.telegramIcons.CAMERA_OFFLINE}`
-                    );
+                const textMsg = `${HarpoonBotMsgSender.botIcons.CAMERA_OFFLINE}CAMERA ${camera.ftpHomeDir} OFFLINE ${timeInOffline}\nLast event at ${lastEvent}`;
+                printLog(textMsg).errorSecond().botMessage();
             }
             camera.statusNow = false;
 
@@ -118,16 +114,14 @@ module.exports = () => {
                     timeInOffline = lastEvent
                         ? moment(lastEvent).fromNow(true)
                         : 0;
-                    const timeOffLineText = `, OFFLINE ${timeInOffline}`;
-                    const textMsg = `CAMERA ${cameraName} ONLINE${
+                    const timeOffLineText = `\nOFFLINE ${timeInOffline}`;
+                    const textMsg = `${
+                        HarpoonBotMsgSender.botIcons.CAMERA_ONLINE
+                    }CAMERA ${cameraName} ONLINE ${
                         timeInOffline !== 0 ? timeOffLineText : ''
                     }`;
 
-                    printLog(textMsg)
-                        .successful()
-                        .botMessage(
-                            ` ${HarpoonBotMsgSender.telegramIcons.CAMERA_ONLINE}`
-                        );
+                    printLog(textMsg).successful().botMessage();
                     workingCamList[cameraIndex].statusNow = true;
                 }
                 workingCamList[cameraIndex].lastEvent = moment();

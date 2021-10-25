@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "axios-cached-dns-resolve": "^3.0.4"
+  }
+}

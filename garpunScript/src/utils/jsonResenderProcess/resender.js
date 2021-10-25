@@ -1,4 +1,3 @@
-const appConfig = require('../../common/config');
 const jsonSender = require('../jsonSender/jsonSender');
 const SuccessfulResponseHandler = require('../jsonSender/successfulResponseHandler');
 const PendingList = require('../../models/pendingList');
@@ -108,8 +107,8 @@ module.exports = (limitToResend) => {
                                         new EventHandlerError(error, {
                                             senderName: MODULE_NAME,
                                             fileMeta: item.fileMeta,
-                                        })
-                                    ).error();
+                                        }).toPrint()
+                                    ).errorSecond();
                                 } else {
                                     printLog(new AppError(error, MODULE_NAME))
                                         .error()
