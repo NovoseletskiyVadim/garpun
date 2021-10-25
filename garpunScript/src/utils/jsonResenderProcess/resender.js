@@ -108,7 +108,7 @@ module.exports = (limitToResend) => {
                                             senderName: MODULE_NAME,
                                             fileMeta: item.fileMeta,
                                         }).toPrint()
-                                    ).error();
+                                    ).errorSecond();
                                 } else {
                                     printLog(
                                         new AppError(

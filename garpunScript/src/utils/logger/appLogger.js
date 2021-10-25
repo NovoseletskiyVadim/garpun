@@ -29,7 +29,7 @@ module.exports = {
             },
 
             error() {
-                process.stdout.write(`\x1b[31m${message}\x1b[0m${EOL}`);
+                process.stderr.write(`\x1b[31m${message}\x1b[0m${EOL}`);
                 return this;
             },
 
