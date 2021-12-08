@@ -34,7 +34,10 @@ const oldFilesCleaner = (camName, FILE_TYPE) => {
             return Promise.resolve(msg);
         }
     } catch (error) {
-        printLog(new AppError(error, 'FILE_EXPLORE_ERROR').toPrint()).error();
+        printLog(new AppError(error, 'FILE_EXPLORE_ERROR'))
+            .error()
+            .toErrorLog()
+            .errorGroupChatMessage();
     }
     return fsp
         .readdir(dirToClean)
@@ -78,9 +81,10 @@ const oldFilesCleaner = (camName, FILE_TYPE) => {
             });
         })
         .catch((error) => {
-            printLog(
-                new AppError(error, 'FILE_EXPLORE_ERROR').toPrint()
-            ).error();
+            printLog(new AppError(error, 'FILE_EXPLORE_ERROR'))
+                .error()
+                .toErrorLog()
+                .errorGroupChatMessage();
         });
 };
 /**
@@ -102,9 +106,10 @@ const getFileDirPath = (camName, FILE_TYPE) => {
             fs.mkdirSync(folderPath, { recursive: true });
             isNewFolder = true;
         } catch (error) {
-            printLog(
-                new AppError(error, 'FILE_EXPLORE_ERROR').toPrint()
-            ).error();
+            printLog(new AppError(error, 'FILE_EXPLORE_ERROR'))
+                .error()
+                .toErrorLog()
+                .errorGroupChatMessage();
         }
     }
     return { folderPath, isNewFolder };
@@ -141,9 +146,10 @@ const rejectFileHandler = (fileMeta) => {
         .catch((error) => {
             rd.destroy();
             wr.end();
-            printLog(
-                new AppError(error, 'FILE_EXPLORE_ERROR').toPrint()
-            ).error();
+            printLog(new AppError(error, 'FILE_EXPLORE_ERROR'))
+                .error()
+                .toErrorLog()
+                .errorGroupChatMessage();
         });
 };
 /**
@@ -192,24 +198,27 @@ const base64Convertor = (eventData) => {
                     resolve(fileInBase64);
                 })
                 .catch((error) => {
-                    printLog(
-                        new AppError(error, 'BASE64_DELETE_ERROR').toPrint()
-                    ).error();
+                    printLog(new AppError(error, 'BASE64_DELETE_ERROR'))
+                        .error()
+                        .toErrorLog()
+                        .errorGroupChatMessage();
                 });
         });
 
         if (ARCHIVE_DAYS > 0) {
             wrStream.on('error', (error) => {
-                printLog(
-                    new AppError(error, 'FILE_EXPLORE_ERROR').toPrint()
-                ).error();
+                printLog(new AppError(error, 'FILE_EXPLORE_ERROR'))
+                    .error()
+                    .toErrorLog()
+                    .errorGroupChatMessage();
             });
         }
 
         stream.on('error', (error) => {
-            printLog(
-                new AppError(error, 'FILE_EXPLORE_ERROR').toPrint()
-            ).error();
+            printLog(new AppError(error, 'FILE_EXPLORE_ERROR'))
+                .error()
+                .toErrorLog()
+                .errorGroupChatMessage();
             rejects(error);
         });
     });

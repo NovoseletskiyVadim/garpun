@@ -1,12 +1,12 @@
-// require('dotenv').config();
+const { AppError } = require('./utils/errorHandlers');
+const { camerasWatcher, rejectApiHandler } = require('./utils/childProcesses');
 const config = require('./common/config');
 const dbConnect = require('./db/dbConnect');
-const { printLog } = require('./utils/logger/appLogger');
-const { appStartAlert } = require('./utils/telegBot/harpoonBot');
 const harpoonStarter = require('./utils/starter/starter');
-const { camerasWatcher, rejectApiHandler } = require('./utils/childProcesses');
+const { HarpoonBotMsgSender } = require('./utils/telegBot/harpoonBot');
+const { printLog } = require('./utils/logger/appLogger');
+const RecipientGroupsStore = require('./utils/telegBot/RecipientGroupsStore');
 const TaskScheduler = require('./utils/TaskScheduler/taskScheduler');
-const { AppError } = require('./utils/errorHandlers');
 
 printLog(`APP_STARTED_MODE: ${process.env.NODE_ENV}`).appInfoMessage();
 printLog(`APP_ID: ${process.pid}`).appInfoMessage();
@@ -23,15 +23,17 @@ if (parseInt(config.TRASH_ARCHIVE_DAYS, 10) > 0) {
 }
 
 process.on('uncaughtException', async (error) => {
-    printLog(new AppError(error, 'UNCAUGHTEXCEPTION').toPrint())
+    printLog(new AppError(error, 'UNCAUGHTEXCEPTION'))
         .error()
-        .toErrorLog();
+        .toErrorLog()
+        .errorGroupChatMessage();
 });
 
 process.on('unhandledRejection', async (error) => {
-    printLog(new AppError(error, 'UNHANDLEDREJECTION').toPrint())
+    printLog(new AppError(error, 'UNHANDLEDREJECTION'))
         .error()
-        .toErrorLog();
+        .toErrorLog()
+        .errorGroupChatMessage();
 });
 
 const app = dbConnect
@@ -51,15 +53,20 @@ const app = dbConnect
         camerasWatcher.on('message', (data) => {
             const { status } = data;
             if (status) {
+                const isDevMode = process.env.NODE_ENV === 'DEV' ? 'DEV' : '';
+                const msg = `Harpoon ${isDevMode} launched ${HarpoonBotMsgSender.telegramIcons.APP_START}`;
+                printLog(msg).botMessage(RecipientGroupsStore.groupTypes.ALL);
                 new TaskScheduler().start();
                 rejectApiHandler.send({ type: 'START' });
                 harpoonStarter();
-                appStartAlert();
             }
         });
     })
     .catch((error) => {
-        printLog(new AppError(error, 'APP_START_ERROR').error().toErrorLog());
+        printLog(new AppError(error, 'APP_START_ERROR'))
+            .error()
+            .toErrorLog()
+            .errorGroupChatMessage();
     });
 
 const stopAPP = () => {

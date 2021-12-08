@@ -1,12 +1,20 @@
 /* eslint-disable no-case-declarations */
 const { EOL } = require('os');
 
-const { alarmSignal } = require('../telegBot/harpoonBot');
+const { HarpoonBotMsgSender } = require('../telegBot/harpoonBot');
+const RecipientGroupsStore = require('../telegBot/RecipientGroupsStore');
 
 const { appErrorLog } = require('./logToFile');
 
 module.exports = {
-    printLog(message) {
+    printLog(inData) {
+        let message = '';
+        if (typeof inData === 'object') {
+            message = inData.toPrint();
+        } else {
+            message = inData;
+        }
+
         return {
             errorSecond() {
                 process.stdout.write(`\x1b[1;31m${message}\x1b[0m${EOL}`);
@@ -37,10 +45,41 @@ module.exports = {
                 appErrorLog({ message });
                 return this;
             },
-
-            botMessage(iconType) {
+            /**
+             *Send one msg to the group
+             * @param {*} groupName
+             * @param {*} iconType
+             */
+            botMessage(groupName, iconType) {
                 const icon = iconType || '';
-                alarmSignal(`${message} ${icon}`);
+                new HarpoonBotMsgSender().sendMessage(
+                    `${message} ${icon}`,
+                    groupName
+                );
+            },
+            errorGroupChatMessage() {
+                const { emitter, stack } = inData;
+                const splittedStack = stack.split('\n');
+                const messageArray = [
+                    ` ${HarpoonBotMsgSender.telegramIcons.CAMERA_OFFLINE_WARNING}\nEmitter: ${emitter}\n`,
+                ];
+                messageArray.push(splittedStack[0]); // Error message
+                let text = '';
+                splittedStack.forEach((item, i) => {
+                    if (i > 0) {
+                        let tempText = text;
+                        tempText += `${item}\n`;
+                        if (tempText.length > 150) {
+                            messageArray.push(text);
+                            text = '';
+                        }
+                        text += `${item}\n`;
+                    }
+                });
+                new HarpoonBotMsgSender().sendManyMessages(
+                    messageArray,
+                    RecipientGroupsStore.groupTypes.ERROR_GROUP
+                );
             },
         };
     },

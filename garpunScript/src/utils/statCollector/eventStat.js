@@ -7,7 +7,7 @@ const { camerasWatcher } = require('../childProcesses');
 const Cameras = require('../../models/cameras');
 const CamEvents = require('../../models/camEvent');
 const ChartCreator = require('./chartCreator');
-const botIcons = require('../telegBot/botIcons');
+const { HarpoonBotMsgSender } = require('../telegBot/harpoonBot');
 
 class GetEventsStat {
     constructor(timeFrom, timeTo, cameraName, eventFilter) {
@@ -382,7 +382,7 @@ class GetEventsStat {
                     parseInt(((timeNow - lastEventTime) / 1000).toFixed(), 10) >
                     86400
                 ) {
-                    lastEventMsg += ` ${botIcons.CAMERA_OFFLINE_WARNING}`;
+                    lastEventMsg += ` ${HarpoonBotMsgSender.telegramIcons.CAMERA_OFFLINE_WARNING}`;
                 }
             }
             cameraStatMsg.push(

@@ -6,7 +6,7 @@ const CamEvents = require('../../models/camEvent');
 const { printLog } = require('../logger/appLogger');
 const config = require('../../common/config');
 const { AppError } = require('../errorHandlers');
-const botIcons = require('../telegBot/botIcons');
+const { HarpoonBotMsgSender } = require('../telegBot/harpoonBot');
 
 /**
  * @module camerasWatcher
@@ -30,10 +30,8 @@ module.exports = () => {
                 const lastEvent = moment(camera.lastEvent).format(
                     'YYYY-MM-DD HH:mm:ss'
                 );
-                const textMsg = `${botIcons.CAMERA_OFFLINE}CAMERA ${camera.ftpHomeDir} OFFLINE ${timeInOffline}\nLast event at ${lastEvent}`;
-                printLog(textMsg)
-                    .errorSecond()
-                    .botMessage();
+                const textMsg = `${HarpoonBotMsgSender.botIcons.CAMERA_OFFLINE}CAMERA ${camera.ftpHomeDir} OFFLINE ${timeInOffline}\nLast event at ${lastEvent}`;
+                printLog(textMsg).errorSecond().botMessage();
             }
             camera.statusNow = false;
 
@@ -89,9 +87,10 @@ module.exports = () => {
                     return true;
                 })
                 .catch((error) => {
-                    printLog(
-                        new AppError(error, 'CAM_WATCHER_ERROR').toPrint()
-                    ).error();
+                    printLog(new AppError(error, 'CAM_WATCHER_ERROR'))
+                        .error()
+                        .toErrorLog()
+                        .errorGroupChatMessage();
                 });
         },
         /**
@@ -116,13 +115,13 @@ module.exports = () => {
                         ? moment(lastEvent).fromNow(true)
                         : 0;
                     const timeOffLineText = `\nOFFLINE ${timeInOffline}`;
-                    const textMsg = `${botIcons.CAMERA_ONLINE}CAMERA ${cameraName} ONLINE ${
+                    const textMsg = `${
+                        HarpoonBotMsgSender.botIcons.CAMERA_ONLINE
+                    }CAMERA ${cameraName} ONLINE ${
                         timeInOffline !== 0 ? timeOffLineText : ''
                     }`;
 
-                    printLog(textMsg)
-                        .successful()
-                        .botMessage();
+                    printLog(textMsg).successful().botMessage();
                     workingCamList[cameraIndex].statusNow = true;
                 }
                 workingCamList[cameraIndex].lastEvent = moment();

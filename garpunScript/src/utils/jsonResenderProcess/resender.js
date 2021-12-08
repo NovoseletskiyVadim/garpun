@@ -94,11 +94,11 @@ module.exports = (limitToResend) => {
                                     })
                                     .catch((error) => {
                                         printLog(
-                                            new AppError(
-                                                error,
-                                                MODULE_NAME
-                                            ).toPrint()
-                                        ).error();
+                                            new AppError(error, MODULE_NAME)
+                                        )
+                                            .error()
+                                            .toErrorLog()
+                                            .errorGroupChatMessage();
                                     });
                             })
                             .catch((error) => {
@@ -110,12 +110,10 @@ module.exports = (limitToResend) => {
                                         }).toPrint()
                                     ).errorSecond();
                                 } else {
-                                    printLog(
-                                        new AppError(
-                                            error,
-                                            MODULE_NAME
-                                        ).toPrint()
-                                    ).error();
+                                    printLog(new AppError(error, MODULE_NAME))
+                                        .error()
+                                        .toErrorLog()
+                                        .errorGroupChatMessage();
                                 }
                                 reject(error);
                             });
@@ -127,6 +125,9 @@ module.exports = (limitToResend) => {
             });
         })
         .catch((error) => {
-            printLog(new AppError(error, MODULE_NAME).toPrint()).error();
+            printLog(new AppError(error, MODULE_NAME))
+                .error()
+                .toErrorLog()
+                .errorGroupChatMessage();
         });
 };

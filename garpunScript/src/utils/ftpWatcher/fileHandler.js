@@ -115,9 +115,10 @@ module.exports = (pathFile, emitter = MODULE_NAME) => {
                                         fileMeta,
                                     });
                                 }
-                                printLog(
-                                    new AppError(error, MODULE_NAME).toPrint()
-                                ).error();
+                                printLog(new AppError(error, MODULE_NAME))
+                                    .error()
+                                    .toErrorLog()
+                                    .errorGroupChatMessage();
                                 return false;
                             })
                     );
@@ -131,7 +132,10 @@ module.exports = (pathFile, emitter = MODULE_NAME) => {
                 return rejectFileHandler(fileMeta);
             })
             .catch((error) => {
-                printLog(new AppError(error, MODULE_NAME).toPrint());
+                printLog(new AppError(error, MODULE_NAME))
+                    .error()
+                    .toErrorLog()
+                    .errorGroupChatMessage();
             })
     );
 };
