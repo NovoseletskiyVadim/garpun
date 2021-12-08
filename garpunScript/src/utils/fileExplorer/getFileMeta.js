@@ -16,6 +16,10 @@ module.exports = (pathFile) => {
     const eventName = rest.join('_');
     const plateNumberRegX = /^[a-zA-ZА-Я0-9\\-]{3,8}$/;
     const noPlate = 'noPlate';
+    const allowedEventsNames = [
+        'VEHICLE_DETECTION',
+        'VEHICLE_DETECTION_BACKGROUND',
+    ];
     const fileMeta = {
         uuid,
         isValid: true,
@@ -28,7 +32,7 @@ module.exports = (pathFile) => {
             ext,
         },
     };
-    if (eventName !== 'VEHICLE_DETECTION') {
+    if (!allowedEventsNames.includes(eventName)) {
         fileMeta.isValid = false;
         fileMeta.notPassed.push('EVENT_NAME');
     }
