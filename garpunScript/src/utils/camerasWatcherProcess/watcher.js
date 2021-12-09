@@ -116,7 +116,7 @@ module.exports = () => {
                         : 0;
                     const timeOffLineText = `\nOFFLINE ${timeInOffline}`;
                     const textMsg = `${
-                        HarpoonBotMsgSender.botIcons.CAMERA_ONLINE
+                        HarpoonBotMsgSender.telegramIcons.CAMERA_ONLINE
                     }CAMERA ${cameraName} ONLINE ${
                         timeInOffline !== 0 ? timeOffLineText : ''
                     }`;
