@@ -27,12 +27,18 @@ module.exports = {
                 process.stdout.write(`\x1b[32m${message}\x1b[0m${EOL}`);
                 return this;
             },
-
+            /**
+             * Show error in console log
+             * @returns 
+             */
             error() {
                 process.stderr.write(`\x1b[31m${message}\x1b[0m${EOL}`);
                 return this;
             },
-
+            /**
+             * Save error to error log file
+             * @returns 
+             */
             toErrorLog() {
                 appErrorLog({ message });
                 return this;

@@ -8,6 +8,8 @@ const Cameras = require('../../models/cameras');
 const CamEvents = require('../../models/camEvent');
 const ChartCreator = require('./chartCreator');
 const botIcons = require('../telegBot/botIcons');
+const { printLog } = require('../logger/appLogger');
+const { AppError } = require('../errorHandlers');
 
 class GetEventsStat {
     constructor(timeFrom, timeTo, cameraName, eventFilter) {
@@ -298,8 +300,13 @@ class GetEventsStat {
                     chartType,
                     messageHeader
                 );
-                const chartUrl = await chart.createChart().getShortUrl();
-                message += `${chartUrl}\n`;
+                try {
+                    const chartUrl = await chart.createChart().getShortUrl();
+                    message += `${chartUrl}\n`;
+                } catch (error) {
+                    printLog(new AppError(error, 'TASK_SCHEDULE').toPrint()).error().toErrorLog();
+                }
+
             }
         }
         return message;
@@ -323,10 +330,15 @@ class GetEventsStat {
                 'line',
                 'Events by time'
             );
-            const eventsByTimeChartUrl = await eventsByTimeChart
+            try {
+                const eventsByTimeChartUrl = await eventsByTimeChart
                 .createChart()
                 .getShortUrl();
-            globalEventCalcMsg += eventsByTimeChartUrl;
+                globalEventCalcMsg += eventsByTimeChartUrl;
+            } catch (error) {
+                printLog(new AppError(error, 'TASK_SCHEDULE').toPrint()).error().toErrorLog();
+            }
+
         }
         msgChunkArray.push(globalEventCalcMsg);
         msgChunkArray.push(
@@ -412,12 +424,14 @@ class GetEventsStat {
                     'line',
                     'Events by time'
                 );
-                const chartUrl = await eventsByTimeChart
+                try {
+                    const chartUrl = await eventsByTimeChart
                     .createChart()
                     .getShortUrl();
-
-                cameraStatMsg.push(`${chartUrl} \n`);
-                return cameraStatMsg.join('');
+                    cameraStatMsg.push(`${chartUrl} \n`);
+                } catch (error) {   
+                    printLog(new AppError(error, 'TASK_SCHEDULE').toPrint()).error().toErrorLog();
+                }
             }
             return cameraStatMsg.join('');
         });
