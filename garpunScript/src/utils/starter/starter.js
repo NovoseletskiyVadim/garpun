@@ -4,7 +4,7 @@ const path = require('path');
 
 const Cameras = require('../../models/cameras');
 const dirWatcher = require('../ftpWatcher/dirWatcher')();
-const fileHandler = require('../ftpWatcher/fileHandler');
+const fileHandler = require('../ftpWatcher/fileHandler.js');
 const { MAX_REQUESTS_COUNT, MEDIA_PATH } = require('../../common/config');
 const { printLog } = require('../logger/appLogger');
 const { AppError } = require('../errorHandlers');

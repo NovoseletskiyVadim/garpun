@@ -46,23 +46,24 @@ const app = dbConnect
     //     })
     //   )
     .then(() => {
-        rejectApiHandler.send({ type: 'START' });
+        harpoonStarter();
+        // rejectApiHandler.send({ type: 'START' });
 
-        camerasWatcher.send({ type: 'START' });
+        // camerasWatcher.send({ type: 'START' });
 
-        camerasWatcher.on('message', (data) => {
-            const { status } = data;
-            if (status) {
-                const isDevMode = process.env.NODE_ENV === 'DEV' ? 'DEV' : '';
-                const msg = `Harpoon ${isDevMode} launched ${HarpoonBotMsgSender.telegramIcons.APP_START}`;
-                printLog(msg).botMessage(RecipientGroupsStore.groupTypes.ALL);
-                new TaskScheduler().start();
-                rejectApiHandler.send({ type: 'START' });
-                harpoonStarter();
-            }
-        });
+        // camerasWatcher.on('message', (data: any) => {
+        //     const { status } = data;
+        //     if (status) {
+        //         const isDevMode = process.env.NODE_ENV === 'DEV' ? 'DEV' : '';
+        //         const msg = `Harpoon ${isDevMode} launched ${HarpoonBotMsgSender.telegramIcons.APP_START}`;
+        //         printLog(msg).botMessage(RecipientGroupsStore.groupTypes.ALL);
+        //         new TaskScheduler().start();
+        //         rejectApiHandler.send({ type: 'START' });
+        //         harpoonStarter();
+        //     }
+        // });
     })
-    .catch((error) => {
+    .catch((error: any) => {
         printLog(new AppError(error, 'APP_START_ERROR'))
             .error()
             .toErrorLog()

@@ -1,0 +1,13 @@
+{
+    "plateNumberRegX": "[a-zA-ZА-Я0-9\\-]{3,8}",
+    "litePlateNumberRegX": "[a-zA-ZА-Я0-9\\-]{3,10}",
+    "eventTimeRegX": "20[0-9]{15}",
+    "fileNameRegX": "^20[0-9]{15} [a-zA-ZА-Я0-9\\-]{3,8}$",
+    "allowedEventsNames": [
+        "VEHICLE_DETECTION",
+        "VEHICLE_DETECTION_BACKGROUND"
+    ],
+    "ignoreSystemFileNames": ["noPlate", "VEHICLE_DETECTION_PLATE"],
+    "allowedOutOfSync": 180000,
+    "fileType": "jpg"
+}
