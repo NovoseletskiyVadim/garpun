@@ -18,8 +18,7 @@ class TaskScheduler {
          *
          */
         schedule.scheduleJob(config.TASK_SCHEDULER_GET_STAT, () => {
-            // const yesterday = moment().subtract(1, 'days').format('YYYY-MM-DD');
-            const yesterday = moment('2021-10-16').subtract(1, 'days').format('YYYY-MM-DD');
+            const yesterday = moment().subtract(1, 'days').format('YYYY-MM-DD');
             printLog(
                 `Start task for collect cameras stat for ${yesterday}`
             ).appInfoMessage();
