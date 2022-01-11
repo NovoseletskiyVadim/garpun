@@ -11,9 +11,9 @@ export class MainFileHandler extends BaseHandler {
     }
 
     execute() {
-        this.setNext(new FileStatHandler(this.filePath)).setNext(
-            new FileTypeChecker(this.filePath)
-        );
+        this
+            .setNext(new FileStatHandler(this.filePath))
+            .setNext(new FileTypeChecker(this.filePath));
         this.next?.execute();
     }
 }
