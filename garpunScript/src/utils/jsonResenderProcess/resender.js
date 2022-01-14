@@ -30,7 +30,7 @@ const MODULE_NAME = 'RESENDER';
  * @returns {Promise<ResultREsender>} result.sentList
  */
 
-module.exports = (limitToResend) => {
+module.exports = (limitToResend, countAttempt) => {
     const finalResult = {};
     return PendingList.findAndCountAll({ limit: limitToResend })
         .then((result) => {
@@ -76,7 +76,7 @@ module.exports = (limitToResend) => {
                                     .then((deleteUpdateResults) => {
                                         const eventData =
                                             deleteUpdateResults[1].dataValues;
-                                        eventData.sender = `[${MODULE_NAME}]`;
+                                        eventData.sender = `[${MODULE_NAME}-${countAttempt}]`;
                                         const logData = printLog(
                                             new SuccessfulResponseHandler(
                                                 eventData
@@ -97,7 +97,7 @@ module.exports = (limitToResend) => {
                                             new AppError(
                                                 error,
                                                 MODULE_NAME
-                                            ).toPrint()
+                                            )
                                         ).error();
                                     });
                             })
@@ -105,16 +105,16 @@ module.exports = (limitToResend) => {
                                 if (error instanceof JsonSenderError) {
                                     printLog(
                                         new EventHandlerError(error, {
-                                            senderName: MODULE_NAME,
+                                            senderName: `${MODULE_NAME}-${countAttempt}`,
                                             fileMeta: item.fileMeta,
-                                        }).toPrint()
+                                        })
                                     ).errorSecond();
                                 } else {
                                     printLog(
                                         new AppError(
                                             error,
                                             MODULE_NAME
-                                        ).toPrint()
+                                        )
                                     ).error();
                                 }
                                 reject(error);
@@ -127,6 +127,6 @@ module.exports = (limitToResend) => {
             });
         })
         .catch((error) => {
-            printLog(new AppError(error, MODULE_NAME).toPrint()).error();
+            printLog(new AppError(error, MODULE_NAME)).error();
         });
 };

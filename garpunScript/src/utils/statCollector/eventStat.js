@@ -304,7 +304,7 @@ class GetEventsStat {
                     const chartUrl = await chart.createChart().getShortUrl();
                     message += `${chartUrl}\n`;
                 } catch (error) {
-                    printLog(new AppError(error, 'TASK_SCHEDULE').toPrint()).error().toErrorLog();
+                    printLog(new AppError(error, 'TASK_SCHEDULE')).error().toErrorLog();
                 }
 
             }
@@ -336,7 +336,7 @@ class GetEventsStat {
                 .getShortUrl();
                 globalEventCalcMsg += eventsByTimeChartUrl;
             } catch (error) {
-                printLog(new AppError(error, 'TASK_SCHEDULE').toPrint()).error().toErrorLog();
+                printLog(new AppError(error, 'TASK_SCHEDULE')).error().toErrorLog();
             }
 
         }
@@ -430,7 +430,7 @@ class GetEventsStat {
                     .getShortUrl();
                     cameraStatMsg.push(`${chartUrl} \n`);
                 } catch (error) {   
-                    printLog(new AppError(error, 'TASK_SCHEDULE').toPrint()).error().toErrorLog();
+                    printLog(new AppError(error, 'TASK_SCHEDULE')).error().toErrorLog();
                 }
             }
             return cameraStatMsg.join('');

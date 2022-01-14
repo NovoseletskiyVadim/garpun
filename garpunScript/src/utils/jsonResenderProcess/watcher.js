@@ -16,7 +16,7 @@ class RejectWatcher {
         this.MAX_REQUEST_LIMIT = MAX_REQUESTS_COUNT;
         this.MIN_REQUEST_LIMIT = 1;
         this.REQUEST_LIMIT_STEP = 3;
-
+        this.countAttempt = 0;
         this.timer = null;
         this.jsonResend = jsonResend;
         this.alertsHistory = {
@@ -55,6 +55,12 @@ class RejectWatcher {
     setDefaultConfig() {
         this.limit = this.MIN_REQUEST_LIMIT;
         this.currentInterval = this.MIN_TIMEOUT;
+        this.countAttempt = 0;
+        this.alertsHistory = {
+            deliveredAlerts: [],
+            lastCount: 0,
+            isBigQueue: false,
+        };
     }
 
     /**
@@ -93,11 +99,12 @@ class RejectWatcher {
 
     startWatch() {
         this.timer = setTimeout(() => {
-            this.jsonResend(this.limit)
+            this.countAttempt +=1;
+            this.jsonResend(this.limit, this.countAttempt)
                 .then((result) => {
                     const { count, sentList } = result;
                     let countOfSent;
-                    if (count && count === 0) {
+                    if (count === 0) {
                         this.setDefaultConfig();
                     }
                     if (sentList && sentList.length) {
@@ -122,14 +129,20 @@ class RejectWatcher {
                             this.setApiOkConfig();
                         }
                     }
-                    if (this.alertsHistory.lastCount !== count) {
-                        const logMessage = `WAITING_REQUESTS_COUNT: ${count} REQUEST_LIMIT: ${
+
+                    const logMessage = `[RESENDER-${this.countAttempt}] WAITING_REQUESTS_COUNT: ${count} REQUEST_LIMIT: ${
                             this.limit
                         } ${
                             countOfSent ? `COUNT_OF_SENT: ${countOfSent}` : ''
                         } WAIT_TIMEOUT: ${this.currentInterval}`;
-                        const logInstance = printLog(logMessage);
+                    const logInstance = printLog(logMessage);
+                    
+                    if(this.alertsHistory.lastCount !== 0) {
                         logInstance.warning();
+                    }
+                    
+
+                    if (this.alertsHistory.lastCount !== count) {
                         const { isGrown, shouldSent } =
                             this.isShouldSendToBot(count);
                         if (shouldSent) {
@@ -143,13 +156,14 @@ class RejectWatcher {
                             }
                         }
                     }
+                    return this.startWatch();
                 })
                 .catch((error) => {
                     printLog(
-                        new AppError(error, 'WATCHER_RESENDER').toPrint()
+                        new AppError(error, 'WATCHER_RESENDER')
                     ).error();
-                })
-                .finally(this.startWatch());
+                    this.startWatch();
+                });
         }, this.currentInterval);
     }
 

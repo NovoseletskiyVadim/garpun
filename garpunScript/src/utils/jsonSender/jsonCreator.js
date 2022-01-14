@@ -93,7 +93,7 @@ module.exports = (eventData) =>
             })
             .catch((err) => {
                 printLog(
-                    new AppError(err, 'JSON_CREATOR_ERROR').toPrint()
+                    new AppError(err, 'JSON_CREATOR_ERROR')
                 ).error();
                 reject(err);
             });

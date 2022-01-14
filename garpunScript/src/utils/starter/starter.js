@@ -120,7 +120,7 @@ const harpoonStarter = () =>
             });
         })
         .catch((error) => {
-            printLog(new AppError(error, 'STARTER_ERROR').toPrint()).error();
+            printLog(new AppError(error, 'STARTER_ERROR')).error();
             process.exitCode = 1;
         });
 

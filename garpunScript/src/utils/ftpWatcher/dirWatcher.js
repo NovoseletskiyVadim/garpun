@@ -21,7 +21,7 @@ module.exports = () => {
                 .on('add', (pathFile) => fileHandler(pathFile))
                 .on('error', (error) => {
                     printLog(
-                        new AppError(error, 'FILE_WATCHER_ERROR').toPrint()
+                        new AppError(error, 'FILE_WATCHER_ERROR')
                     ).error();
                 });
         },

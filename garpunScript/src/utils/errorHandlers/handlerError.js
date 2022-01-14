@@ -1,5 +1,9 @@
-class EventHandlerError {
+const AbstractErrorLogEvent = require('./AbstractErrorLogEvent');
+
+class EventHandlerError extends AbstractErrorLogEvent{
+    
     constructor(error, props) {
+        super(error);
         this.errorText = error.errorText || '';
         this.statusCode = error.statusCode !== 0 ? error.statusCode : '';
         this.apiURL = error.apiURL || '?';
@@ -18,10 +22,10 @@ class EventHandlerError {
         return false;
     }
 
-    toPrint() {
+    PrepareMsgToPrint() {
         return `[${
             this.senderName
-        }_API_ERROR] ${`${this.statusCode} ${this.errorText}`} ${
+        } API_ERROR] ${`${this.statusCode} ${this.errorText}`} ${
             this.apiURL && `UPL:${this.apiURL}`
         } camera:${this.cameraName} ${this.getFileName()}`;
     }

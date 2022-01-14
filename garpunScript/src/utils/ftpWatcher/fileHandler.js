@@ -105,7 +105,7 @@ module.exports = (pathFile, emitter = MODULE_NAME) => {
                                         new EventHandlerError(error, {
                                             senderName: emitter,
                                             fileMeta,
-                                        }).toPrint()
+                                        })
                                     ).errorSecond();
                                     // If API no response or response not valid, save event to temp db for re-send
                                     return PendingList.create({
@@ -116,7 +116,7 @@ module.exports = (pathFile, emitter = MODULE_NAME) => {
                                     });
                                 }
                                 printLog(
-                                    new AppError(error, MODULE_NAME).toPrint()
+                                    new AppError(error, MODULE_NAME)
                                 ).error();
                                 return false;
                             })
@@ -131,7 +131,7 @@ module.exports = (pathFile, emitter = MODULE_NAME) => {
                 return rejectFileHandler(fileMeta);
             })
             .catch((error) => {
-                printLog(new AppError(error, MODULE_NAME).toPrint());
+                printLog(new AppError(error, MODULE_NAME));
             })
     );
 };

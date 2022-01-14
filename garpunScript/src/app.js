@@ -23,13 +23,13 @@ if (parseInt(config.TRASH_ARCHIVE_DAYS, 10) > 0) {
 }
 
 process.on('uncaughtException', async (error) => {
-    printLog(new AppError(error, 'UNCAUGHTEXCEPTION').toPrint())
+    printLog(new AppError(error, 'UNCAUGHTEXCEPTION'))
         .error()
         .toErrorLog();
 });
 
 process.on('unhandledRejection', async (error) => {
-    printLog(new AppError(error, 'UNHANDLEDREJECTION').toPrint())
+    printLog(new AppError(error, 'UNHANDLEDREJECTION'))
         .error()
         .toErrorLog();
 });
@@ -59,7 +59,7 @@ const app = dbConnect
         });
     })
     .catch((error) => {
-        printLog(new AppError(error, 'APP_START_ERROR').error().toErrorLog());
+        printLog(new AppError(error, 'APP_START_ERROR')).error().toErrorLog();
     });
 
 const stopAPP = () => {

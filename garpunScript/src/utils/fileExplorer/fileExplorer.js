@@ -34,7 +34,7 @@ const oldFilesCleaner = (camName, FILE_TYPE) => {
             return Promise.resolve(msg);
         }
     } catch (error) {
-        printLog(new AppError(error, 'FILE_EXPLORE_ERROR').toPrint()).error();
+        printLog(new AppError(error, 'FILE_EXPLORE_ERROR')).error();
     }
     return fsp
         .readdir(dirToClean)
@@ -79,7 +79,7 @@ const oldFilesCleaner = (camName, FILE_TYPE) => {
         })
         .catch((error) => {
             printLog(
-                new AppError(error, 'FILE_EXPLORE_ERROR').toPrint()
+                new AppError(error, 'FILE_EXPLORE_ERROR')
             ).error();
         });
 };
@@ -103,7 +103,7 @@ const getFileDirPath = (camName, FILE_TYPE) => {
             isNewFolder = true;
         } catch (error) {
             printLog(
-                new AppError(error, 'FILE_EXPLORE_ERROR').toPrint()
+                new AppError(error, 'FILE_EXPLORE_ERROR')
             ).error();
         }
     }
@@ -142,7 +142,7 @@ const rejectFileHandler = (fileMeta) => {
             rd.destroy();
             wr.end();
             printLog(
-                new AppError(error, 'FILE_EXPLORE_ERROR').toPrint()
+                new AppError(error, 'FILE_EXPLORE_ERROR')
             ).error();
         });
 };
@@ -193,7 +193,7 @@ const base64Convertor = (eventData) => {
                 })
                 .catch((error) => {
                     printLog(
-                        new AppError(error, 'BASE64_DELETE_ERROR').toPrint()
+                        new AppError(error, 'BASE64_DELETE_ERROR')
                     ).error();
                 });
         });
@@ -201,14 +201,14 @@ const base64Convertor = (eventData) => {
         if (ARCHIVE_DAYS > 0) {
             wrStream.on('error', (error) => {
                 printLog(
-                    new AppError(error, 'FILE_EXPLORE_ERROR').toPrint()
+                    new AppError(error, 'FILE_EXPLORE_ERROR')
                 ).error();
             });
         }
 
         stream.on('error', (error) => {
             printLog(
-                new AppError(error, 'FILE_EXPLORE_ERROR').toPrint()
+                new AppError(error, 'FILE_EXPLORE_ERROR')
             ).error();
             rejects(error);
         });

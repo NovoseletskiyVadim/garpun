@@ -90,7 +90,7 @@ module.exports = () => {
                 })
                 .catch((error) => {
                     printLog(
-                        new AppError(error, 'CAM_WATCHER_ERROR').toPrint()
+                        new AppError(error, 'CAM_WATCHER_ERROR')
                     ).error();
                 });
         },

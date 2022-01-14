@@ -2,11 +2,18 @@
 const { EOL } = require('os');
 
 const { alarmSignal } = require('../telegBot/harpoonBot');
-
+const AbstractErrorLogEvent = require('../errorHandlers/AbstractErrorLogEvent');
 const { appErrorLog } = require('./logToFile');
 
 module.exports = {
-    printLog(message) {
+    printLog(event) {
+        let message = '';
+        if (event instanceof AbstractErrorLogEvent) {
+            message = event.PrepareMsgToPrint();
+        }
+        else {
+            message = event;
+        }
         return {
             errorSecond() {
                 process.stdout.write(`\x1b[1;31m${message}\x1b[0m${EOL}`);

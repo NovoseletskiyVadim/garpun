@@ -1,11 +1,13 @@
-class AppError extends Error {
+const AbstractErrorLogEvent = require('./AbstractErrorLogEvent');
+
+class AppError extends AbstractErrorLogEvent {
     constructor(error, emitter) {
         super(error);
         this.emitter = error.emitter || emitter;
         this.stack = error.stack;
     }
 
-    toPrint() {
+    PrepareMsgToPrint() {
         return JSON.stringify({
             emitter: `[${this.emitter}]`,
             errorMessage: this.message,
@@ -15,3 +17,4 @@ class AppError extends Error {
 }
 
 module.exports = AppError;
+
