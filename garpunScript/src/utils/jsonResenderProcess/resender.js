@@ -39,6 +39,10 @@ module.exports = (limitToResend, countAttempt) => {
             if (rows.length === 0) {
                 return finalResult;
             }
+            const logMessage = `[RESENDER-${countAttempt} START]  WAITING_REQUESTS_COUNT: ${count} REQUEST_LIMIT: ${
+                limitToResend
+            }`;
+            printLog(logMessage).warning();
             const preparedRequests = rows.map(
                 (item) =>
                     new Promise((resolve, reject) => {
@@ -69,7 +73,7 @@ module.exports = (limitToResend, countAttempt) => {
                                     );
                                 });
 
-                                Promise.all([
+                                return Promise.all([
                                     deleteFromPendingList,
                                     updateCamEvent,
                                 ])
@@ -82,6 +86,7 @@ module.exports = (limitToResend, countAttempt) => {
                                                 eventData
                                             ).toPrint()
                                         );
+                                        
                                         if (
                                             !eventData.uploaded ||
                                             eventData.fileErrors.length
@@ -90,15 +95,8 @@ module.exports = (limitToResend, countAttempt) => {
                                         } else {
                                             logData.successful();
                                         }
+
                                         resolve(eventData);
-                                    })
-                                    .catch((error) => {
-                                        printLog(
-                                            new AppError(
-                                                error,
-                                                MODULE_NAME
-                                            )
-                                        ).error();
                                     });
                             })
                             .catch((error) => {

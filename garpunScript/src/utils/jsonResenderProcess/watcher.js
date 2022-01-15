@@ -10,12 +10,13 @@ const jsonResend = require('./resender');
  */
 class RejectWatcher {
     constructor() {
-        this.MAX_TIMEOUT = 60000;
+        this.MAX_TIMEOUT = 30000;
         this.MIN_TIMEOUT = 5000;
         this.TIMEOUT_STEP = 5000;
         this.MAX_REQUEST_LIMIT = MAX_REQUESTS_COUNT;
         this.MIN_REQUEST_LIMIT = 1;
         this.REQUEST_LIMIT_STEP = 3;
+        this.REQUEST_LIMIT_DEFAULT = 3; 
         this.countAttempt = 0;
         this.timer = null;
         this.jsonResend = jsonResend;
@@ -53,14 +54,9 @@ class RejectWatcher {
      */
 
     setDefaultConfig() {
-        this.limit = this.MIN_REQUEST_LIMIT;
+        this.limit = this.REQUEST_LIMIT_DEFAULT;
         this.currentInterval = this.MIN_TIMEOUT;
         this.countAttempt = 0;
-        this.alertsHistory = {
-            deliveredAlerts: [],
-            lastCount: 0,
-            isBigQueue: false,
-        };
     }
 
     /**
@@ -91,6 +87,7 @@ class RejectWatcher {
         }
         this.currentInterval = this.MIN_TIMEOUT;
     }
+
     /**
      * @method startWatch
      * @description This method launch work jsonResend and after timeout restarts it again
@@ -98,6 +95,7 @@ class RejectWatcher {
      */
 
     startWatch() {
+        clearTimeout(this.timer);
         this.timer = setTimeout(() => {
             this.countAttempt +=1;
             this.jsonResend(this.limit, this.countAttempt)
@@ -130,17 +128,15 @@ class RejectWatcher {
                         }
                     }
 
-                    const logMessage = `[RESENDER-${this.countAttempt}] WAITING_REQUESTS_COUNT: ${count} REQUEST_LIMIT: ${
+                    if (count || this.alertsHistory.lastCount !== 0) {
+                        const logMessage = `[RESENDER-${this.countAttempt} END]${
+                        countOfSent ? ` COUNT_OF_SENT: ${countOfSent} ` : ' '
+                    }SET_REQUEST_LIMIT: ${
                             this.limit
-                        } ${
-                            countOfSent ? `COUNT_OF_SENT: ${countOfSent}` : ''
-                        } WAIT_TIMEOUT: ${this.currentInterval}`;
-                    const logInstance = printLog(logMessage);
-                    
-                    if(this.alertsHistory.lastCount !== 0) {
-                        logInstance.warning();
+                        } SET_WAIT_TIMEOUT: ${this.currentInterval}`;
+
+                        printLog(logMessage).warning();
                     }
-                    
 
                     if (this.alertsHistory.lastCount !== count) {
                         const { isGrown, shouldSent } =
@@ -150,13 +146,22 @@ class RejectWatcher {
                                 const botIcon = isGrown
                                     ? botIcons.QUERY_UP
                                     : botIcons.QUERY_DOWN;
-                                logInstance.botMessage(` ${botIcon}`);
+
+                                const botMessage = `[RESENDER-${this.countAttempt}] WAITING_REQUESTS_COUNT: ${count} REQUEST_LIMIT: ${
+                                    this.limit
+                                } ${
+                                    countOfSent ? `COUNT_OF_SENT: ${countOfSent}` : ''
+                                } WAIT_TIMEOUT: ${this.currentInterval}`;
+
+                                printLog(botMessage).botMessage(` ${botIcon}`);
                             } else {
                                 printLog('API_OK').botMessage(botIcons.API_OK);
                             }
                         }
                     }
-                    return this.startWatch();
+
+                    this.startWatch();
+                    
                 })
                 .catch((error) => {
                     printLog(
