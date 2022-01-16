@@ -15,7 +15,7 @@ module.exports = (pathFile) => {
     const [date, plateNumber, ...rest] = fileName.split('_');
     const eventName = rest.join('_');
     const plateNumberRegX = /^[a-zA-ZА-Я0-9\\-]{3,8}$/;
-    const noPlate = 'noPlate';
+    const excludePlateNumber = ['unknown',  'noPlate'];
     const allowedEventsNames = [
         'VEHICLE_DETECTION',
         'VEHICLE_DETECTION_BACKGROUND',
@@ -39,7 +39,7 @@ module.exports = (pathFile) => {
     if (
         !plateNumber ||
         !plateNumberRegX.test(plateNumber) ||
-        plateNumber === noPlate
+        excludePlateNumber.includes(plateNumber)
     ) {
         fileMeta.isValid = false;
         fileMeta.notPassed.push('PLATE_NUMBER');
