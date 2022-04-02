@@ -131,7 +131,9 @@ module.exports = (pathFile, emitter = MODULE_NAME) => {
                 return rejectFileHandler(fileMeta);
             })
             .catch((error) => {
-                printLog(new AppError(error, MODULE_NAME));
+                printLog(new AppError(error, MODULE_NAME))
+                    .error()
+                    .toErrorLog();
             })
     );
 };
