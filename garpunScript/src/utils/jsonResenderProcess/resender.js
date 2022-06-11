@@ -1,7 +1,7 @@
 const jsonSender = require('../jsonSender/jsonSender');
 const SuccessfulResponseHandler = require('../jsonSender/successfulResponseHandler');
 const PendingList = require('../../models/pendingList');
-const CamEvents = require('../../models/camEvent');
+// const CamEvents = require('../../models/camEvent');
 const { printLog } = require('../logger/appLogger');
 const {
     JsonSenderError,
@@ -57,30 +57,33 @@ module.exports = (limitToResend, countAttempt) => {
                                         },
                                     });
 
-                                const updateCamEvent = CamEvents.findOne({
-                                    where: {
-                                        id: item.dbID,
-                                    },
-                                }).then((camEvent) => {
-                                    if (camEvent) {
-                                        return camEvent.update({
-                                            uploaded: isSent,
-                                            apiResponse,
-                                        });
-                                    }
-                                    throw new Error(
-                                        `CamEvent ID: ${item.dbID} not found`
-                                    );
-                                });
+                                // const updateCamEvent = CamEvents.findOne({
+                                //     where: {
+                                //         id: item.dbID,
+                                //     },
+                                // }).then((camEvent) => {
+                                //     if (camEvent) {
+                                //         return camEvent.update({
+                                //             uploaded: isSent,
+                                //             apiResponse,
+                                //         });
+                                //     }
+                                //     throw new Error(
+                                //         `CamEvent ID: ${item.dbID} not found`
+                                //     );
+                                // });
 
                                 return Promise.all([
                                     deleteFromPendingList,
-                                    updateCamEvent,
+                                    // updateCamEvent,
                                 ])
-                                    .then((deleteUpdateResults) => {
-                                        const eventData =
-                                            deleteUpdateResults[1].dataValues;
+                                    .then(() => {
+                                        const eventData = {};
                                         eventData.sender = `[${MODULE_NAME}-${countAttempt}]`;
+                                        eventData.cameraName = item.fileMeta ? item.fileMeta.cameraName : '?';
+                                        eventData.fileName = item.fileMeta ? item.fileMeta.file.name + item.fileMeta.file.ext : '?';
+                                        eventData.eventTime = item.fileMeta ? item.fileMeta.eventDate: '?';
+                                        eventData.apiResponse = apiResponse;
                                         const logData = printLog(
                                             new SuccessfulResponseHandler(
                                                 eventData
@@ -88,15 +91,14 @@ module.exports = (limitToResend, countAttempt) => {
                                         );
                                         
                                         if (
-                                            !eventData.uploaded ||
-                                            eventData.fileErrors.length
+                                            !isSent
                                         ) {
                                             logData.warning();
                                         } else {
                                             logData.successful();
                                         }
 
-                                        resolve(eventData);
+                                        return resolve(eventData);
                                     });
                             })
                             .catch((error) => {
