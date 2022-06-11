@@ -32,9 +32,10 @@ const MODULE_NAME = 'RESENDER_A';
 
 module.exports = (limitToResend, countAttempt) => {
     const finalResult = {};
-    return PendingList.findAndCountAll({ limit: limitToResend })
+    return PendingList.findAll({ limit: limitToResend })
         .then((result) => {
-            const { count, rows } = result;
+            const { rows } = result;
+            const count = '00';
             finalResult.count = count;
             if (rows.length === 0) {
                 return finalResult;
