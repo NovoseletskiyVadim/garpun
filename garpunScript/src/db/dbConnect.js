@@ -6,16 +6,16 @@ const Sequelize = require('sequelize');
 const config = require('../common/config');
 const { printLog } = require('../utils/logger/appLogger');
 
-const mainDbPath =
-    config.MAIN_DB_PATH || path.join(__dirname, './../../dataBase/main.db');
+// const mainDbPath =
+//     config.MAIN_DB_PATH || path.join(__dirname, './../../dataBase/main.db');
 const cashDbPath =
     config.TEMP_DB_PATH || path.join(__dirname, './../../dataBase/temp.db');
 
-const mainDbConnection = new Sequelize({
-    dialect: 'sqlite',
-    storage: mainDbPath,
-    logging: false, // Disables logging
-});
+// const mainDbConnection = new Sequelize({
+//     dialect: 'sqlite',
+//     storage: mainDbPath,
+//     logging: false, // Disables logging
+// });
 
 const cashReqDbConnection = new Sequelize({
     dialect: 'sqlite',
@@ -25,11 +25,11 @@ const cashReqDbConnection = new Sequelize({
 
 module.exports = {
     connectionTest: () => {
-        const main = mainDbConnection.authenticate();
+        // const main = mainDbConnection.authenticate();
         const cash = cashReqDbConnection.authenticate();
-        return Promise.all([main, cash]).then(() => {
+        return Promise.all([cash]).then(() => {
             printLog(
-                `mainDbPath:${mainDbPath}\ncashDbPath:${cashDbPath}`
+                `cashDbPath:${cashDbPath}`
             ).appInfoMessage();
             printLog('Connections with data bases OK').appInfoMessage();
             return true;
@@ -66,9 +66,9 @@ module.exports = {
         return Promise.all(tablesList);
     },
     stop: () => {
-        mainDbConnection.close();
+        // mainDbConnection.close();
         cashReqDbConnection.close();
     },
-    mainDbConnection,
+    // mainDbConnection,
     cashReqDbConnection,
 };
