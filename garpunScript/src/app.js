@@ -3,9 +3,9 @@ const config = require('./common/config');
 const dbConnect = require('./db/dbConnect');
 const { printLog } = require('./utils/logger/appLogger');
 const { appStartAlert } = require('./utils/telegBot/harpoonBot');
-const harpoonStarter = require('./utils/starter/starter');
+// const harpoonStarter = require('./utils/starter/starter');
 const { camerasWatcher, rejectApiHandler } = require('./utils/childProcesses');
-const TaskScheduler = require('./utils/TaskScheduler/taskScheduler');
+// const TaskScheduler = require('./utils/TaskScheduler/taskScheduler');
 const { AppError } = require('./utils/errorHandlers');
 
 printLog(`APP_STARTED_MODE: ${process.env.NODE_ENV}`).appInfoMessage();
@@ -46,17 +46,19 @@ const app = dbConnect
     .then(() => {
         rejectApiHandler.send({ type: 'START' });
 
-        camerasWatcher.send({ type: 'START' });
+        appStartAlert();
 
-        camerasWatcher.on('message', (data) => {
-            const { status } = data;
-            if (status) {
-                new TaskScheduler().start();
-                rejectApiHandler.send({ type: 'START' });
-                harpoonStarter();
-                appStartAlert();
-            }
-        });
+        // camerasWatcher.send({ type: 'START' });
+
+        // camerasWatcher.on('message', (data) => {
+        //     const { status } = data;
+        //     if (status) {
+        //         new TaskScheduler().start();
+        //         rejectApiHandler.send({ type: 'START' });
+        //         harpoonStarter();
+        //         appStartAlert();
+        //     }
+        // });
     })
     .catch((error) => {
         printLog(new AppError(error, 'APP_START_ERROR')).error().toErrorLog();
