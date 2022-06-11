@@ -9,7 +9,7 @@ const {
     EventHandlerError,
 } = require('../errorHandlers');
 
-const MODULE_NAME = 'RESENDER';
+const MODULE_NAME = 'RESENDER_A';
 /**
  * @typedef ResultREsender
  * @property {number} count True if the token is valid.
@@ -39,7 +39,7 @@ module.exports = (limitToResend, countAttempt) => {
             if (rows.length === 0) {
                 return finalResult;
             }
-            const logMessage = `[RESENDER-${countAttempt} START]  WAITING_REQUESTS_COUNT: ${count} REQUEST_LIMIT: ${
+            const logMessage = `[RESENDER_A-${countAttempt} START]  WAITING_REQUESTS_COUNT: ${count} REQUEST_LIMIT: ${
                 limitToResend
             }`;
             printLog(logMessage).warning();

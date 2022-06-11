@@ -129,7 +129,7 @@ class RejectWatcher {
                     }
 
                     if (count || this.alertsHistory.lastCount !== 0) {
-                        const logMessage = `[RESENDER-${this.countAttempt} END]${
+                        const logMessage = `[RESENDER_A-${this.countAttempt} END]${
                         countOfSent ? ` COUNT_OF_SENT: ${countOfSent} ` : ' '
                     }SET_REQUEST_LIMIT: ${
                             this.limit
@@ -147,7 +147,7 @@ class RejectWatcher {
                                     ? botIcons.QUERY_UP
                                     : botIcons.QUERY_DOWN;
 
-                                const botMessage = `[RESENDER-${this.countAttempt}] WAITING_REQUESTS_COUNT: ${count} REQUEST_LIMIT: ${
+                                const botMessage = `[RESENDER_A-${this.countAttempt}] WAITING_REQUESTS_COUNT: ${count} REQUEST_LIMIT: ${
                                     this.limit
                                 } ${
                                     countOfSent ? `COUNT_OF_SENT: ${countOfSent}` : ''
@@ -165,7 +165,7 @@ class RejectWatcher {
                 })
                 .catch((error) => {
                     printLog(
-                        new AppError(error, 'WATCHER_RESENDER')
+                        new AppError(error, 'WATCHER_RESENDER_A')
                     ).error();
                     this.startWatch();
                 });

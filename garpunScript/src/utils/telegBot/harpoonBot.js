@@ -27,7 +27,7 @@ const alarmSignal = (msg) => {
 
 const appStartAlert = () => {
     const isDevMode = process.env.NODE_ENV === 'DEV' ? 'DEV' : '';
-    const msg = `Resender ${isDevMode} launched ${telegramIcons.APP_START}`;
+    const msg = `Resender_a ${isDevMode} launched ${telegramIcons.APP_START}`;
     alarmSignal(msg);
 };
 
