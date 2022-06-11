@@ -56,11 +56,11 @@ module.exports = {
             ];
         } else {
             tablesList = [
-                Cameras.sync({ alter: true }),
-                CamEvents.sync({ alter: true }),
+                // Cameras.sync({ alter: true }),
+                // CamEvents.sync({ alter: true }),
                 PendingList.sync({ alter: true }),
-                Users.sync({ alter: true }),
-                Reports.sync({ alter: true }),
+                // Users.sync({ alter: true }),
+                // Reports.sync({ alter: true }),
             ];
         }
         return Promise.all(tablesList);
