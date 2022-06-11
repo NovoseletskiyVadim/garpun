@@ -34,17 +34,17 @@ module.exports = (limitToResend, countAttempt) => {
     const finalResult = {};
     return PendingList.findAll({ limit: limitToResend })
         .then((result) => {
-            const { rows } = result;
+            // const { rows } = result;
             const count = '00';
             finalResult.count = count;
-            if (rows.length === 0) {
+            if (result.length === 0) {
                 return finalResult;
             }
             const logMessage = `[RESENDER_A-${countAttempt} START]  WAITING_REQUESTS_COUNT: ${count} REQUEST_LIMIT: ${
                 limitToResend
             }`;
             printLog(logMessage).warning();
-            const preparedRequests = rows.map(
+            const preparedRequests = result.map(
                 (item) =>
                     new Promise((resolve, reject) => {
                         jsonSender(item.data)
