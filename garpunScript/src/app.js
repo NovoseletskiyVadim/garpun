@@ -4,7 +4,7 @@ const dbConnect = require('./db/dbConnect');
 const { printLog } = require('./utils/logger/appLogger');
 const { appStartAlert } = require('./utils/telegBot/harpoonBot');
 // const harpoonStarter = require('./utils/starter/starter');
-const { camerasWatcher, rejectApiHandler } = require('./utils/childProcesses');
+const { rejectApiHandler } = require('./utils/childProcesses');
 // const TaskScheduler = require('./utils/TaskScheduler/taskScheduler');
 const { AppError } = require('./utils/errorHandlers');
 
@@ -66,7 +66,7 @@ const app = dbConnect
 
 const stopAPP = () => {
     rejectApiHandler.kill();
-    camerasWatcher.kill();
+    // camerasWatcher.kill();
 };
 
 module.exports = { stopAPP, app };

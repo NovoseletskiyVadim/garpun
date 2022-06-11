@@ -35,36 +35,36 @@ module.exports = {
             return true;
         });
     },
-    dbTablesCreate: () => {
-        const CamEvents = require('../models/camEvent');
-        const PendingList = require('../models/pendingList');
-        const Cameras = require('../models/cameras');
-        const Users = require('../models/users');
-        const Reports = require('../models/reports');
+    // dbTablesCreate: () => {
+    //     const CamEvents = require('../models/camEvent');
+    //     const PendingList = require('../models/pendingList');
+    //     const Cameras = require('../models/cameras');
+    //     const Users = require('../models/users');
+    //     const Reports = require('../models/reports');
 
-        let tablesList = [];
+    //     let tablesList = [];
 
-        // if NODE_ENV === 'DEV' clean test DB table PendingList and CamEvents
+    //     // if NODE_ENV === 'DEV' clean test DB table PendingList and CamEvents
 
-        if (process.env.NODE_ENV === 'DEV') {
-            tablesList = [
-                Cameras.sync({ alter: true }),
-                CamEvents.sync({ force: true }),
-                PendingList.sync({ force: true }),
-                Users.sync({ alter: true }),
-                Reports.sync({ alter: true }),
-            ];
-        } else {
-            tablesList = [
-                Cameras.sync({ alter: true }),
-                CamEvents.sync({ alter: true }),
-                PendingList.sync({ alter: true }),
-                Users.sync({ alter: true }),
-                Reports.sync({ alter: true }),
-            ];
-        }
-        return Promise.all(tablesList);
-    },
+    //     if (process.env.NODE_ENV === 'DEV') {
+    //         tablesList = [
+    //             Cameras.sync({ alter: true }),
+    //             CamEvents.sync({ force: true }),
+    //             PendingList.sync({ force: true }),
+    //             Users.sync({ alter: true }),
+    //             Reports.sync({ alter: true }),
+    //         ];
+    //     } else {
+    //         tablesList = [
+    //             Cameras.sync({ alter: true }),
+    //             CamEvents.sync({ alter: true }),
+    //             PendingList.sync({ alter: true }),
+    //             Users.sync({ alter: true }),
+    //             Reports.sync({ alter: true }),
+    //         ];
+    //     }
+    //     return Promise.all(tablesList);
+    // },
     stop: () => {
         // mainDbConnection.close();
         cashReqDbConnection.close();
