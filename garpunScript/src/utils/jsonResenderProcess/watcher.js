@@ -138,7 +138,7 @@ class RejectWatcher {
                         printLog(logMessage).warning();
                     }
 
-                    if (this.alertsHistory.lastCount !== count) {
+                    if (count && this.alertsHistory.lastCount !== count) {
                         const { isGrown, shouldSent } =
                             this.isShouldSendToBot(count);
                         if (shouldSent) {

@@ -10,6 +10,7 @@ const {
 } = require('../errorHandlers');
 
 const MODULE_NAME = 'RESENDER';
+const COUNT_ROW_AFTER_ATTEMPTS = 1000;
 /**
  * @typedef ResultREsender
  * @property {number} count True if the token is valid.
@@ -33,18 +34,25 @@ const MODULE_NAME = 'RESENDER';
 module.exports = (limitToResend, countAttempt) => {
     const finalResult = {};
     return PendingList.findAll({ limit: limitToResend })
+        .then(result => {
+            if (countAttempt % COUNT_ROW_AFTER_ATTEMPTS === 0) {
+                return PendingList.count()
+                    .then(count => ({count, rows: result}));
+            }
+            return {count: null, rows: result };
+        } )
         .then((result) => {
-            // const { count, rows } = result;
-            const count = '00';
+            const { count, rows } = result;
             finalResult.count = count;
-            if (result.length === 0) {
+            if (rows.length === 0) {
+                finalResult.count = 0;
                 return finalResult;
             }
-            const logMessage = `[RESENDER-${countAttempt} START]  WAITING_REQUESTS_COUNT: ${count} REQUEST_LIMIT: ${
+            const logMessage = `[RESENDER-${countAttempt} START]${count && ` WAITING_REQUESTS_COUNT: ${count} `}WAITING_REQUESTS_COUNT: ${count} REQUEST_LIMIT: ${
                 limitToResend
             }`;
             printLog(logMessage).warning();
-            const preparedRequests = result.map(
+            const preparedRequests = rows.map(
                 (item) =>
                     new Promise((resolve, reject) => {
                         jsonSender(item.data)
