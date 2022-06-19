@@ -102,7 +102,7 @@ class RejectWatcher {
                 .then((result) => {
                     const { count, sentList } = result;
                     let countOfSent;
-                    if (count === 0) {
+                    if (count && count === 0) {
                         this.setDefaultConfig();
                     }
                     if (sentList && sentList.length) {
@@ -128,8 +128,8 @@ class RejectWatcher {
                         }
                     }
 
-                    if (count || this.alertsHistory.lastCount !== 0) {
-                        const logMessage = `[RESENDER_A-${this.countAttempt} END]${
+                    if (count !== 0) {
+                        const logMessage = `[RESENDER-${this.countAttempt} END]${
                         countOfSent ? ` COUNT_OF_SENT: ${countOfSent} ` : ' '
                     }SET_REQUEST_LIMIT: ${
                             this.limit
@@ -138,7 +138,7 @@ class RejectWatcher {
                         printLog(logMessage).warning();
                     }
 
-                    if (this.alertsHistory.lastCount !== count) {
+                    if (count && this.alertsHistory.lastCount !== count) {
                         const { isGrown, shouldSent } =
                             this.isShouldSendToBot(count);
                         if (shouldSent) {
