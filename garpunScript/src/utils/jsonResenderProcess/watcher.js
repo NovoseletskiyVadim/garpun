@@ -128,7 +128,7 @@ class RejectWatcher {
                         }
                     }
 
-                    if (count || this.alertsHistory.lastCount !== 0) {
+                    if (count !== 0) {
                         const logMessage = `[RESENDER-${this.countAttempt} END]${
                         countOfSent ? ` COUNT_OF_SENT: ${countOfSent} ` : ' '
                     }SET_REQUEST_LIMIT: ${

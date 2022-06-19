@@ -37,14 +37,14 @@ process.on('unhandledRejection', async (error) => {
 const app = dbConnect
     .connectionTest()
     // uncomment this for first start
-      .then(() =>
-        dbConnect.dbTablesCreate().then(() => {
-      printLog('tables created').appInfoMessage();
-          return true;
-        })
-      )
+    //   .then(() =>
+    //     dbConnect.dbTablesCreate().then(() => {
+    //   printLog('tables created').appInfoMessage();
+    //       return true;
+    //     })
+    //   )
     .then(() => {
-        //rejectApiHandler.send({ type: 'START' });
+        // rejectApiHandler.send({ type: 'START' });
 
         camerasWatcher.send({ type: 'START' });
 
