@@ -1,7 +1,8 @@
+const AbstractErrorLogEvent = require('./AbstractErrorLogEvent');
 /**
  * @class JsonSenderError
  */
-class JsonSenderError extends Error {
+class JsonSenderError extends AbstractErrorLogEvent {
     constructor(error) {
         super(error);
         this.response = error.response;
@@ -19,7 +20,7 @@ class JsonSenderError extends Error {
         }
     }
 
-    toPrint() {
+    PrepareMsgToPrint() {
         return {
             errorText: this.errorText,
             statusCode: this.statusCode,

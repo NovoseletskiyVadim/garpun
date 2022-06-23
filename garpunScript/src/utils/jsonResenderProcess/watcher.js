@@ -11,13 +11,14 @@ const { printLog } = require('../logger/appLogger');
  */
 class RejectWatcher {
     constructor() {
-        this.MAX_TIMEOUT = 60000;
+        this.MAX_TIMEOUT = 30000;
         this.MIN_TIMEOUT = 5000;
         this.TIMEOUT_STEP = 5000;
         this.MAX_REQUEST_LIMIT = MAX_REQUESTS_COUNT;
         this.MIN_REQUEST_LIMIT = 1;
         this.REQUEST_LIMIT_STEP = 3;
-
+        this.REQUEST_LIMIT_DEFAULT = 3; 
+        this.countAttempt = 0;
         this.timer = null;
         this.jsonResend = jsonResend;
         this.alertsHistory = {
@@ -54,8 +55,9 @@ class RejectWatcher {
      */
 
     setDefaultConfig() {
-        this.limit = this.MIN_REQUEST_LIMIT;
+        this.limit = this.REQUEST_LIMIT_DEFAULT;
         this.currentInterval = this.MIN_TIMEOUT;
+        this.countAttempt = 0;
     }
 
     /**
@@ -86,6 +88,7 @@ class RejectWatcher {
         }
         this.currentInterval = this.MIN_TIMEOUT;
     }
+
     /**
      * @method startWatch
      * @description This method launch work jsonResend and after timeout restarts it again
@@ -93,12 +96,14 @@ class RejectWatcher {
      */
 
     startWatch() {
+        clearTimeout(this.timer);
         this.timer = setTimeout(() => {
-            this.jsonResend(this.limit)
+            this.countAttempt +=1;
+            this.jsonResend(this.limit, this.countAttempt)
                 .then((result) => {
                     const { count, sentList } = result;
                     let countOfSent;
-                    if (count && count === 0) {
+                    if (count === 0) {
                         this.setDefaultConfig();
                     }
                     if (sentList && sentList.length) {
@@ -123,14 +128,18 @@ class RejectWatcher {
                             this.setApiOkConfig();
                         }
                     }
-                    if (this.alertsHistory.lastCount !== count) {
-                        const logMessage = `WAITING_REQUESTS_COUNT: ${count} REQUEST_LIMIT: ${
+
+                    if (count !== 0) {
+                        const logMessage = `[RESENDER-${this.countAttempt} END]${
+                        countOfSent ? ` COUNT_OF_SENT: ${countOfSent} ` : ' '
+                    }SET_REQUEST_LIMIT: ${
                             this.limit
-                        } ${
-                            countOfSent ? `COUNT_OF_SENT: ${countOfSent}` : ''
-                        } WAIT_TIMEOUT: ${this.currentInterval}`;
-                        const logInstance = printLog(logMessage);
-                        logInstance.warning();
+                        } SET_WAIT_TIMEOUT: ${this.currentInterval}`;
+
+                        printLog(logMessage).warning();
+                    }
+
+                    if (count !== null && this.alertsHistory.lastCount !== count) {
                         const { isGrown, shouldSent } =
                             this.isShouldSendToBot(count);
                         if (shouldSent) {
@@ -139,7 +148,14 @@ class RejectWatcher {
                                     ? HarpoonBotMsgSender.telegramIcons.QUERY_UP
                                     : HarpoonBotMsgSender.telegramIcons
                                           .QUERY_DOWN;
-                                logInstance.botMessage(` ${botIcon}`);
+
+                                const botMessage = `[RESENDER-${this.countAttempt}] WAITING_REQUESTS_COUNT: ${count} REQUEST_LIMIT: ${
+                                    this.limit
+                                } ${
+                                    countOfSent ? `COUNT_OF_SENT: ${countOfSent}` : ''
+                                } WAIT_TIMEOUT: ${this.currentInterval}`;
+
+                                printLog(botMessage).botMessage(` ${botIcon}`);
                             } else {
                                 printLog('API_OK').botMessage(
                                     HarpoonBotMsgSender.telegramIcons.API_OK
@@ -147,13 +163,16 @@ class RejectWatcher {
                             }
                         }
                     }
+
+                    this.startWatch();
+                    
                 })
                 .catch((error) => {
                     printLog(
-                        new AppError(error, 'WATCHER_RESENDER').toPrint()
+                        new AppError(error, 'WATCHER_RESENDER')
                     ).error();
-                })
-                .finally(this.startWatch());
+                    this.startWatch();
+                });
         }, this.currentInterval);
     }
 

@@ -1,20 +1,19 @@
 /* eslint-disable no-case-declarations */
 const { EOL } = require('os');
-
-const { HarpoonBotMsgSender } = require('../telegBot/harpoonBot');
 const RecipientGroupsStore = require('../telegBot/RecipientGroupsStore');
-
+const AbstractErrorLogEvent = require('../errorHandlers/AbstractErrorLogEvent');
 const { appErrorLog } = require('./logToFile');
+const { HarpoonBotMsgSender } = require('../telegBot/harpoonBot');
 
 module.exports = {
-    printLog(inData) {
+    printLog(event) {
         let message = '';
-        if (typeof inData === 'object') {
-            message = inData.toPrint();
-        } else {
-            message = inData;
+        if (event instanceof AbstractErrorLogEvent) {
+            message = event.PrepareMsgToPrint();
         }
-
+        else {
+            message = event;
+        }
         return {
             errorSecond() {
                 process.stdout.write(`\x1b[1;31m${message}\x1b[0m${EOL}`);
@@ -64,7 +63,7 @@ module.exports = {
                 );
             },
             errorGroupChatMessage() {
-                const { emitter, stack } = inData;
+                const { emitter, stack } = event;
                 const splittedStack = stack.split('\n');
                 const messageArray = [
                     ` ${HarpoonBotMsgSender.telegramIcons.CAMERA_OFFLINE_WARNING}\nEmitter: ${emitter}\n`,

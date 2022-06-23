@@ -22,6 +22,7 @@ const {
 const MODULE_NAME = 'FILE_HANDLER';
 
 module.exports = (pathFile, emitter = MODULE_NAME) => {
+    let processState = '';
     const fileStat = fs.statSync(pathFile);
     if (!fileStat.isFile()) {
         printLog(`NOT A FILE ${pathFile}`).errorSecond();
@@ -60,6 +61,7 @@ module.exports = (pathFile, emitter = MODULE_NAME) => {
                     fileName: fileMeta.file.name + fileMeta.file.ext,
                     fileErrors: fileMeta.notPassed.join(),
                 };
+                processState = 'CamEvents.create';
                 return CamEvents.create(dataToLocalDB);
             })
             .then((savedEvent) => {
@@ -97,6 +99,7 @@ module.exports = (pathFile, emitter = MODULE_NAME) => {
                                 savedEvent.apiResponse = apiResponse;
                                 savedEvent.uploaded = isSent;
                                 // Save API request in db
+                                processState = 'avedEvent.save';
                                 return savedEvent.save();
                             })
                             .catch((error) => {
@@ -105,9 +108,10 @@ module.exports = (pathFile, emitter = MODULE_NAME) => {
                                         new EventHandlerError(error, {
                                             senderName: emitter,
                                             fileMeta,
-                                        }).toPrint()
+                                        })
                                     ).errorSecond();
                                     // If API no response or response not valid, save event to temp db for re-send
+                                    processState = 'PendingList.create';
                                     return PendingList.create({
                                         status: 'API_ERROR',
                                         data: jsonToSend,
@@ -132,7 +136,7 @@ module.exports = (pathFile, emitter = MODULE_NAME) => {
                 return rejectFileHandler(fileMeta);
             })
             .catch((error) => {
-                printLog(new AppError(error, MODULE_NAME))
+                printLog(new AppError(error, `${ MODULE_NAME} ${processState }`))
                     .error()
                     .toErrorLog()
                     .errorGroupChatMessage();
