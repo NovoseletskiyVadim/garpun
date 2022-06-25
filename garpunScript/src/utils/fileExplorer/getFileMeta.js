@@ -15,7 +15,7 @@ module.exports = (pathFile) => {
     const [date, plateNumber, ...rest] = fileName.split('_');
     const eventName = rest.join('_');
     const plateNumberRegX = /^[a-zA-ZА-Я0-9\\-]{3,8}$/;
-    const excludePlateNumber = ['unknown', 'noPlate', 'PR12', 'P012', 'P12'];
+    const excludePlateNumber = ['unknown', 'noPlate', 'PR12', 'P012', 'P12', 'IP012', 'R12', 'B12', 'IP12', 'C12'];
     const allowedEventsNames = [
         'VEHICLE_DETECTION',
         'VEHICLE_DETECTION_BACKGROUND',
