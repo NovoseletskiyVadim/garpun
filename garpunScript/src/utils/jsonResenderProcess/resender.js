@@ -8,11 +8,27 @@ const {
     AppError,
     EventHandlerError,
 } = require('../errorHandlers');
+const { cashReqDbConnection } = require('../../db/dbConnect');
 
 const MODULE_NAME = 'RESENDER';
+const COUNT_ROW_AFTER_ATTEMPTS = 100;
+
+const requestQueryCount = () => {
+    const requestMaxID = cashReqDbConnection.query('SELECT MAX(ID) as max  FROM pendingLists');
+    const requestMinID = cashReqDbConnection.query('SELECT MIN(ID) as min  FROM pendingLists');
+    return Promise.all([requestMaxID, requestMinID]).then((requestsResult)=>{
+        const [queryResultMaxId,  queryResultMinId ] = requestsResult;
+        const queryValueMax = queryResultMaxId[0];
+        const queryValueMin = queryResultMinId[0];
+        const { max: maxId } = queryValueMax[0];
+        const { min: minId } = queryValueMin[0];
+        const count = maxId - minId + 1;
+        return count;
+    });
+};
 /**
  * @typedef ResultREsender
- * @property {number} count True if the token is valid.
+ * @property {number | null} count True if the token is valid.
  * @property {Array} sentList The list of result sending to the API.
  */
 
@@ -32,14 +48,22 @@ const MODULE_NAME = 'RESENDER';
 
 module.exports = (limitToResend, countAttempt) => {
     const finalResult = {};
-    return PendingList.findAndCountAll({ limit: limitToResend })
+    return PendingList.findAll({ limit: limitToResend })
+        .then(result => {
+            if (countAttempt % COUNT_ROW_AFTER_ATTEMPTS === 0) {
+                return requestQueryCount().then(count => ({count, rows: result}));
+            }
+
+            return {count: null, rows: result };
+        } )
         .then((result) => {
             const { count, rows } = result;
             finalResult.count = count;
             if (rows.length === 0) {
+                finalResult.count = 0;
                 return finalResult;
             }
-            const logMessage = `[RESENDER-${countAttempt} START]  WAITING_REQUESTS_COUNT: ${count} REQUEST_LIMIT: ${
+            const logMessage = `[RESENDER-${countAttempt} START]${(count ? ` WAITING_REQUESTS_COUNT: ${count} `: ' ')}REQUEST_LIMIT: ${
                 limitToResend
             }`;
             printLog(logMessage).warning();

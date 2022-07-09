@@ -34,17 +34,15 @@ process.on('unhandledRejection', async (error) => {
         .toErrorLog();
 });
 
-const app = dbConnect
+export const app = dbConnect
     .connectionTest()
     // uncomment this for first start
-    //   .then(() =>
+    // .then(() =>
     //     dbConnect.dbTablesCreate().then(() => {
     //   printLog('tables created').appInfoMessage();
     //       return true;
-    //     })
-    //   )
+    //     }))
     .then(() => {
-        rejectApiHandler.send({ type: 'START' });
 
         camerasWatcher.send({ type: 'START' });
 
@@ -62,9 +60,8 @@ const app = dbConnect
         printLog(new AppError(error, 'APP_START_ERROR')).error().toErrorLog();
     });
 
-const stopAPP = () => {
+export const stopAPP = () => {
     rejectApiHandler.kill();
     camerasWatcher.kill();
 };
 
-module.exports = { stopAPP, app };

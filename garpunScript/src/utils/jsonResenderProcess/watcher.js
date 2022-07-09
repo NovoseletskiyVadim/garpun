@@ -10,7 +10,7 @@ const jsonResend = require('./resender');
  */
 class RejectWatcher {
     constructor() {
-        this.MAX_TIMEOUT = 30000;
+        this.MAX_TIMEOUT = 60000;
         this.MIN_TIMEOUT = 5000;
         this.TIMEOUT_STEP = 5000;
         this.MAX_REQUEST_LIMIT = MAX_REQUESTS_COUNT;
@@ -128,7 +128,7 @@ class RejectWatcher {
                         }
                     }
 
-                    if (count || this.alertsHistory.lastCount !== 0) {
+                    if (count !== 0) {
                         const logMessage = `[RESENDER-${this.countAttempt} END]${
                         countOfSent ? ` COUNT_OF_SENT: ${countOfSent} ` : ' '
                     }SET_REQUEST_LIMIT: ${
@@ -138,7 +138,7 @@ class RejectWatcher {
                         printLog(logMessage).warning();
                     }
 
-                    if (this.alertsHistory.lastCount !== count) {
+                    if (count !== null && this.alertsHistory.lastCount !== count) {
                         const { isGrown, shouldSent } =
                             this.isShouldSendToBot(count);
                         if (shouldSent) {

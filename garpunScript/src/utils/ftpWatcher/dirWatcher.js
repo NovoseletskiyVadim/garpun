@@ -1,10 +1,11 @@
+/* eslint-disable import/no-import-module-exports */
+import { StartChainHandlers } from '../fileExplorer/StartChainHandlers';
+
 const chokidar = require('chokidar');
 
 // const fileHandler = require('./fileHandler');
 const { printLog } = require('../logger/appLogger');
 const { AppError } = require('../errorHandlers');
-
-const StartFileHandler = require('../fileExplorer/StartHandler');
 
 module.exports = () => {
     const ignoredFiles = ['.*DVRWorkDirectory.*'];
@@ -21,7 +22,7 @@ module.exports = () => {
             printLog(`Under watch: ${watchPath}`).appInfoMessage();
             watcher
                 // .on('add', (pathFile) => fileHandler(pathFile))
-                .on('add', (pathFile) => new StartFileHandler(pathFile).execute())
+                .on('add', (pathFile) => new StartChainHandlers(pathFile, 'FILE_WATCHER').execute())
                 .on('error', (error) => {
                     printLog(
                         new AppError(error, 'FILE_WATCHER_ERROR')

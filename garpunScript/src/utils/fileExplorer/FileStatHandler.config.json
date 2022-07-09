@@ -8,7 +8,7 @@
         "VEHICLE_DETECTION",
         "VEHICLE_DETECTION_BACKGROUND"
     ],
-    "excludePlateNumber": ["unknown",  "noPlate"],
+    "excludePlateNumber": ["unknown", "noPlate", "PR12", "P012", "P12"],
     "ignoreSystemFileNames": ["noPlate", "VEHICLE_DETECTION_PLATE"],
     "allowedOutOfSync": 180000,
     "fileType": "jpg"

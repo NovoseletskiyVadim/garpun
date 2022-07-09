@@ -1,23 +1,30 @@
 /* eslint-disable no-param-reassign */
+
+// eslint-disable-next-line import/no-import-module-exports
+import { StartChainHandlers } from '../fileExplorer/StartChainHandlers';
+
 const fsp = require('fs').promises;
 const path = require('path');
 
 const Cameras = require('../../models/cameras');
 const dirWatcher = require('../ftpWatcher/dirWatcher')();
-const fileHandler = require('../ftpWatcher/fileHandler');
+// const fileHandler = require('../ftpWatcher/fileHandler');
 const { MAX_REQUESTS_COUNT, MEDIA_PATH } = require('../../common/config');
 const { printLog } = require('../logger/appLogger');
 const { AppError } = require('../errorHandlers');
 
 const dirHandler = (dirInfo, stateUpdate) => {
-    const { filesList, maxRequests, dirPath, dirName } = dirInfo;
+    const {
+ filesList, maxRequests, dirPath, dirName
+} = dirInfo;
     const filesInDir = filesList.length;
     if (filesInDir > 0) {
         const listToSend = [];
         const amtToSend = filesInDir > maxRequests ? maxRequests : filesInDir;
         for (let index = 0; index < amtToSend; index += 1) {
             listToSend.push(
-                fileHandler(path.join(dirPath, filesList[index]), 'APP_STARTER')
+                // fileHandler(path.join(dirPath, filesList[index]), 'APP_STARTER')
+                new StartChainHandlers(path.join(dirPath, filesList[index]), 'STARTER').execute()
             );
         }
         return Promise.all(listToSend).then(() => {
@@ -100,12 +107,10 @@ const harpoonStarter = () =>
                 });
                 return Promise.all(ftpDirsStatListReq).then(
                     (ftpDirsStatList) => {
-                        const calcMaxReqForDir =
-                            maxRequestsCalculator(ftpDirsStatList);
+                        const calcMaxReqForDir =                            maxRequestsCalculator(ftpDirsStatList);
                         calcMaxReqForDir();
                         const listDirsInProcess = ftpDirsStatList.map((dir) =>
-                            dirHandler(dir, calcMaxReqForDir)
-                        );
+                            dirHandler(dir, calcMaxReqForDir));
                         return Promise.all(listDirsInProcess).then(
                             (resultList) => {
                                 printLog(
