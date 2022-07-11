@@ -1,8 +1,13 @@
-import { ReadableStreamWithFileType } from 'file-type';
-import { BaseResult, FinalExecuteCommands, HandlerResult, PreviousResultTypes } from './fileExplorerTypes';
-import { HandleResult } from './HandleResult';
+import fs, { ReadStream, WriteStream } from 'fs';
+import { finished }  from 'node:stream/promises';
+import fsp  from 'fs/promises';
 
-const fsp = require('fs').promises;
+import { BaseResult, FinalExecuteCommands, HandlerResult, PreviousResultTypes } from './fileExplorerTypes';
+import { FileRouter, FilesTypes } from './FileRouter';
+import { HandleResult } from './HandleResult';
+import path from 'path';
+
+
 
 const { AppError} = require('../errorHandlers/index');
 const { printLog } = require('../logger/appLogger');
@@ -10,7 +15,13 @@ const { printLog } = require('../logger/appLogger');
 export enum ExecuteCommands  {
     DELETE = 'DELETE',
     BAD_FILE_MSG = 'BAD_FILE_MSG',
+    COPY_TO_ARCHIVE = 'COPY_TO_ARCHIVE',
+    COPY_TO_TRASH = 'COPY_TO_TRASH'
 }
+
+export type CommandType = {
+    [key: string]: () => string
+} 
 
 export class BaseHandler {
     filePath = '';
@@ -21,11 +32,11 @@ export class BaseHandler {
     
     next: null | BaseHandler = null;
 
-    streamWithFileType:ReadableStreamWithFileType | null = null;
+    fileRouter = new FileRouter();
+
+    readFileStream:ReadStream | null = null;
 
     moduleName:string | undefined;
-
-    finalExecuteQuery = ''
 
     private handlerFinalExecuteCommands: string[] = []
 
@@ -34,6 +45,8 @@ export class BaseHandler {
     finalExecuteCommands:FinalExecuteCommands  = {
         DELETE: async () =>  this.deleteFile(),
         BAD_FILE_MSG: async () => this.sendBadFileMsg(),
+        COPY_TO_ARCHIVE: async () => this.copyFile(FilesTypes.ARCHIVE),
+        COPY_TO_TRASH: async () => this.copyFile(FilesTypes.TRASH),
     }
 /**
  * 
@@ -49,7 +62,7 @@ export class BaseHandler {
 
     
 
-    execute(previousResult?:HandleResult| null) {
+    execute(previousResult?:HandleResult| null, readFileStream?:ReadStream | null) {
 
         if (this.next && this.shouldGoToNext) {
             this.next.execute(this.handleResult);
@@ -87,7 +100,6 @@ export class BaseHandler {
         
         for (let index = 0; index < this.handlerFinalExecuteCommands.length; index += 1) {
             // eslint-disable-next-line no-await-in-loop
-            // const isFunctionExist = Object.keys(this.finalExecuteCommands).includes(commandName);
             const commandName = this.handlerFinalExecuteCommands[index];
             await this.finalExecuteCommands[commandName]();
         }
@@ -99,15 +111,49 @@ export class BaseHandler {
     }
     
     /**
-     * @description Move file to trash archive
+     * @description Delete file to trash archive
      */
-
-    
      async deleteFile(): Promise<any> {
         try {
             return await fsp.unlink(this.filePath);
         } catch (error) {
             return new AppError(error, 'FILE_EXPLORE_ERROR');
         }
+    }
+
+    async copyFile( fileType: FilesTypes):Promise<void> {
+        let readFileStream = this.readFileStream;
+        if(!readFileStream) {
+            readFileStream = fs.createReadStream(this.filePath);
+        }
+
+        if (this.handleResult &&  this.handleResult.cameraName) {
+            const pathToMove = this.fileRouter.pathToMoveFile(this.handleResult.cameraName, fileType);
+            const pathToMoveWithFileName = path.join(pathToMove, this.handleResult.fileNameWithExt);
+            const wr = fs.createWriteStream(pathToMoveWithFileName);
+            readFileStream.pipe(wr);
+            try {
+                await finished(readFileStream);
+                this.deleteFile();
+            } catch (error) {
+                printLog(
+                    new AppError(error, 'FILE_EXPLORE_ERROR')
+                ).error();
+            }
+
+            return;
+        }
+        printLog(
+            new AppError(new Error('cameraName empty'), 'FILE_EXPLORE_ERROR')
+        ).error();
+    }
+
+    getFinalCommand(fileType:FilesTypes): string {
+        const commandType:CommandType = {
+            [FilesTypes.TRASH]: () => this.fileRouter.isTrashArchiveOn() ? ExecuteCommands.COPY_TO_TRASH : ExecuteCommands.DELETE,
+            [FilesTypes.ARCHIVE]: () => this.fileRouter.isFileArchiveOn() ? ExecuteCommands.COPY_TO_ARCHIVE : ExecuteCommands.DELETE,
+        }
+
+        return commandType[fileType]();
     }
 }

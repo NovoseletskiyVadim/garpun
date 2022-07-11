@@ -32,4 +32,12 @@ export class HandleResult {
             this.statHandlerResult.cameraName
             } photo:${this.statHandlerResult.fileName}${this.statHandlerResult.fileType}`
     }
+
+    get cameraName() {
+        return this.statHandlerResult.cameraName;
+    }
+
+    get fileNameWithExt() {
+        return `${this.statHandlerResult.fileName}${this.statHandlerResult.fileType}`;
+    }
 }

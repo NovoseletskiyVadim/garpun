@@ -1,8 +1,11 @@
 import fs from 'fs';
 
+import FileType   from 'file-type';
+
 import { BaseHandler, ExecuteCommands } from './BaseHandler';
 import { HandleResult } from './HandleResult';
 import config  from './FileStatHandler.config.json';
+import { FilesTypes } from './FileRouter';
 
 export class FileTypeChecker extends BaseHandler {
 
@@ -17,20 +20,16 @@ export class FileTypeChecker extends BaseHandler {
 
         this.handleResult.handleSteps.push(this.handleStepName);
 
-        const { fileTypeStream } = await import('file-type');
-       
-        const readStream = fs.createReadStream(this.filePath);
+        this.readFileStream = fs.createReadStream(this.filePath);
 
-        this.streamWithFileType = await fileTypeStream(readStream);
+        const fileTypeResult = await FileType.fromStream(this.readFileStream);
 
-        const { fileType } = this.streamWithFileType;
-
-        if (!fileType || fileType.ext !== config.fileType) {
+        if (!fileTypeResult || fileTypeResult.ext !== config.fileType) {
             eventObj.fileIssues.push('CHK_FILE_TYPE');
             this.shouldGoToNext = false;
-            this.setHandlerFinalExecuteCommands([ExecuteCommands.DELETE]);
+            this.setHandlerFinalExecuteCommands([this.getFinalCommand(FilesTypes.TRASH), ExecuteCommands.BAD_FILE_MSG]);
         }
 
-        super.execute(this.handleResult);
+        super.execute(this.handleResult, this.readFileStream);
     }
 }

@@ -58,6 +58,7 @@ export class FileStatHandler extends BaseHandler  {
 
         if (!getFileStatResult.isFile()) {
             printLog(`NOT A FILE ${this.filePath}`).errorSecond();
+            this.shouldGoToNext = false;
             this.setHandlerFinalExecuteCommands([ExecuteCommands.DELETE]);
             await this.finalExecute();
             return;
@@ -91,10 +92,6 @@ export class FileStatHandler extends BaseHandler  {
         }
 
         super.execute(this.handleResult);
-        // await this.finalExecute([
-        //     ExecuteCommands.DELETE,
-        //     ExecuteCommands.BAD_FILE_MSG,
-        // ]);
     }
 
     private checkFileName():void {
