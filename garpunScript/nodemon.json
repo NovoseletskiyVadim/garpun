@@ -2,6 +2,6 @@
     "watch": ["src"],
     "ext": "ts,js",
     "ignore": ["src/**/*.test.ts", "src/**/*.test.js"],
-    "exec": "cross-env NODE_ENV=DEV node ./dist/app.js",
+    "exec": "node --inspect ./dist/app.js",
     "signal": "SIGINT"
 }

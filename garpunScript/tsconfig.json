@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
-    "target": "ES6",
-    "module": "CommonJS",
+    "target": "es2022",
+    "module": "commonjs",
     "outDir": "dist",
     "rootDir": "./src",
     "inlineSourceMap": true,
@@ -10,7 +10,7 @@
     "resolveJsonModule": true,
     "allowJs": true,
     "strict": true,
-    "noImplicitAny": true,
+    "noImplicitAny": false,
     "esModuleInterop": true,
     "types": [
         "node",
@@ -20,6 +20,6 @@
   "include": [
     "src/**/*.ts",
     "src/**/*.js"
-, "src/app.js" ],
+, "src/app.ts"],
   "exclude": ["node_modules", "**/*.spec.ts"]
 }

@@ -1,8 +1,8 @@
 module.exports = {
     apps: [
         {
-            name: 'garpunScript6',
-            script: './src/app.js',
+            name: 'garpunScript7',
+            script: './dist/app.js',
             watch: false,
             ignore_watch: ['[/\\]./', 'node_modules', 'logs', 'dataBase'],
             max_memory_restart: '1G',

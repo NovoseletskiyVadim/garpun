@@ -1,6 +1,6 @@
 const expect = require('chai').expect;
 require('dotenv').config({ path: '../../.env' });
-const { printLog, botIcons } = require('../../src/utils/logger/appLogger');
+const { setLogMessage, botIcons } = require('../../src/utils/logger/appLogger');
 
 const logTypes = require('../../src/utils/logger/appLogger');
 
@@ -15,4 +15,4 @@ const logTypes = require('../../src/utils/logger/appLogger');
 //     });
 //   });
 // });
-printLog(botIcons.CAMERA_OFFLINE).error().botMessage(botIcons.CAMERA_OFFLINE);
+setLogMessage(botIcons.CAMERA_OFFLINE).error().botMessage(botIcons.CAMERA_OFFLINE);
