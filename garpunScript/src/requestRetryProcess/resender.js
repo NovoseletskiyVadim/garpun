@@ -146,7 +146,7 @@ export const resender = (limitToResend, countAttempt) => {
                                         new EventHandlerError(apiError, {
                                             senderName: MODULE_NAME,
                                             cameraName: item.fileMeta.cameraName,
-                                            file: item.fileMeta.file
+                                            file: item.fileMeta.file.name + item.fileMeta.file.ext
                                         })
                                     ).errorSecond();
                                 }
