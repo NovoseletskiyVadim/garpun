@@ -1,5 +1,3 @@
-import { AxiosError } from 'axios';
-
 import { BaseHandler } from './BaseHandler';
 import { JsonSenderError } from '../errorHandlers/jsonSenderError';
 import { appLogger } from '../logger/appLogger';
@@ -35,14 +33,14 @@ export class SendToApi extends BaseHandler {
                 logger.errorSecond();
             }
 
-        } catch (error) {
+        } catch (error:any) {
             let apiError: JsonSenderError| null = null;
 
             if (error instanceof JsonSenderError) {
                 apiError = error;
             }
 
-            if (error instanceof AxiosError) {
+            if ('isAxiosError' in error) {
                 apiError = new JsonSenderError(error);
             }
 

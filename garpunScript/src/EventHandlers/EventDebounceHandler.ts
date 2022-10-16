@@ -1,4 +1,4 @@
-import { EventDebounce } from '../eventDebounce/eventDebounce';
+import { EventDebounce } from '../eventDebounce/EventDebounce';
 import { BaseHandler, ExecuteCommands } from './BaseHandler';
 
 export class EventDebounceHandler extends BaseHandler {
