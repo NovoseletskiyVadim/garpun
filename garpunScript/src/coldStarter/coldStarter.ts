@@ -1,6 +1,7 @@
 /* eslint-disable no-param-reassign */
 import path from 'path';
-import * as  fsp from 'fs/promises';
+import  { promises as fsp } from 'fs';
+// import * as  fsp from 'fs/promises';
 // eslint-disable-next-line import/no-import-module-exports
 import { StartChainHandlers } from '../EventHandlers/StartChainHandlers';
 import { appLogger } from '../logger/appLogger';
